@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <SpaRoot>..\..\frontend\</SpaRoot>
+    <SpaProxyServerUrl>http://localhost:1420</SpaProxyServerUrl>
+    <SpaProxyLaunchCommand>npm install &amp;&amp; npm run dev</SpaProxyLaunchCommand>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\WeatherStyler.Application\WeatherStyler.Application.csproj" />
+    <ProjectReference Include="..\src\WeatherStyler.Infrastructure\WeatherStyler.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

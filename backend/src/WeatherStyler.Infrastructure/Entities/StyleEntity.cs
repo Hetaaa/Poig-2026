@@ -1,0 +1,31 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using WeatherStyler.Infrastructure.Persistence;
+
+namespace WeatherStyler.Infrastructure.Entities;
+
+public class StyleEntity : WardrobeEntityBase
+{
+    public required string Name { get; set; }
+
+    public ICollection<ClothingItemEntity> ClothingItems { get; set; } = new List<ClothingItemEntity>();
+}
+
+internal class StyleEntityConfiguration : IEntityTypeConfiguration<StyleEntity>
+{
+    public void Configure(EntityTypeBuilder<StyleEntity> builder)
+    {
+        builder.ToTable("Styles");
+
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.Name)
+            .HasMaxLength(128)
+            .IsRequired();
+
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.IsDeleted).IsRequired();
+
+        builder.HasIndex(x => x.Name).IsUnique();
+    }
+}

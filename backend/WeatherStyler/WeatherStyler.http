@@ -1,0 +1,6 @@
+@WeatherStyler_HostAddress = http://localhost:5267
+
+GET {{WeatherStyler_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

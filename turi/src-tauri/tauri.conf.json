@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "WeatherStyler",
+  "version": "0.1.0",
+  "identifier": "com.weatherstyler.desktop",
+  "build": {
+    "beforeDevCommand": "cd ../../frontend && npm run dev",
+    "beforeBuildCommand": "cd ../../frontend && npm run build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "WeatherStyler",
+        "width": 1200,
+        "height": 800
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "externalBin": [
+      "binaries/backend"
+    ]
+  }
+}
