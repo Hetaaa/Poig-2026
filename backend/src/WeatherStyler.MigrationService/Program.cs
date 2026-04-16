@@ -26,7 +26,7 @@ services.AddInfrastructure(configuration);
 using var provider = services.BuildServiceProvider();
 using var scope = provider.CreateScope();
 
-var dbContext = scope.ServiceProvider.GetRequiredService<WeatherStylerDbContext>();
+var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 await dbContext.Database.MigrateAsync();
 
 Console.WriteLine($"Migration completed. SQLite: {databasePath}");

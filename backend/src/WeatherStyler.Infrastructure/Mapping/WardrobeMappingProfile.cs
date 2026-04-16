@@ -8,11 +8,12 @@ public class WardrobeMappingProfile : Profile
 {
     public WardrobeMappingProfile()
     {
-        CreateMap<UserEntity, User>().ReverseMap();
+        CreateMap<ApplicationUser, User>().ReverseMap();
         CreateMap<CategoryEntity, Category>().ReverseMap();
+        CreateMap<ClothingSlotEntity, ClothingSlot>().ReverseMap();
         CreateMap<ClothingItemEntity, ClothingItem>().ReverseMap();
         CreateMap<ClothingPropertyEntity, ClothingProperty>().ReverseMap();
-        CreateMap<WarmthRatingEntity, WarmthRating>().ReverseMap();
+        // WarmthRating removed; map WarmthLevel directly on ClothingItem
         CreateMap<StyleEntity, Style>().ReverseMap();
         CreateMap<ColorEntity, Color>().ReverseMap();
         CreateMap<OutfitEntity, Outfit>().ReverseMap();

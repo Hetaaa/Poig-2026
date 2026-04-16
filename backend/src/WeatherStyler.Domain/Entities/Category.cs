@@ -7,4 +7,5 @@ public class Category : DomainEntityBase
     public required string Name { get; set; }
 
     public ICollection<ClothingItem> ClothingItems { get; set; } = new List<ClothingItem>();
+    public ICollection<ClothingSlot> ClothingSlots { get; set; } = new List<ClothingSlot>();
 }

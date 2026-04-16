@@ -2,16 +2,22 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using WeatherStyler.Domain.Common;
 using WeatherStyler.Infrastructure.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace WeatherStyler.Infrastructure.Persistence;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using WeatherStyler.Infrastructure.Entities;
+
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
-    public DbSet<UserEntity> Users => Set<UserEntity>();
+    public DbSet<ApplicationUser> Users => Set<ApplicationUser>();
     public DbSet<CategoryEntity> Categories => Set<CategoryEntity>();
+    public DbSet<ClothingSlotEntity> ClothingSlots => Set<ClothingSlotEntity>();
     public DbSet<ClothingItemEntity> ClothingItems => Set<ClothingItemEntity>();
     public DbSet<ClothingPropertyEntity> ClothingProperties => Set<ClothingPropertyEntity>();
-    public DbSet<WarmthRatingEntity> WarmthRatings => Set<WarmthRatingEntity>();
+    // WarmthRating removed; using WarmthLevel int on ClothingItem instead
     public DbSet<StyleEntity> Styles => Set<StyleEntity>();
     public DbSet<ColorEntity> Colors => Set<ColorEntity>();
     public DbSet<OutfitEntity> Outfits => Set<OutfitEntity>();

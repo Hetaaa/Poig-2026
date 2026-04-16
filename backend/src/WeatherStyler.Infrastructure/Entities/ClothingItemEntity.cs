@@ -13,8 +13,9 @@ public class ClothingItemEntity : WardrobeEntityBase
     public Guid UserId { get; set; }
 
     public CategoryEntity? Category { get; set; }
-    public UserEntity? User { get; set; }
-    public WarmthRatingEntity? WarmthRating { get; set; }
+    public ApplicationUser? User { get; set; }
+    // General warmth level for the item (1-10)
+    public int WarmthLevel { get; set; }
 
     public ICollection<ClothingPropertyEntity> Properties { get; set; } = new List<ClothingPropertyEntity>();
     public ICollection<StyleEntity> Styles { get; set; } = new List<StyleEntity>();

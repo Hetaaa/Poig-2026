@@ -10,7 +10,7 @@ public class UsageHistoryEntity : WardrobeEntityBase
     public DateTime DateWorn { get; set; }
 
     public Guid UserId { get; set; }
-    public UserEntity? User { get; set; }
+    public ApplicationUser? User { get; set; }
 
     public ICollection<ClothingItemEntity> ClothingItems { get; set; } = new List<ClothingItemEntity>();
 }

@@ -12,7 +12,8 @@ public class ClothingItem : DomainEntityBase
 
     public Category? Category { get; set; }
     public User? User { get; set; }
-    public WarmthRating? WarmthRating { get; set; }
+    // General warmth level for the item (1-10)
+    public int WarmthLevel { get; set; }
 
     public ICollection<ClothingProperty> Properties { get; set; } = new List<ClothingProperty>();
     public ICollection<Style> Styles { get; set; } = new List<Style>();

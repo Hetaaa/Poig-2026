@@ -9,6 +9,7 @@ public class CategoryEntity : WardrobeEntityBase
     public required string Name { get; set; }
 
     public ICollection<ClothingItemEntity> ClothingItems { get; set; } = new List<ClothingItemEntity>();
+    public ICollection<ClothingSlotEntity> ClothingSlots { get; set; } = new List<ClothingSlotEntity>();
 }
 
 internal class CategoryEntityConfiguration : IEntityTypeConfiguration<CategoryEntity>
