@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WeatherStyler.Infrastructure.Mapping;
+using WeatherStyler.Domain.Repositories;
+using WeatherStyler.Infrastructure.Repositories;
 using WeatherStyler.Infrastructure.Persistence;
 using WeatherStyler.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,7 +24,19 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
         services.AddAutoMapper(typeof(WardrobeMappingProfile).Assembly);
         // register infra repositories
-        services.AddScoped<WeatherStyler.Domain.Repositories.IClothingItemRepository, WeatherStyler.Infrastructure.Repositories.ClothingItemRepository>();
+        services.AddScoped<IClothingItemRepository, ClothingItemRepository>();
+        services.AddScoped<ILookupRepository, LookupRepository>();
+        services.AddScoped<IClothingPropertyRepository, ClothingPropertyRepository>();
+        // Clothing attributes repository (categories, styles, colors, properties CRUD)
+        services.AddScoped<IClothingAttributesRepository, ClothingAttributesRepository>();
+        services.AddScoped<IProgramVariableRepository, ProgramVariableRepository>();
+        // ensure IHttpContextAccessor available to application
+        services.AddSingleton(typeof(Microsoft.AspNetCore.Http.IHttpContextAccessor), typeof(Microsoft.AspNetCore.Http.HttpContextAccessor));
+        // register IUserService implementation
+        services.AddScoped<WeatherStyler.Application.Services.IUserService, WeatherStyler.Infrastructure.Services.HttpContextUserService>();
+        // register initial values service
+        services.AddScoped<WeatherStyler.Application.Services.InitialValuesService>();
+        services.AddScoped<WeatherStyler.Domain.Repositories.IWeatherHistoryRepository, WeatherStyler.Infrastructure.Repositories.WeatherHistoryRepository>();
 
         // Identity - use ApplicationUser with GUID primary key and IdentityRole<Guid>
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options => { })

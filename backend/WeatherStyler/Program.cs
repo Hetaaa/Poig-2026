@@ -49,6 +49,20 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
+    // Seed initial readonly values (slots, categories, colors) once if database is empty
+    var anyCategories = db.Categories.Any();
+    if (!anyCategories)
+    {
+        var seeder = scope.ServiceProvider.GetService<WeatherStyler.Application.Services.InitialValuesService>();
+        try
+        {
+            seeder?.SeedAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+        catch
+        {
+            // swallow seed exceptions during startup to avoid blocking app startup; inspect logs in real app
+        }
+    }
 }
 
 app.Run();

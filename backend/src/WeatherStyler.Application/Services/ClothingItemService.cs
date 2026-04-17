@@ -63,10 +63,11 @@ public class ClothingItemService : IClothingItemService
         return MapToDto(created);
     }
 
-    public async Task UpdateAsync(Guid id, CreateClothingItemRequest request, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(Guid id, CreateClothingItemRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
         var existing = await _repo.GetByIdAsync(id, cancellationToken);
         if (existing is null) throw new InvalidOperationException("Not found");
+        if (existing.UserId != userId) throw new UnauthorizedAccessException("Not the owner");
 
         existing.Name = request.Name;
         existing.PhotoUrl = request.PhotoUrl;
@@ -79,8 +80,12 @@ public class ClothingItemService : IClothingItemService
         await _repo.UpdateAsync(existing, cancellationToken);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
+        var existing = await _repo.GetByIdAsync(id, cancellationToken);
+        if (existing is null) return;
+        if (existing.UserId != userId) throw new UnauthorizedAccessException("Not the owner");
+
         await _repo.DeleteAsync(id, cancellationToken);
     }
 

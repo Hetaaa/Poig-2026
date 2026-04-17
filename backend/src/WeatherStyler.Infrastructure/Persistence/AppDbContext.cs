@@ -20,6 +20,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     // WarmthRating removed; using WarmthLevel int on ClothingItem instead
     public DbSet<StyleEntity> Styles => Set<StyleEntity>();
     public DbSet<ColorEntity> Colors => Set<ColorEntity>();
+    public DbSet<ProgramVariableEntity> ProgramVariables => Set<ProgramVariableEntity>();
+    public DbSet<WeatherHistoryEntity> WeatherHistories => Set<WeatherHistoryEntity>();
     public DbSet<OutfitEntity> Outfits => Set<OutfitEntity>();
     public DbSet<UsageHistoryEntity> UsageHistories => Set<UsageHistoryEntity>();
 

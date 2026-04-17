@@ -11,12 +11,12 @@ namespace WeatherStyler.Controllers;
 public class ClothingItemsController : ControllerBase
 {
     private readonly IClothingItemService _service;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly WeatherStyler.Application.Services.IUserService _userService;
 
-    public ClothingItemsController(WeatherStyler.Application.Services.IClothingItemService service, IHttpContextAccessor httpContextAccessor)
+    public ClothingItemsController(WeatherStyler.Application.Services.IClothingItemService service, WeatherStyler.Application.Services.IUserService userService)
     {
         _service = service;
-        _httpContextAccessor = httpContextAccessor;
+        _userService = userService;
     }
 
     [HttpGet]
@@ -38,7 +38,7 @@ public class ClothingItemsController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Create([FromBody] CreateClothingItemRequest request, CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
+        var userId = _userService.GetUserId();
         var dto = await _service.CreateAsync(request, userId, cancellationToken);
         return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
     }
@@ -47,7 +47,8 @@ public class ClothingItemsController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Update(Guid id, [FromBody] CreateClothingItemRequest request, CancellationToken cancellationToken)
     {
-        await _service.UpdateAsync(id, request, cancellationToken);
+        var userId = _userService.GetUserId();
+        await _service.UpdateAsync(id, request, userId, cancellationToken);
         return NoContent();
     }
 
@@ -55,14 +56,9 @@ public class ClothingItemsController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        await _service.DeleteAsync(id, cancellationToken);
+        var userId = _userService.GetUserId();
+        await _service.DeleteAsync(id, userId, cancellationToken);
         return NoContent();
     }
 
-    private Guid GetCurrentUserId()
-    {
-        var sub = _httpContextAccessor.HttpContext?.User?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
-        if (Guid.TryParse(sub, out var id)) return id;
-        throw new InvalidOperationException("Unable to determine current user id");
-    }
 }
