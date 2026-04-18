@@ -16,6 +16,7 @@ public static class DependencyInjection
         // IUserService is registered by Infrastructure project
         // register WeatherService
         services.AddScoped<WeatherStyler.Application.Services.WeatherService>();
+        services.AddScoped<WeatherStyler.Application.Services.HistoryService>();
         return services;
     }
 }

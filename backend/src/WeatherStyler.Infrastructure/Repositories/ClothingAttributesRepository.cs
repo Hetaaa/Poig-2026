@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WeatherStyler.Domain.Entities;
 using WeatherStyler.Domain.Repositories;
 using WeatherStyler.Domain.Wardrobe.Entities;
 using WeatherStyler.Infrastructure.Entities;

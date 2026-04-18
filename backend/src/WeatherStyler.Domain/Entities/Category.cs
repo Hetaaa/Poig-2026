@@ -1,4 +1,5 @@
 using WeatherStyler.Domain.Common;
+using WeatherStyler.Domain.Entities;
 
 namespace WeatherStyler.Domain.Wardrobe.Entities;
 

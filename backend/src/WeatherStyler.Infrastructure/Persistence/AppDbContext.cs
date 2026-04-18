@@ -24,6 +24,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<WeatherHistoryEntity> WeatherHistories => Set<WeatherHistoryEntity>();
     public DbSet<OutfitEntity> Outfits => Set<OutfitEntity>();
     public DbSet<UsageHistoryEntity> UsageHistories => Set<UsageHistoryEntity>();
+    // OutfitClothingItems handled via many-to-many join table configuration
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

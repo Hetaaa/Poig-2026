@@ -21,7 +21,6 @@ public class ClothingItemEntity : WardrobeEntityBase
     public ICollection<StyleEntity> Styles { get; set; } = new List<StyleEntity>();
     public ICollection<ColorEntity> Colors { get; set; } = new List<ColorEntity>();
     public ICollection<OutfitEntity> Outfits { get; set; } = new List<OutfitEntity>();
-    public ICollection<UsageHistoryEntity> UsageHistories { get; set; } = new List<UsageHistoryEntity>();
 }
 
 internal class ClothingItemEntityConfiguration : IEntityTypeConfiguration<ClothingItemEntity>
@@ -80,28 +79,8 @@ internal class ClothingItemEntityConfiguration : IEntityTypeConfiguration<Clothi
                     join.HasKey("ClothingItemId", "ColorId");
                 });
 
-        builder.HasMany(x => x.Outfits)
-            .WithMany(x => x.ClothingItems)
-            .UsingEntity<Dictionary<string, object>>(
-                "OutfitClothingItems",
-                right => right.HasOne<OutfitEntity>().WithMany().HasForeignKey("OutfitId").OnDelete(DeleteBehavior.Cascade),
-                left => left.HasOne<ClothingItemEntity>().WithMany().HasForeignKey("ClothingItemId").OnDelete(DeleteBehavior.Cascade),
-                join =>
-                {
-                    join.ToTable("OutfitClothingItems");
-                    join.HasKey("OutfitId", "ClothingItemId");
-                });
+        // outfit items are represented by OutfitClothingItemEntity snapshot relation
 
-        builder.HasMany(x => x.UsageHistories)
-            .WithMany(x => x.ClothingItems)
-            .UsingEntity<Dictionary<string, object>>(
-                "UsageHistoryClothingItems",
-                right => right.HasOne<UsageHistoryEntity>().WithMany().HasForeignKey("UsageHistoryId").OnDelete(DeleteBehavior.Cascade),
-                left => left.HasOne<ClothingItemEntity>().WithMany().HasForeignKey("ClothingItemId").OnDelete(DeleteBehavior.Cascade),
-                join =>
-                {
-                    join.ToTable("UsageHistoryClothingItems");
-                    join.HasKey("UsageHistoryId", "ClothingItemId");
-                });
+        // usage histories now reference outfits, not items directly
     }
 }

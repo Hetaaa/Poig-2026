@@ -36,7 +36,10 @@ public static class DependencyInjection
         services.AddScoped<WeatherStyler.Application.Services.IUserService, WeatherStyler.Infrastructure.Services.HttpContextUserService>();
         // register initial values service
         services.AddScoped<WeatherStyler.Application.Services.InitialValuesService>();
+        services.AddScoped<WeatherStyler.Application.Services.IUserAccountService, WeatherStyler.Infrastructure.Services.UserAccountService>();
         services.AddScoped<WeatherStyler.Domain.Repositories.IWeatherHistoryRepository, WeatherStyler.Infrastructure.Repositories.WeatherHistoryRepository>();
+        services.AddScoped<WeatherStyler.Domain.Repositories.IUsageHistoryRepository, WeatherStyler.Infrastructure.Repositories.UsageHistoryRepository>();
+        services.AddScoped<WeatherStyler.Domain.Repositories.IWeatherHistoryQueryRepository, WeatherStyler.Infrastructure.Repositories.WeatherHistoryQueryRepository>();
 
         // Identity - use ApplicationUser with GUID primary key and IdentityRole<Guid>
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options => { })

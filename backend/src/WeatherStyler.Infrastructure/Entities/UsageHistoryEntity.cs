@@ -11,8 +11,9 @@ public class UsageHistoryEntity : WardrobeEntityBase
 
     public Guid UserId { get; set; }
     public ApplicationUser? User { get; set; }
-
-    public ICollection<ClothingItemEntity> ClothingItems { get; set; } = new List<ClothingItemEntity>();
+    // a usage history entry references an outfit that was worn that day
+    public Guid? OutfitId { get; set; }
+    public OutfitEntity? Outfit { get; set; }
 }
 
 internal class UsageHistoryEntityConfiguration : IEntityTypeConfiguration<UsageHistoryEntity>
@@ -35,6 +36,11 @@ internal class UsageHistoryEntityConfiguration : IEntityTypeConfiguration<UsageH
         builder.HasOne(x => x.User)
             .WithMany(x => x.UsageHistories)
             .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Outfit)
+            .WithMany(x => x.UsageHistories)
+            .HasForeignKey(x => x.OutfitId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

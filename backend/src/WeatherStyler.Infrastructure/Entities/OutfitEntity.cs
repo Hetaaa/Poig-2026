@@ -7,13 +7,15 @@ namespace WeatherStyler.Infrastructure.Entities;
 public class OutfitEntity : WardrobeEntityBase
 {
     public required string Name { get; set; }
-    public string? WeatherCondition { get; set; }
     public DateTime DateCreated { get; set; }
 
     public Guid UserId { get; set; }
     public ApplicationUser? User { get; set; }
 
+    // items that compose this outfit
     public ICollection<ClothingItemEntity> ClothingItems { get; set; } = new List<ClothingItemEntity>();
+    // usage history entries that reference this outfit (one outfit can be used on many days)
+    public ICollection<UsageHistoryEntity> UsageHistories { get; set; } = new List<UsageHistoryEntity>();
 }
 
 internal class OutfitEntityConfiguration : IEntityTypeConfiguration<OutfitEntity>
@@ -28,8 +30,7 @@ internal class OutfitEntityConfiguration : IEntityTypeConfiguration<OutfitEntity
             .HasMaxLength(200)
             .IsRequired();
 
-        builder.Property(x => x.WeatherCondition)
-            .HasMaxLength(128);
+        // weather condition removed - weather handled separately in WeatherHistory
 
         builder.Property(x => x.DateCreated).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
@@ -41,5 +42,22 @@ internal class OutfitEntityConfiguration : IEntityTypeConfiguration<OutfitEntity
             .WithMany(x => x.Outfits)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(x => x.UsageHistories)
+            .WithOne(x => x.Outfit)
+            .HasForeignKey(x => x.OutfitId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(x => x.ClothingItems)
+            .WithMany(x => x.Outfits)
+            .UsingEntity<Dictionary<string, object>>(
+                "OutfitClothingItems",
+                right => right.HasOne<ClothingItemEntity>().WithMany().HasForeignKey("ClothingItemId").OnDelete(DeleteBehavior.Cascade),
+                left => left.HasOne<OutfitEntity>().WithMany().HasForeignKey("OutfitId").OnDelete(DeleteBehavior.Cascade),
+                join =>
+                {
+                    join.ToTable("OutfitClothingItems");
+                    join.HasKey("OutfitId", "ClothingItemId");
+                });
     }
 }

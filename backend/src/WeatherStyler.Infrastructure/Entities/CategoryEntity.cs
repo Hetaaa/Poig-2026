@@ -7,6 +7,8 @@ namespace WeatherStyler.Infrastructure.Entities;
 public class CategoryEntity : WardrobeEntityBase
 {
     public required string Name { get; set; }
+    // 1=Base (T-shirt), 2=Middle (Sweater), 3=Outer (Jacket)
+    public int LayerIndex { get; set; }
 
     public ICollection<ClothingItemEntity> ClothingItems { get; set; } = new List<ClothingItemEntity>();
     public ICollection<ClothingSlotEntity> ClothingSlots { get; set; } = new List<ClothingSlotEntity>();

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using WeatherStyler.Domain.Repositories;
+using WeatherStyler.Domain.Wardrobe.Entities;
 
 namespace WeatherStyler.Application.Services;
 
@@ -43,6 +44,17 @@ public class InitialValuesService
             if (existing is null)
             {
                 await _attributesRepo.AddColorAsync(new WeatherStyler.Domain.Wardrobe.Entities.Color { Name = c }, cancellationToken);
+            }
+        }
+
+        // seed styles
+        var styles = new[] { "Casual", "Sportowy", "Elegancki" };
+        foreach (var s in styles)
+        {
+            var existingStyle = (await _attributesRepo.GetAllStylesAsync(cancellationToken)).FirstOrDefault(x => x.Name == s);
+            if (existingStyle is null)
+            {
+                await _attributesRepo.AddStyleAsync(new WeatherStyler.Domain.Wardrobe.Entities.Style { Name = s }, cancellationToken);
             }
         }
 
@@ -88,5 +100,7 @@ public class InitialValuesService
             var slotIds = kv.Value.Select(name => slotEntities[name]).ToArray();
             await _attributesRepo.AssociateCategoryWithSlotsAsync(categoryId, slotIds, cancellationToken);
         }
+
+        // optionally create a default style associations or other lookups if necessary
     }
 }

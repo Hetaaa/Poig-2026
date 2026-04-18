@@ -1,4 +1,5 @@
 using AutoMapper;
+using WeatherStyler.Domain.Entities;
 using WeatherStyler.Domain.Wardrobe.Entities;
 using WeatherStyler.Infrastructure.Entities;
 

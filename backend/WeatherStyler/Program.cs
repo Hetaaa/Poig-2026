@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using WeatherStyler.Application;
+// OpenAPI transformer removed to avoid direct dependency on Microsoft.OpenApi types
 using WeatherStyler.Infrastructure;
 using WeatherStyler.Infrastructure.Persistence;
 
@@ -37,7 +38,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTitle("Moje API")
+            .WithTheme(ScalarTheme.DeepSpace)
+            ;
+    });
 }
 
 app.UseCors("LocalhostPolicy");

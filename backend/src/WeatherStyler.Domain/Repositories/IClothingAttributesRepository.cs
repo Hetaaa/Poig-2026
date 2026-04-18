@@ -1,3 +1,4 @@
+using WeatherStyler.Domain.Entities;
 using WeatherStyler.Domain.Wardrobe.Entities;
 
 namespace WeatherStyler.Domain.Repositories;

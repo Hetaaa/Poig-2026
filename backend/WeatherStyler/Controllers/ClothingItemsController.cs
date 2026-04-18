@@ -22,14 +22,16 @@ public class ClothingItemsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var dtos = await _service.GetAllAsync(cancellationToken);
+        var userId = _userService.GetUserId();
+        var dtos = await _service.GetAllAsync(userId, cancellationToken);
         return Ok(dtos);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
-        var dto = await _service.GetByIdAsync(id, cancellationToken);
+        var userId = _userService.GetUserId();
+        var dto = await _service.GetByIdAsync(id, userId, cancellationToken);
         if (dto is null) return NotFound();
         return Ok(dto);
     }

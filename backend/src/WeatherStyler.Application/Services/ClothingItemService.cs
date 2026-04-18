@@ -13,16 +13,18 @@ public class ClothingItemService : IClothingItemService
         _repo = repo;
     }
 
-    public async Task<IEnumerable<ClothingItemDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ClothingItemDto>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var items = await _repo.GetAllAsync(cancellationToken);
-        return items.Select(MapToDto);
+        return items.Where(i => i.UserId == userId).Select(MapToDto);
     }
 
-    public async Task<ClothingItemDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ClothingItemDto?> GetByIdAsync(Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         var item = await _repo.GetByIdAsync(id, cancellationToken);
-        return item is null ? null : MapToDto(item);
+        if (item is null) return null;
+        if (item.UserId != userId) return null;
+        return MapToDto(item);
     }
 
     public async Task<ClothingItemDto> CreateAsync(CreateClothingItemRequest request, Guid userId, CancellationToken cancellationToken = default)
