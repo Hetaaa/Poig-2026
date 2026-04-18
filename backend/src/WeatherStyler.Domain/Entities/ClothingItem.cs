@@ -19,5 +19,4 @@ public class ClothingItem : DomainEntityBase
     public ICollection<Style> Styles { get; set; } = new List<Style>();
     public ICollection<Color> Colors { get; set; } = new List<Color>();
     public ICollection<Outfit> Outfits { get; set; } = new List<Outfit>();
-    public ICollection<UsageHistory> UsageHistories { get; set; } = new List<UsageHistory>();
 }

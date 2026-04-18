@@ -7,6 +7,8 @@ namespace WeatherStyler.Infrastructure.Entities;
 public class ColorEntity : WardrobeEntityBase
 {
     public required string Name { get; set; }
+    // True for neutral colors (black, white, gray, beige) - used for outfit harmony validation
+    public bool IsNeutral { get; set; }
 
     public ICollection<ClothingItemEntity> ClothingItems { get; set; } = new List<ClothingItemEntity>();
 }

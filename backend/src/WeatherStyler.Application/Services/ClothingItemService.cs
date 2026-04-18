@@ -99,8 +99,8 @@ public class ClothingItemService : IClothingItemService
             item.PhotoUrl,
             item.CategoryId,
             item.WarmthLevel,
-            item.Styles?.Select(s => s.Id) ?? Enumerable.Empty<Guid>(),
-            item.Colors?.Select(c => c.Id) ?? Enumerable.Empty<Guid>(),
+            item.Styles?.Select(s => new StylePreviewDto(s.Id, s.Name)) ?? Enumerable.Empty<StylePreviewDto>(),
+            item.Colors?.Select(c => new ColorPreviewDto(c.Id, c.Name, c.IsNeutral)) ?? Enumerable.Empty<ColorPreviewDto>(),
             item.Properties?.Select(p => new ClothingPropertyDto(p.Name, p.Value)) ?? Enumerable.Empty<ClothingPropertyDto>()
         );
     }

@@ -8,6 +8,7 @@ public class UsageHistoryEntity : WardrobeEntityBase
 {
     public int Rating { get; set; }
     public DateTime DateWorn { get; set; }
+    public bool IsFavourite { get; set; }  // Mark outfit as favourite
 
     public Guid UserId { get; set; }
     public ApplicationUser? User { get; set; }

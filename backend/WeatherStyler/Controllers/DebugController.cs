@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Application.Services;
 using WeatherStyler.Domain.Repositories;
 using WeatherStyler.Application.Contracts;
+using WeatherStyler.Infrastructure.Services;
 
 namespace WeatherStyler.Controllers;
 
@@ -17,7 +19,8 @@ public class DebugController : ControllerBase
     private readonly IClothingItemService _clothingService;
     private readonly IClothingAttributesRepository _attributesRepo;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly WeatherStyler.Application.Services.WeatherService _weatherService;
+    private readonly OutfitGeneratorService _outfitGenerator;
+    private readonly IUserService _userService;
 
     public DebugController(
         WeatherStyler.Infrastructure.Persistence.AppDbContext db,
@@ -25,14 +28,16 @@ public class DebugController : ControllerBase
         IClothingItemService clothingService,
         IClothingAttributesRepository attributesRepo,
         UserManager<ApplicationUser> userManager,
-        WeatherStyler.Application.Services.WeatherService weatherService)
+        OutfitGeneratorService outfitGenerator,
+        IUserService userService)
     {
         _db = db;
         _initialValues = initialValues;
         _clothingService = clothingService;
         _attributesRepo = attributesRepo;
         _userManager = userManager;
-        _weatherService = weatherService;
+        _outfitGenerator = outfitGenerator;
+        _userService = userService;
     }
 
     [HttpPost("reset")]
@@ -132,22 +137,36 @@ public class DebugController : ControllerBase
             _db.Outfits.Add(outfit);
             await _db.SaveChangesAsync();
 
-            // create usage history entry for today and fetch weather
+            // create usage history entry for today
             var usage = new UsageHistoryEntity { Id = Guid.NewGuid(), DateWorn = DateTime.UtcNow.Date, Rating = 5, UserId = userId, OutfitId = outfit.Id };
             _db.UsageHistories.Add(usage);
             await _db.SaveChangesAsync();
-
-            // fetch weather for this usage entry (uses user's saved location)
-            try
-            {
-                await _weatherService.FetchAndSaveForUser(userId, usage.Id);
-            }
-            catch
-            {
-                // ignore errors in debug seed
-            }
         }
 
         return Ok(new { createdCount = created.Count, items = created });
+    }
+
+    /// <summary>
+    /// Generate outfit for today based on user's location and current weather
+    /// </summary>
+    [HttpPost("generate-outfit-today")]
+    [Authorize]
+    public async Task<IActionResult> GenerateOutfitForToday(CancellationToken cancellationToken = default)
+    {
+        // Get current logged-in user
+        var userId = _userService.GetUserId();
+
+        // Generate outfit (will fetch location and weather automatically)
+        var outfitResult = await _outfitGenerator.GenerateOutfitForTodayAsync(userId, cancellationToken);
+
+        if (outfitResult.Outfit == null)
+            return BadRequest(new { message = "Could not generate outfit", warnings = outfitResult.Warnings });
+
+        return Ok(new 
+        { 
+            message = "Outfit generation initiated",
+            warnings = outfitResult.Warnings,
+            note = "Full implementation coming soon - outfit generation logic will be completed"
+        });
     }
 }

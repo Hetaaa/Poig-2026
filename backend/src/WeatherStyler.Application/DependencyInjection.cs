@@ -17,6 +17,7 @@ public static class DependencyInjection
         // register WeatherService
         services.AddScoped<WeatherStyler.Application.Services.WeatherService>();
         services.AddScoped<WeatherStyler.Application.Services.HistoryService>();
+        services.AddScoped<WeatherStyler.Application.Services.OutfitGeneratorService>();
         return services;
     }
 }
