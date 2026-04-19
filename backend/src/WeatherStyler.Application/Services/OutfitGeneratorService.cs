@@ -1,29 +1,11 @@
+using WeatherStyler.Domain.Entities;
 using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Domain.Wardrobe.Entities;
+using WeatherStyler.Domain.Entities.BuisnessLogic;
 
 namespace WeatherStyler.Application.Services;
 
 /// <summary>
-/// Model wyniku generowania outfitu
-/// </summary>
-public class OutfitGeneratorResult
-{
-    public Outfit? Outfit { get; set; }
-    public List<string> Warnings { get; set; } = new();
-}
-
-/// <summary>
-/// Dane pogodowe dla dnia
-/// </summary>
-public record WeatherDataForGeneration(
-    int Temperature,        // Temperatura w °C
-    bool IsRaining,        // Czy pada deszcz?
-    bool IsWindy,          // Czy jest wietrznie?
-    bool IsSunny           // Czy jest słonecznie?
-);
-
-/// <summary>
-/// Wymagania dla konkretnego slotu
+/// Wymagania dla konkretnego slotu ciała (np. "Core" z warstwami [1,2,3])
 /// </summary>
 internal class SlotRequirement
 {
@@ -34,8 +16,48 @@ internal class SlotRequirement
 }
 
 /// <summary>
-/// Serwis generujący outfity dla użytkownika na dzień dzisiejszy
-/// Pobiera lokację użytkownika i wywoła WeatherService do pobrania pogody
+/// Klucz unikalnie identyfikujący zajęcie fizycznego slotu na konkretnej warstwie.
+/// Np. ("Core", 1), ("Nogi", 1), ("Core", 2)
+/// Używany do wykrywania kolizji: sukienka zajmująca Core+Nogi/warstwa-1
+/// blokuje oba te klucze — spodnie na warstwę 1 nie zostaną już dobrane.
+/// </summary>
+internal readonly record struct SlotLayerKey(string SlotName, int Layer);
+
+/// <summary>
+/// Wewnętrzny wynik punktacji kandydata na ubranie
+/// </summary>
+internal class ScoredCandidate
+{
+    public ClothingItem Item { get; set; } = null!;
+    public double Score { get; set; }
+}
+
+/// <summary>
+/// Serwis generujący outfity dla użytkownika na dzień dzisiejszy.
+///
+/// KLUCZOWA LOGIKA SLOTÓW — zapobieganie kolizjom:
+/// ─────────────────────────────────────────────────
+/// Każde ubranie należy do kategorii, która może zajmować WIELE fizycznych slotów
+/// (np. sukienka → ClothingSlots = [Core, Nogi], LayerIndex = 1).
+///
+/// Gdy ubranie zostanie wybrane, wszystkie jego sloty na tej warstwie trafiają
+/// do zbioru `occupiedSlotLayers`. Kolejne wymagania których klucz (slot, warstwa)
+/// jest już w tym zbiorze są pomijane — nie szukamy drugiego ubrania na to miejsce.
+///
+/// Przykład przy temp < 10°C (wymagania: Core/1,2,3 + Nogi/1):
+///   Iteracja Core/warstwa-1 → kandydaci: koszulki + sukienki
+///     → wybrano sukienkę (ClothingSlots=[Core,Nogi], LayerIndex=1)
+///     → occupied: {(Core,1), (Nogi,1)}
+///   Iteracja Core/warstwa-2 → (Core,2) wolne → szukamy swetra ✓
+///   Iteracja Core/warstwa-3 → (Core,3) wolne → szukamy kurtki ✓
+///   Iteracja Nogi/warstwa-1 → (Nogi,1) ZAJĘTE → skip (brak spodni!) ✓
+///
+/// STRATEGIA JAKOŚCI (scoring zamiast hard-filtering):
+/// ─────────────────────────────────────────────────────
+/// Zamiast twardych filtrów, każde ubranie dostaje wynik punktowy.
+/// Fallback stopniowo obniża minimalny akceptowany próg — dzięki temu
+/// przy małej szafie outfit prawie zawsze zostaje zbudowany.
+/// Twarde return null tylko gdy pula dla slotu/warstwy jest dosłownie pusta.
 /// </summary>
 public class OutfitGeneratorService
 {
@@ -46,8 +68,17 @@ public class OutfitGeneratorService
     private readonly WeatherService _weatherService;
     private readonly Random _random = new Random();
 
+    // Wagi punktów dla kryteriów jakościowych
+    private const double ScoreDiversity = 3.0;  // nie noszono w ostatnich 3 dniach
+    private const double ScoreStyleMatch = 2.0;  // pasuje do wylosowanego stylu
+    private const double ScoreWarmthIdeal = 2.0;  // ciepłota w oknie ±3
+    private const double ScoreWarmthAccepted = 0.5;  // ciepłota w oknie ±6
+    private const double ScoreWaterproof = 4.0;  // wodoodporne gdy pada
+    private const double ScoreWindproof = 3.0;  // wiatroszczelne gdy wieje
+    private const double PenaltyNonNeutralColor = -2.0;  // każdy nadmiarowy kolor nie-neutralny
+
     public OutfitGeneratorService(
-        IProgramVariableRepository programVars, 
+        IProgramVariableRepository programVars,
         IClothingItemRepository clothingRepo,
         ILookupRepository lookupRepo,
         IUsageHistoryRepository usageHistoryRepo,
@@ -60,387 +91,317 @@ public class OutfitGeneratorService
         _weatherService = weatherService;
     }
 
-    /// <summary>
-    /// Główna metoda generująca outfit na dzień dzisiejszy dla użytkownika
-    /// Pobiera lokację użytkownika i pogodę, następnie generuje outfit
-    /// </summary>
-    public async Task<OutfitGeneratorResult> GenerateOutfitForTodayAsync(Guid userId, CancellationToken cancellationToken = default)
+    // ──────────────────────────────────────────────────────────────────────────
+    // Publiczne API
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public async Task<OutfitGeneratorResult> GenerateOutfitForTodayAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
-        // Pobierz lokację użytkownika
         var lat = await _programVars.GetValueAsync("last_location_lat", userId, cancellationToken);
         var lon = await _programVars.GetValueAsync("last_location_lon", userId, cancellationToken);
 
         if (lat is null || lon is null)
-            return new OutfitGeneratorResult 
-            { 
-                Outfit = null,
-                Warnings = new List<string> { "Brak zapisanej lokacji użytkownika. Ustaw lokację aby generować outfity." }
-            };
+            return Failure("Brak zapisanej lokacji użytkownika. Ustaw lokację aby generować outfity.");
 
-        // Pobierz pogodę dla lokacji
-        var weatherJson = await _weatherService.GetWeatherForLocationAsync(double.Parse(lat), double.Parse(lon), cancellationToken);
-        if (weatherJson is null)
-            return new OutfitGeneratorResult
-            {
-                Outfit = null,
-                Warnings = new List<string> { "Nie udało się pobrać danych pogodowych." }
-            };
+        var weather = await _weatherService.GetWeatherForLocationAsync(
+            double.Parse(lat), double.Parse(lon), cancellationToken);
 
-        // Parsuj pogodę i określ dane dla dzisiaj
-        var weather = ParseWeatherForToday(weatherJson);
+        if (weather is null)
+            return Failure("Nie udało się pobrać danych pogodowych.");
 
-        // Generuj outfit na podstawie pogody
         return await GenerateOutfitWithWeatherAsync(userId, weather, cancellationToken);
     }
 
-    /// <summary>
-    /// Generuj outfit na podstawie wstępnie podanej pogody (dla debug/testing)
-    /// </summary>
     public async Task<OutfitGeneratorResult> GenerateOutfitWithWeatherAsync(
-        Guid userId, 
-        WeatherDataForGeneration weather, 
+        Guid userId,
+        WeatherDataForGeneration weather,
         CancellationToken cancellationToken = default)
     {
-        // Pobierz szafę użytkownika przez repozytorium
-        var wardrobe = await _clothingRepo.GetAllAsync(cancellationToken);
-        var userClothing = wardrobe
+        var wardrobe = (await _clothingRepo.GetAllAsync(cancellationToken))
             .Where(c => c.UserId == userId && !c.IsDeleted)
             .ToList();
 
-        if (!userClothing.Any())
-            return new OutfitGeneratorResult 
-            { 
-                Outfit = null,
-                Warnings = new List<string> { "Szafa użytkownika jest pusta. Dodaj ubrania aby generować outfity." }
-            };
+        if (!wardrobe.Any())
+            return Failure("Szafa użytkownika jest pusta. Dodaj ubrania aby generować outfity.");
 
-        // Pobierz kategorie z warstwami
-        var categories = await _lookupRepo.GetCategoriesAsync(cancellationToken);
-
-        // Pobierz historię noszenia z ostatnich 3 dni dla diversity check
         var threeDaysAgo = DateTime.UtcNow.Date.AddDays(-3);
-        var recentUsageHistories = await _usageHistoryRepo.GetByDateRangeAsync(userId, threeDaysAgo, DateTime.UtcNow.Date, cancellationToken);
+        var recentUsage = await _usageHistoryRepo.GetByDateRangeAsync(
+            userId, threeDaysAgo, DateTime.UtcNow.Date, cancellationToken);
 
-        // Zbierz ID itemów które były noszone w ostatnich 3 dniach
-        var recentlyWornItemIds = recentUsageHistories
+        var recentlyWornIds = recentUsage
             .Where(u => u.Outfit != null)
             .SelectMany(u => u.Outfit.ClothingItems.Select(ci => ci.Id))
-            .Distinct()
             .ToHashSet();
 
-        // Określ wymagania na podstawie pogody
         var requirements = DetermineRequirements(weather);
 
-        // Fallback Loop: zaczynamy od maksymalnie restrykcyjnego poziomu 0, kończymy na 5 (brak restrykcji)
         for (int fallbackLevel = 0; fallbackLevel <= 5; fallbackLevel++)
         {
-            // Flagi restrykcyjności
-            bool enforceDiversity = fallbackLevel < 1;
-            bool enforceColorHarmony = fallbackLevel < 2;
-            bool enforceStyleConsistency = fallbackLevel < 3;
-            bool enforceWarmth = fallbackLevel < 4;
-            bool enforceWaterproof = fallbackLevel < 5 && weather.IsRaining;
+            // Minimalny wynik punktowy kandydata — spada z każdym poziomem fallbacku
+            double minimumScore = fallbackLevel switch
+            {
+                0 => 5.0,
+                1 => 3.0,
+                2 => 1.0,
+                3 => 0.0,
+                4 => -5.0,
+                _ => double.MinValue
+            };
 
-            // Spróbuj wygenerować outfit na tym poziomie
-            var outfit = TryBuildOutfit(
-                userClothing, 
-                categories,
+            // Kara kolorystyczna aktywna tylko na poziomach 0–1
+            bool applyColorPenalty = fallbackLevel < 2;
+
+            var result = TryBuildOutfit(
+                wardrobe,
                 requirements,
                 weather,
-                recentlyWornItemIds,
-                enforceDiversity, 
-                enforceColorHarmony, 
-                enforceStyleConsistency, 
-                enforceWarmth, 
-                enforceWaterproof);
+                recentlyWornIds,
+                minimumScore,
+                applyColorPenalty);
 
-            if (outfit != null)
+            if (result != null)
             {
-                // Sukces! Dodaj ostrzeżenia na podstawie fallback level
-                var warnings = GetWarningsForLevel(fallbackLevel, weather);
-
-                return new OutfitGeneratorResult 
-                { 
-                    Outfit = outfit, 
-                    Warnings = warnings 
+                return new OutfitGeneratorResult
+                {
+                    Outfit = result,
+                    Warnings = BuildWarnings(fallbackLevel, weather),
+                    Temperature = weather.Temperature,
+                    IsWindy = weather.IsWindy,
+                    IsSunny = weather.IsSunny,
+                    IsRaining = weather.IsRaining
                 };
             }
         }
 
-        // Nie udało się wygenerować outfitu
-        return new OutfitGeneratorResult 
-        { 
+        return new OutfitGeneratorResult
+        {
             Outfit = null,
-            Warnings = new List<string> { "Nie można wygenerować outfitu spełniającego minimalne wymagania" }
+            Warnings = new List<string> { "Nie można wygenerować outfitu — brak ubrań dla wymaganych slotów." },
+            Temperature = weather.Temperature,
+            IsWindy = weather.IsWindy,
+            IsSunny = weather.IsSunny,
+            IsRaining = weather.IsRaining
         };
     }
 
-    /// <summary>
-    /// Określa wymagania dla slotów na podstawie pogody
-    /// </summary>
-    private List<SlotRequirement> DetermineRequirements(WeatherDataForGeneration weather)
-    {
-        var requirements = new List<SlotRequirement>();
-
-        if (weather.Temperature >= 20)
-        {
-            // Ciepła pogoda: minimalne warstwy
-            requirements.Add(new SlotRequirement 
-            { 
-                SlotName = "Core", 
-                RequiredLayers = new List<int> { 1 }, 
-                MinWarmth = 1,
-                MaxWarmth = 100
-            });
-            requirements.Add(new SlotRequirement 
-            { 
-                SlotName = "Nogi", 
-                RequiredLayers = new List<int> { 1 }, 
-                MinWarmth = 1,
-                MaxWarmth = 100
-            });
-        }
-        else if (weather.Temperature >= 10)
-        {
-            // Umiarkowana pogoda: 2 warstwy na tułowiu
-            requirements.Add(new SlotRequirement 
-            { 
-                SlotName = "Core", 
-                RequiredLayers = new List<int> { 1, 2 }, 
-                MinWarmth = 5,
-                MaxWarmth = 100
-            });
-            requirements.Add(new SlotRequirement 
-            { 
-                SlotName = "Nogi", 
-                RequiredLayers = new List<int> { 1 }, 
-                MinWarmth = 3,
-                MaxWarmth = 100
-            });
-        }
-        else
-        {
-            // Zimna pogoda: maksymalne warstwy
-            requirements.Add(new SlotRequirement 
-            { 
-                SlotName = "Core", 
-                RequiredLayers = new List<int> { 1, 2, 3 }, 
-                MinWarmth = 12,
-                MaxWarmth = 100
-            });
-            requirements.Add(new SlotRequirement 
-            { 
-                SlotName = "Nogi", 
-                RequiredLayers = new List<int> { 1 }, 
-                MinWarmth = 5,
-                MaxWarmth = 100
-            });
-        }
-
-        // Głowa jest opcjonalna - dla wiatru lub zimna
-        if (weather.IsWindy || weather.Temperature < 10)
-        {
-            requirements.Add(new SlotRequirement 
-            { 
-                SlotName = "Głowa", 
-                RequiredLayers = new List<int> { 1 }, 
-                MinWarmth = 0,
-                MaxWarmth = 100
-            });
-        }
-
-        // Okulary przeciwsłoneczne gdy jest słonecznie
-        if (weather.IsSunny)
-        {
-            requirements.Add(new SlotRequirement 
-            { 
-                SlotName = "Oczy", 
-                RequiredLayers = new List<int> { 1 }, 
-                MinWarmth = 0,
-                MaxWarmth = 100
-            });
-        }
-
-        return requirements;
-    }
+    // ──────────────────────────────────────────────────────────────────────────
+    // Budowanie outfitu z respektowaniem kolizji slotów
+    // ──────────────────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Spróbuj wygenerować outfit na danym poziomie restrykcyjności
+    /// Próbuje zbudować outfit. Zwraca null tylko gdy pula dla jakiegoś
+    /// wymaganego (i niezajętego) slotu/warstwy jest dosłownie pusta.
     /// </summary>
     private Outfit? TryBuildOutfit(
         List<ClothingItem> wardrobe,
-        IEnumerable<Category> categories,
         List<SlotRequirement> requirements,
         WeatherDataForGeneration weather,
-        HashSet<Guid> recentlyWornItemIds,
-        bool enforceDiversity,
-        bool enforceColorHarmony,
-        bool enforceStyleConsistency,
-        bool enforceWarmth,
-        bool enforceWaterproof)
+        HashSet<Guid> recentlyWornIds,
+        double minimumScore,
+        bool applyColorPenalty)
     {
-        var candidateOutfit = new Outfit 
-        { 
-            Id = Guid.NewGuid(), 
-            Name = $"Generated Outfit {DateTime.Now:HH:mm}", 
-            DateCreated = DateTime.UtcNow 
+        string? targetStyle = PickRandomStyle(wardrobe);
+
+        var outfit = new Outfit
+        {
+            Id = Guid.NewGuid(),
+            Name = $"Generated Outfit {DateTime.Now:HH:mm}",
+            DateCreated = DateTime.UtcNow
         };
 
-        // Wybierz styl jeśli wymagamy spójności stylistycznej
-        string? targetStyle = null;
-        if (enforceStyleConsistency)
-        {
-            var availableStyles = wardrobe
-                .SelectMany(c => c.Styles)
-                .Select(s => s.Name)
-                .Distinct()
-                .ToList();
+        // Zbiór par (slot, warstwa) już zajętych przez wybrane ubrania.
+        // Gdy sukienka zajmuje Core+Nogi na warstwie 1, obie pary trafiają tutaj.
+        var occupiedSlotLayers = new HashSet<SlotLayerKey>();
 
-            if (availableStyles.Any())
-                targetStyle = availableStyles[_random.Next(availableStyles.Count)];
-        }
+        // Licznik non-neutral dla harmonii kolorów
+        int nonNeutralAccumulator = 0;
 
-        // Iteruj przez wymagane sloty i warstwy
         foreach (var requirement in requirements)
         {
-            int totalWarmth = 0;
+            int outerLayer = requirement.RequiredLayers.Max();
 
             foreach (int layer in requirement.RequiredLayers)
             {
-                // Filtruj dostępne ubrania dla tego slotu i warstwy
-                var candidates = wardrobe
-                    .Where(c => c.Category.ClothingSlots.Any(s => s.Name == requirement.SlotName) 
-                            && c.Category.LayerIndex == layer)
+                var key = new SlotLayerKey(requirement.SlotName, layer);
+
+                // Ten slot+warstwa już zajęty (np. sukienka "wzięła" Nogi/1) — skip
+                if (occupiedSlotLayers.Contains(key))
+                    continue;
+
+                // Pula kandydatów: ubrania pasujące do tego konkretnego slotu i warstwy
+                var pool = wardrobe
+                    .Where(c => c.Category?.ClothingSlots != null
+                             && c.Category.ClothingSlots.Any(s => s.Name == requirement.SlotName)
+                             && c.Category.LayerIndex == layer)
                     .ToList();
 
-                // Filtr: Diversity - nie noszono ostatnio (ostatnie 3 dni)
-                if (enforceDiversity)
-                {
-                    // Pomijaj ubrania noszone w ostatnich 3 dniach
-                    candidates = candidates
-                        .Where(c => !recentlyWornItemIds.Contains(c.Id))
-                        .ToList();
-                }
+                // Brak ubrań w szafie dla tego slotu/warstwy — nie da się naprawić fallbackiem
+                if (!pool.Any())
+                    return null;
 
-                // Filtr: Style Consistency - dopasuj styl
-                if (enforceStyleConsistency && targetStyle != null)
-                {
-                    candidates = candidates
-                        .Where(c => c.Styles.Any(s => s.Name == targetStyle))
-                        .ToList();
-                }
-
-                // Filtr: Waterproof - dla ostatniej warstwy jeśli pada
-                if (enforceWaterproof && layer == requirement.RequiredLayers.Max())
-                {
-                    candidates = candidates
-                        .Where(c => c.Properties.Any(p => p.Name.ToLower().Contains("waterproof") 
-                                                      || p.Name.ToLower().Contains("water-resistant")
-                                                      || p.Name.ToLower().Contains("wodoodpor")))
-                        .ToList();
-                }
-
-                // Filtr: Windproof - dla głowy jeśli jest wietrznie
-                if (weather.IsWindy && requirement.SlotName == "Głowa")
-                {
-                    candidates = candidates
-                        .Where(c => c.Properties.Any(p => p.Name.ToLower().Contains("windproof") 
-                                                      || p.Name.ToLower().Contains("wind-resistant")
-                                                      || p.Name.ToLower().Contains("wiatroszczelny")))
-                        .ToList();
-
-                    // Jeśli brak windproof, akceptuj bez tego filtra na wyższych fallback levelach
-                    if (!candidates.Any() && weather.IsWindy)
+                // Oceń i posortuj kandydatów
+                var scored = pool
+                    .Select(item => new ScoredCandidate
                     {
-                        candidates = wardrobe
-                            .Where(c => c.Category.ClothingSlots.Any(s => s.Name == requirement.SlotName) 
-                                    && c.Category.LayerIndex == layer)
-                            .ToList();
+                        Item = item,
+                        Score = ScoreItem(
+                            item,
+                            requirement,
+                            weather,
+                            recentlyWornIds,
+                            targetStyle,
+                            isOuterLayer: layer == outerLayer,
+                            nonNeutralAccumulator,
+                            applyColorPenalty)
+                    })
+                    .OrderByDescending(s => s.Score)
+                    .ToList();
+
+                // Wybierz losowo z Top-3 nad progiem; jeśli nikt progu nie spełnia — weź najlepszego
+                var aboveThreshold = scored.Where(s => s.Score >= minimumScore).ToList();
+                var chosen = aboveThreshold.Any()
+                    ? aboveThreshold.Take(3).ToList()[_random.Next(Math.Min(3, aboveThreshold.Count))]
+                    : scored.First();
+
+                outfit.ClothingItems.Add(chosen.Item);
+                nonNeutralAccumulator += chosen.Item.Colors.Count(c => !c.IsNeutral);
+
+                // Zarejestruj WSZYSTKIE sloty zajmowane przez wybrane ubranie na tej warstwie.
+                //
+                // Dlaczego wszystkie sloty kategorii, nie tylko bieżący?
+                // Bo sukienka (ClothingSlots=[Core,Nogi]) wybrana przy okazji szukania
+                // ubrania na slot Core/warstwa-1, pokrywa RÓWNIEŻ Nogi/warstwa-1.
+                // Bez tego moglibyśmy później dobrać spodnie na te same nogi.
+                if (chosen.Item.Category?.ClothingSlots != null)
+                {
+                    foreach (var coveredSlot in chosen.Item.Category.ClothingSlots)
+                    {
+                        occupiedSlotLayers.Add(new SlotLayerKey(coveredSlot.Name, layer));
                     }
                 }
-
-                // KRYTYCZNE: Jeśli brak kandydatów, przerwij budowanie outfitu
-                if (!candidates.Any())
-                    return null;
-
-                // Wybierz losowe ubranie z przefiltrowanej listy
-                var selected = candidates.OrderBy(x => Guid.NewGuid()).FirstOrDefault();
-                if (selected == null)
-                    return null;
-
-                candidateOutfit.ClothingItems.Add(selected);
-                totalWarmth += selected.WarmthLevel;
             }
-
-            // Walidacja ciepła dla slotu
-            if (enforceWarmth && (totalWarmth < requirement.MinWarmth || totalWarmth > requirement.MaxWarmth))
-                return null;
         }
 
-        // Walidacja harmonii kolorów
-        if (enforceColorHarmony && !ValidateColorHarmony(candidateOutfit.ClothingItems))
-            return null;
-
-        return candidateOutfit;
+        return outfit;
     }
 
-    /// <summary>
-    /// Waliduj harmonię kolorów - maksymalnie jeden kolor nie-neutralny
-    /// </summary>
-    private bool ValidateColorHarmony(ICollection<ClothingItem> items)
-    {
-        var nonNeutralCount = items
-            .SelectMany(i => i.Colors)
-            .Where(c => !c.IsNeutral)
-            .Distinct()
-            .Count();
+    // ──────────────────────────────────────────────────────────────────────────
+    // Scoring
+    // ──────────────────────────────────────────────────────────────────────────
 
-        // Maksymalnie jeden akcent kolorystyczny (kolor nie-neutralny)
-        return nonNeutralCount <= 1;
+    private double ScoreItem(
+        ClothingItem item,
+        SlotRequirement requirement,
+        WeatherDataForGeneration weather,
+        HashSet<Guid> recentlyWornIds,
+        string? targetStyle,
+        bool isOuterLayer,
+        int currentNonNeutralCount,
+        bool applyColorPenalty)
+    {
+        double score = 0;
+
+        if (!recentlyWornIds.Contains(item.Id))
+            score += ScoreDiversity;
+
+        if (targetStyle != null && item.Styles.Any(s => s.Name == targetStyle))
+            score += ScoreStyleMatch;
+
+        if (requirement.RequiredLayers.Count > 0)
+        {
+            int expectedPerLayer = requirement.MinWarmth / requirement.RequiredLayers.Count;
+            int diff = Math.Abs(item.WarmthLevel - expectedPerLayer);
+            if (diff <= 3) score += ScoreWarmthIdeal;
+            else if (diff <= 6) score += ScoreWarmthAccepted;
+        }
+
+        if (isOuterLayer && weather.IsRaining
+            && HasProperty(item, "waterproof", "water-resistant", "wodoodpor"))
+            score += ScoreWaterproof;
+
+        if (weather.IsWindy && requirement.SlotName == "Głowa"
+            && HasProperty(item, "windproof", "wind-resistant", "wiatroszczelny"))
+            score += ScoreWindproof;
+
+        if (applyColorPenalty)
+        {
+            int projected = currentNonNeutralCount + item.Colors.Count(c => !c.IsNeutral);
+            if (projected > 1)
+                score += (projected - 1) * PenaltyNonNeutralColor;
+        }
+
+        return score;
     }
 
-    /// <summary>
-    /// Zwróć ostrzeżenia na podstawie poziomu fallback
-    /// </summary>
-    private List<string> GetWarningsForLevel(int fallbackLevel, WeatherDataForGeneration weather)
+    // ──────────────────────────────────────────────────────────────────────────
+    // Wymagania pogodowe
+    // ──────────────────────────────────────────────────────────────────────────
+
+    private static List<SlotRequirement> DetermineRequirements(WeatherDataForGeneration weather)
     {
-        var warnings = new List<string>();
+        var req = new List<SlotRequirement>();
 
-        if (fallbackLevel >= 1)
-            warnings.Add("Ostrzeżenie: Może być noszone ubranie z ostatnich 3 dni.");
+        if (weather.Temperature >= 20)
+        {
+            req.Add(new SlotRequirement { SlotName = "Core", RequiredLayers = new() { 1 }, MinWarmth = 1 });
+            req.Add(new SlotRequirement { SlotName = "Nogi", RequiredLayers = new() { 1 }, MinWarmth = 1 });
+        }
+        else if (weather.Temperature >= 10)
+        {
+            req.Add(new SlotRequirement { SlotName = "Core", RequiredLayers = new() { 1, 2 }, MinWarmth = 5 });
+            req.Add(new SlotRequirement { SlotName = "Nogi", RequiredLayers = new() { 1 }, MinWarmth = 3 });
+        }
+        else
+        {
+            req.Add(new SlotRequirement { SlotName = "Core", RequiredLayers = new() { 1, 2, 3 }, MinWarmth = 12 });
+            req.Add(new SlotRequirement { SlotName = "Nogi", RequiredLayers = new() { 1 }, MinWarmth = 5 });
+        }
 
-        if (fallbackLevel >= 2)
-            warnings.Add("Ostrzeżenie: Outfit może nie mieć harmonijnych kolorów.");
-
-        if (fallbackLevel >= 3)
-            warnings.Add("Ostrzeżenie: Outfit może być niespójny stylowo.");
-
-        if (fallbackLevel >= 4)
-            warnings.Add("Ostrzeżenie: Outfit może nie spełniać wymagań ciepła dla pogody.");
-
-        if (fallbackLevel >= 5 && weather.IsRaining)
-            warnings.Add("Ostrzeżenie: Wybrano odzież nieodporną na deszcz. Zabierz parasol!");
-
-        if (weather.IsWindy && fallbackLevel >= 4)
-            warnings.Add("Ostrzeżenie: Wiatr - Czapka może nie być wiatroszczelna. Przytrzymaj!");
+        if (weather.IsWindy || weather.Temperature < 10)
+            req.Add(new SlotRequirement { SlotName = "Głowa", RequiredLayers = new() { 1 }, MinWarmth = 0 });
 
         if (weather.IsSunny)
-            warnings.Add("💡 Sugestia: Nie zapomnij okularów przeciwsłonecznych!");
+            req.Add(new SlotRequirement { SlotName = "Oczy", RequiredLayers = new() { 1 }, MinWarmth = 0 });
 
-        return warnings;
+        return req;
     }
 
-    /// <summary>
-    /// Parsuj JSON pogody i zwróć WeatherDataForGeneration dla dzisiaj
-    /// </summary>
-    private WeatherDataForGeneration ParseWeatherForToday(string weatherJson)
+    // ──────────────────────────────────────────────────────────────────────────
+    // Helpery
+    // ──────────────────────────────────────────────────────────────────────────
+
+    private static bool HasProperty(ClothingItem item, params string[] keywords) =>
+        item.Properties.Any(p =>
+            keywords.Any(kw => p.Name.Contains(kw, StringComparison.OrdinalIgnoreCase)));
+
+    private string? PickRandomStyle(List<ClothingItem> wardrobe)
     {
-        // Simplified parsing - w produkcji użyć System.Text.Json
-        var hasRain = weatherJson.Contains("\"precipitation_sum\":[");
-        var hasCloud = weatherJson.Contains("\"cloudcover\":");
-        var isSunny = !hasCloud || weatherJson.Contains("\"cloudcover\":[0") || weatherJson.Contains("\"cloudcover\":[1") || weatherJson.Contains("\"cloudcover\":[5");
-        var temperature = 15; // default
-
-        return new WeatherDataForGeneration(temperature, hasRain, false, isSunny);
+        var styles = wardrobe
+            .SelectMany(c => c.Styles)
+            .Select(s => s.Name)
+            .Distinct()
+            .ToList();
+        return styles.Any() ? styles[_random.Next(styles.Count)] : null;
     }
+
+    private static List<string> BuildWarnings(int fallbackLevel, WeatherDataForGeneration weather)
+    {
+        var w = new List<string>();
+        if (fallbackLevel >= 1) w.Add("Ostrzeżenie: Może być noszone ubranie z ostatnich 3 dni.");
+        if (fallbackLevel >= 2) w.Add("Ostrzeżenie: Outfit może nie mieć harmonijnych kolorów.");
+        if (fallbackLevel >= 3) w.Add("Ostrzeżenie: Outfit może być niespójny stylowo.");
+        if (fallbackLevel >= 4) w.Add("Ostrzeżenie: Outfit może nie spełniać optymalnych wymagań ciepła.");
+        if (fallbackLevel >= 5 && weather.IsRaining)
+            w.Add("Ostrzeżenie: Wybrano odzież nieodporną na deszcz. Zabierz parasol!");
+        if (weather.IsWindy && fallbackLevel >= 4)
+            w.Add("Ostrzeżenie: Wiatr — czapka może nie być wiatroszczelna. Przytrzymaj!");
+        if (weather.IsSunny)
+            w.Add("💡 Sugestia: Nie zapomnij okularów przeciwsłonecznych!");
+        return w;
+    }
+
+    private static OutfitGeneratorResult Failure(string message) =>
+        new() { Outfit = null, Warnings = new List<string> { message } };
 }

@@ -27,6 +27,7 @@ internal class ColorEntityConfiguration : IEntityTypeConfiguration<ColorEntity>
 
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.IsDeleted).IsRequired();
+        builder.Property(x => x.IsNeutral).IsRequired();
 
         builder.HasIndex(x => x.Name).IsUnique();
     }

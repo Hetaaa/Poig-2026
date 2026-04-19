@@ -28,6 +28,7 @@ internal class CategoryEntityConfiguration : IEntityTypeConfiguration<CategoryEn
 
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.IsDeleted).IsRequired();
+        builder.Property(x => x.LayerIndex).IsRequired();
 
         builder.HasIndex(x => x.Name).IsUnique();
     }

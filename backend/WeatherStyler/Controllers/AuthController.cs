@@ -9,10 +9,14 @@ namespace WeatherStyler.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly WeatherStyler.Application.Services.IUserAccountService _userAccountService;
+    private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+    private readonly bool _isDevelopment;
 
-    public AuthController(WeatherStyler.Application.Services.IUserAccountService userAccountService)
+    public AuthController(WeatherStyler.Application.Services.IUserAccountService userAccountService, Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _userAccountService = userAccountService;
+        _configuration = configuration;
+        _isDevelopment = _configuration.GetValue<bool>("IsDevelopment");
     }
 
     [HttpPost("register")]
@@ -28,6 +32,11 @@ public class AuthController : ControllerBase
         {
             return Conflict(new { message = ex.Message });
         }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     [HttpPost("login")]
@@ -42,6 +51,11 @@ public class AuthController : ControllerBase
         catch (InvalidOperationException ex)
         {
             return Unauthorized(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
         }
     }
 

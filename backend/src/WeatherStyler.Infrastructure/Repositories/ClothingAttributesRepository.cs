@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WeatherStyler.Domain.Entities;
 using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Domain.Wardrobe.Entities;
+using WeatherStyler.Domain.Entities;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
@@ -19,19 +19,19 @@ internal class ClothingAttributesRepository : IClothingAttributesRepository
     // Categories
     public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.Categories.AsNoTracking().Select(c => new Category { Id = c.Id, Name = c.Name }).ToListAsync(cancellationToken);
+        return await _db.Categories.AsNoTracking().Select(c => new Category { Id = c.Id, Name = c.Name, LayerIndex = c.LayerIndex }).ToListAsync(cancellationToken);
     }
 
     public async Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await _db.Categories.FindAsync(new object[] { id }, cancellationToken);
         if (e is null) return null;
-        return new Category { Id = e.Id, Name = e.Name };
+        return new Category { Id = e.Id, Name = e.Name, LayerIndex = e.LayerIndex };
     }
 
     public async Task<Category> AddCategoryAsync(Category category, CancellationToken cancellationToken = default)
     {
-        var e = new CategoryEntity { Id = category.Id == Guid.Empty ? Guid.NewGuid() : category.Id, Name = category.Name };
+        var e = new CategoryEntity { Id = category.Id == Guid.Empty ? Guid.NewGuid() : category.Id, Name = category.Name, LayerIndex = category.LayerIndex };
         _db.Categories.Add(e);
         await _db.SaveChangesAsync(cancellationToken);
         category.Id = e.Id;
@@ -43,6 +43,7 @@ internal class ClothingAttributesRepository : IClothingAttributesRepository
         var e = await _db.Categories.FindAsync(new object[] { category.Id }, cancellationToken);
         if (e is null) throw new InvalidOperationException("Not found");
         e.Name = category.Name;
+        e.LayerIndex = category.LayerIndex;
         await _db.SaveChangesAsync(cancellationToken);
     }
 
@@ -95,19 +96,19 @@ internal class ClothingAttributesRepository : IClothingAttributesRepository
     // Colors
     public async Task<IReadOnlyList<Color>> GetAllColorsAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.Colors.AsNoTracking().Select(c => new Color { Id = c.Id, Name = c.Name }).ToListAsync(cancellationToken);
+        return await _db.Colors.AsNoTracking().Select(c => new Color { Id = c.Id, Name = c.Name, IsNeutral = c.IsNeutral }).ToListAsync(cancellationToken);
     }
 
     public async Task<Color?> GetColorByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await _db.Colors.FindAsync(new object[] { id }, cancellationToken);
         if (e is null) return null;
-        return new Color { Id = e.Id, Name = e.Name };
+        return new Color { Id = e.Id, Name = e.Name, IsNeutral = e.IsNeutral };
     }
 
     public async Task<Color> AddColorAsync(Color color, CancellationToken cancellationToken = default)
     {
-        var e = new ColorEntity { Id = color.Id == Guid.Empty ? Guid.NewGuid() : color.Id, Name = color.Name };
+        var e = new ColorEntity { Id = color.Id == Guid.Empty ? Guid.NewGuid() : color.Id, Name = color.Name, IsNeutral = color.IsNeutral };
         _db.Colors.Add(e);
         await _db.SaveChangesAsync(cancellationToken);
         color.Id = e.Id;
@@ -119,6 +120,7 @@ internal class ClothingAttributesRepository : IClothingAttributesRepository
         var e = await _db.Colors.FindAsync(new object[] { color.Id }, cancellationToken);
         if (e is null) throw new InvalidOperationException("Not found");
         e.Name = color.Name;
+        e.IsNeutral = color.IsNeutral;
         await _db.SaveChangesAsync(cancellationToken);
     }
 

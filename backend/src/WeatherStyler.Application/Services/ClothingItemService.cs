@@ -1,6 +1,6 @@
 using WeatherStyler.Application.Contracts;
 using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Domain.Wardrobe.Entities;
+using WeatherStyler.Domain.Entities;
 
 namespace WeatherStyler.Application.Services;
 

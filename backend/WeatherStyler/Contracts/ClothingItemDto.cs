@@ -13,3 +13,4 @@ public record ClothingItemDto(
 
 public record StylePreviewDto(Guid Id, string Name);
 public record ColorPreviewDto(Guid Id, string Name, bool IsNeutral);
+public record ClothingPropertyDto(string Name, string Value);

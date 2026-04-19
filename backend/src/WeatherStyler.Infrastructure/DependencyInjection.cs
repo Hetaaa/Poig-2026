@@ -22,7 +22,7 @@ public static class DependencyInjection
             ?? "Data Source=weatherstyler.db";
 
         services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
-        services.AddAutoMapper(typeof(WardrobeMappingProfile).Assembly);
+        services.AddAutoMapper(cfg => cfg.AddMaps(typeof(WardrobeMappingProfile).Assembly));
         // register infra repositories
         services.AddScoped<IClothingItemRepository, ClothingItemRepository>();
         services.AddScoped<ILookupRepository, LookupRepository>();
@@ -38,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<WeatherStyler.Application.Services.InitialValuesService>();
         services.AddScoped<WeatherStyler.Application.Services.IUserAccountService, WeatherStyler.Infrastructure.Services.UserAccountService>();
         services.AddScoped<WeatherStyler.Domain.Repositories.IUsageHistoryRepository, WeatherStyler.Infrastructure.Repositories.UsageHistoryRepository>();
+        services.AddScoped<WeatherStyler.Domain.Repositories.IWeatherHistoryQueryRepository, WeatherStyler.Infrastructure.Repositories.WeatherHistoryQueryRepository>();
         services.AddScoped<WeatherStyler.Infrastructure.Services.OutfitService>();
 
         // Identity - use ApplicationUser with GUID primary key and IdentityRole<Guid>
@@ -45,7 +46,7 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
-        var jwtKey = configuration["Jwt:Key"] ?? "PLEASE_CHANGE_THIS_SECRET";
+        var jwtKey = configuration["Jwt:Key"] ?? "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
         var jwtIssuer = configuration["Jwt:Issuer"] ?? "WeatherStyler";
 
         services.AddAuthentication(options =>

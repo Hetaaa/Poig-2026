@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Domain.Wardrobe.Entities;
+using WeatherStyler.Domain.Entities;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
@@ -21,6 +21,8 @@ internal class ClothingItemRepository : IClothingItemRepository
             .Include(x => x.Properties)
             .Include(x => x.Styles)
             .Include(x => x.Colors)
+            .Include(x => x.Category)
+                .ThenInclude(c => c.ClothingSlots)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
@@ -35,7 +37,14 @@ internal class ClothingItemRepository : IClothingItemRepository
             WarmthLevel = e.WarmthLevel,
             Properties = e.Properties.Select(p => new ClothingProperty { Id = p.Id, Name = p.Name, Value = p.Value, ClothingItemId = p.ClothingItemId }).ToList(),
             Styles = e.Styles.Select(s => new Style { Id = s.Id, Name = s.Name }).ToList(),
-            Colors = e.Colors.Select(c => new Color { Id = c.Id, Name = c.Name }).ToList()
+            Colors = e.Colors.Select(c => new Color { Id = c.Id, Name = c.Name, IsNeutral = c.IsNeutral }).ToList(),
+            Category = e.Category == null ? null : new Category
+            {
+                Id = e.Category.Id,
+                Name = e.Category.Name,
+                LayerIndex = e.Category.LayerIndex,
+                ClothingSlots = e.Category.ClothingSlots.Select(cs => new ClothingSlot { Id = cs.Id, Name = cs.Name }).ToList()
+            }
         }).ToList();
     }
 
@@ -45,6 +54,8 @@ internal class ClothingItemRepository : IClothingItemRepository
             .Include(x => x.Properties)
             .Include(x => x.Styles)
             .Include(x => x.Colors)
+            .Include(x => x.Category)
+                .ThenInclude(c => c.ClothingSlots)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         if (e is null) return null;
@@ -59,7 +70,14 @@ internal class ClothingItemRepository : IClothingItemRepository
             WarmthLevel = e.WarmthLevel,
             Properties = e.Properties.Select(p => new ClothingProperty { Id = p.Id, Name = p.Name, Value = p.Value, ClothingItemId = p.ClothingItemId }).ToList(),
             Styles = e.Styles.Select(s => new Style { Id = s.Id, Name = s.Name }).ToList(),
-            Colors = e.Colors.Select(c => new Color { Id = c.Id, Name = c.Name }).ToList()
+            Colors = e.Colors.Select(c => new Color { Id = c.Id, Name = c.Name, IsNeutral = c.IsNeutral }).ToList(),
+            Category = e.Category == null ? null : new Category
+            {
+                Id = e.Category.Id,
+                Name = e.Category.Name,
+                LayerIndex = e.Category.LayerIndex,
+                ClothingSlots = e.Category.ClothingSlots.Select(cs => new ClothingSlot { Id = cs.Id, Name = cs.Name }).ToList()
+            }
         };
     }
 

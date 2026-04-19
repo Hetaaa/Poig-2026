@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Domain.Wardrobe.Entities;
+using WeatherStyler.Domain.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
 namespace WeatherStyler.Infrastructure.Repositories;

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Domain.Wardrobe.Entities;
+using WeatherStyler.Domain.Entities;
 
 namespace WeatherStyler.Application.Services;
 
@@ -27,7 +27,7 @@ public class InitialValuesService
             var existing = await _attributesRepo.GetClothingSlotByNameAsync(s, cancellationToken);
             if (existing is null)
             {
-                var created = await _attributesRepo.AddClothingSlotAsync(new WeatherStyler.Domain.Wardrobe.Entities.ClothingSlot { Name = s }, cancellationToken);
+                var created = await _attributesRepo.AddClothingSlotAsync(new WeatherStyler.Domain.Entities.ClothingSlot { Name = s }, cancellationToken);
                 slotEntities[s] = created.Id;
             }
             else
@@ -36,14 +36,22 @@ public class InitialValuesService
             }
         }
 
-        // seed colors
+        // seed colors (mark neutral colors)
         var colors = new[] { "Czarny","Biały","Szary","Granatowy","Beżowy","Brązowy","Szałwiowy","Oliwkowy","Błękitny","Bordowy","Pudrowy Róż","Maślany Żółty","Czerwony" };
+        var neutralColorNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Czarny", "Biały", "Szary", "Beżowy", "Brązowy" };
         foreach (var c in colors)
         {
             var existing = (await _attributesRepo.GetAllColorsAsync(cancellationToken)).FirstOrDefault(x => x.Name == c);
+            var isNeutral = neutralColorNames.Contains(c);
             if (existing is null)
             {
-                await _attributesRepo.AddColorAsync(new WeatherStyler.Domain.Wardrobe.Entities.Color { Name = c }, cancellationToken);
+                await _attributesRepo.AddColorAsync(new WeatherStyler.Domain.Entities.Color { Name = c, IsNeutral = isNeutral }, cancellationToken);
+            }
+            else if (existing.IsNeutral != isNeutral)
+            {
+                // normalize IsNeutral flag
+                existing.IsNeutral = isNeutral;
+                await _attributesRepo.UpdateColorAsync(new WeatherStyler.Domain.Entities.Color { Id = existing.Id, Name = existing.Name, IsNeutral = existing.IsNeutral }, cancellationToken);
             }
         }
 
@@ -54,7 +62,7 @@ public class InitialValuesService
             var existingStyle = (await _attributesRepo.GetAllStylesAsync(cancellationToken)).FirstOrDefault(x => x.Name == s);
             if (existingStyle is null)
             {
-                await _attributesRepo.AddStyleAsync(new WeatherStyler.Domain.Wardrobe.Entities.Style { Name = s }, cancellationToken);
+                await _attributesRepo.AddStyleAsync(new WeatherStyler.Domain.Entities.Style { Name = s }, cancellationToken);
             }
         }
 
@@ -87,14 +95,27 @@ public class InitialValuesService
         {
             var existing = (await _attributesRepo.GetAllCategoriesAsync(cancellationToken)).FirstOrDefault(x => x.Name == kv.Key);
             Guid categoryId;
+
+            // determine sensible layer index
+            int layerIndex = 1;
+            if (kv.Key.IndexOf("Kurtka", StringComparison.OrdinalIgnoreCase) >= 0 || kv.Key.IndexOf("Płaszcz", StringComparison.OrdinalIgnoreCase) >= 0 || kv.Key.IndexOf("Marynarka", StringComparison.OrdinalIgnoreCase) >= 0)
+                layerIndex = 3;
+            else if (kv.Key.IndexOf("Sweter", StringComparison.OrdinalIgnoreCase) >= 0 || kv.Key.IndexOf("Bluza", StringComparison.OrdinalIgnoreCase) >= 0 || kv.Key.IndexOf("Kardigan", StringComparison.OrdinalIgnoreCase) >= 0 || kv.Key.IndexOf("Kamizelka", StringComparison.OrdinalIgnoreCase) >= 0)
+                layerIndex = 2;
+
             if (existing is null)
             {
-                var created = await _attributesRepo.AddCategoryAsync(new WeatherStyler.Domain.Wardrobe.Entities.Category { Name = kv.Key }, cancellationToken);
+                var created = await _attributesRepo.AddCategoryAsync(new WeatherStyler.Domain.Entities.Category { Name = kv.Key, LayerIndex = layerIndex }, cancellationToken);
                 categoryId = created.Id;
             }
             else
             {
                 categoryId = existing.Id;
+                if (existing.LayerIndex != layerIndex)
+                {
+                    existing.LayerIndex = layerIndex;
+                    await _attributesRepo.UpdateCategoryAsync(new WeatherStyler.Domain.Entities.Category { Id = existing.Id, Name = existing.Name, LayerIndex = existing.LayerIndex }, cancellationToken);
+                }
             }
 
             var slotIds = kv.Value.Select(name => slotEntities[name]).ToArray();

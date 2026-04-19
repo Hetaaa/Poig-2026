@@ -1,6 +1,6 @@
 using WeatherStyler.Domain.Common;
 
-namespace WeatherStyler.Domain.Wardrobe.Entities;
+namespace WeatherStyler.Domain.Entities;
 
 public class Style : DomainEntityBase
 {

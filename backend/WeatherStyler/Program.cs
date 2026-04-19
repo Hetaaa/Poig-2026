@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using WeatherStyler.Application;
-// OpenAPI transformer removed to avoid direct dependency on Microsoft.OpenApi types
 using WeatherStyler.Infrastructure;
 using WeatherStyler.Infrastructure.Persistence;
 
@@ -14,8 +15,6 @@ Directory.CreateDirectory(weatherStylerFolder);
 var databasePath = Path.Combine(weatherStylerFolder, "weatherstyler.db");
 builder.Configuration["ConnectionStrings:WeatherStylerDb"] = $"Data Source={databasePath}";
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
@@ -27,27 +26,60 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddInfrastructure(builder.Configuration); // JWT jest tutaj
+
+// ─── OpenAPI + JWT ────────────────────────────────────────────────────────────
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, _, _) =>
+    {
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+        document.Components.SecuritySchemes.Add(
+            "Bearer",
+            new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Wprowadź token JWT (bez prefiksu 'Bearer')"
+            });
+
+        document.Security =
+        [
+            new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+            }
+        ];
+
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference(options =>
     {
         options
-            .WithTitle("Moje API")
+            .WithTitle("WeatherStyler API")
             .WithTheme(ScalarTheme.DeepSpace)
-            ;
+            .AddPreferredSecuritySchemes("Bearer")
+            .AddHttpAuthentication("Bearer", auth =>
+            {
+                auth.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzYzA3NWRhNy1jY2ViLTQ0NTQtYTY2Zi1kZTk2NTIwMTA5MWIiLCJ1bmlxdWVfbmFtZSI6IngiLCJqdGkiOiJiYWM0MzFjOS0yYjY4LTQ0MWItOTgxNC04Yjc2Mjk4MDFkZjQiLCJleHAiOjE3NzY2Nzk3NzUsImlzcyI6IldlYXRoZXJTdHlsZXIifQ.T_ZfH029liG4pxZn_JIpBIEOb2S3f2axDdwsIsFARks";
+            });
     });
 }
 
 app.UseCors("LocalhostPolicy");
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -56,18 +88,18 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
-    // Seed initial readonly values (slots, categories, colors) once if database is empty
-    var anyCategories = db.Categories.Any();
-    if (!anyCategories)
+
+    if (!db.Categories.Any())
     {
-        var seeder = scope.ServiceProvider.GetService<WeatherStyler.Application.Services.InitialValuesService>();
+        var seeder = scope.ServiceProvider
+            .GetService<WeatherStyler.Application.Services.InitialValuesService>();
         try
         {
             seeder?.SeedAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
         catch
         {
-            // swallow seed exceptions during startup to avoid blocking app startup; inspect logs in real app
+            // swallow seed exceptions during startup
         }
     }
 }

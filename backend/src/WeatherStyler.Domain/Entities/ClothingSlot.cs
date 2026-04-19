@@ -1,6 +1,7 @@
 using WeatherStyler.Domain.Common;
+using WeatherStyler.Domain.Entities;
 
-namespace WeatherStyler.Domain.Wardrobe.Entities;
+namespace WeatherStyler.Domain.Entities;
 
 public class ClothingSlot : DomainEntityBase
 {

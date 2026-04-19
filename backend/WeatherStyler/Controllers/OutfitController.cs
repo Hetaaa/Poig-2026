@@ -12,11 +12,15 @@ public class OutfitController : ControllerBase
 {
     private readonly OutfitService _outfitService;
     private readonly IUserService _userService;
+    private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+    private readonly bool _isDevelopment;
 
-    public OutfitController(OutfitService outfitService, IUserService userService)
+    public OutfitController(OutfitService outfitService, IUserService userService, Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _outfitService = outfitService;
         _userService = userService;
+        _configuration = configuration;
+        _isDevelopment = _configuration.GetValue<bool>("IsDevelopment");
     }
 
     /// <summary>
@@ -28,13 +32,21 @@ public class OutfitController : ControllerBase
         [FromQuery] DateTime to,
         CancellationToken cancellationToken = default)
     {
-        var userId = _userService.GetUserId();
+        try
+        {
+            var userId = _userService.GetUserId();
 
-        if (from > to)
-            return BadRequest(new { message = "From date must be before To date" });
+            if (from > to)
+                return BadRequest(new { message = "From date must be before To date" });
 
-        var outfits = await _outfitService.GetOutfitsAsync(userId, from, to, cancellationToken);
-        return Ok(outfits);
+            var outfits = await _outfitService.GetOutfitsAsync(userId, from, to, cancellationToken);
+            return Ok(outfits);
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -43,10 +55,18 @@ public class OutfitController : ControllerBase
     [HttpGet("today")]
     public async Task<IActionResult> GetOutfitsForToday(CancellationToken cancellationToken = default)
     {
-        var userId = _userService.GetUserId();
-        var today = DateTime.UtcNow.Date;
-        var outfits = await _outfitService.GetOutfitsAsync(userId, today, today.AddDays(1).AddTicks(-1), cancellationToken);
-        return Ok(outfits);
+        try
+        {
+            var userId = _userService.GetUserId();
+            var today = DateTime.UtcNow.Date;
+            var raw = await _outfitService.GetOutfitsAsync(userId, today, today.AddDays(1).AddTicks(-1), cancellationToken);
+            return Ok(raw);
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -55,9 +75,17 @@ public class OutfitController : ControllerBase
     [HttpGet("favourite")]
     public async Task<IActionResult> GetFavouriteOutfits(CancellationToken cancellationToken = default)
     {
-        var userId = _userService.GetUserId();
-        var outfits = await _outfitService.GetFavouriteOutfitsAsync(userId, cancellationToken);
-        return Ok(outfits);
+        try
+        {
+            var userId = _userService.GetUserId();
+            var outfits = await _outfitService.GetFavouriteOutfitsAsync(userId, cancellationToken);
+            return Ok(outfits);
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -69,13 +97,21 @@ public class OutfitController : ControllerBase
         [FromQuery] DateTime to,
         CancellationToken cancellationToken = default)
     {
-        var userId = _userService.GetUserId();
-        
-        if (from > to)
-            return BadRequest(new { message = "From date must be before To date" });
+        try
+        {
+            var userId = _userService.GetUserId();
 
-        var outfits = await _outfitService.GetFavouriteOutfitsAsync(userId, from, to, cancellationToken);
-        return Ok(outfits);
+            if (from > to)
+                return BadRequest(new { message = "From date must be before To date" });
+
+            var outfits = await _outfitService.GetFavouriteOutfitsAsync(userId, from, to, cancellationToken);
+            return Ok(outfits);
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -86,12 +122,20 @@ public class OutfitController : ControllerBase
         Guid usageHistoryId,
         CancellationToken cancellationToken = default)
     {
-        var userId = _userService.GetUserId();
-        var result = await _outfitService.ToggleFavouriteAsync(usageHistoryId, userId, cancellationToken);
+        try
+        {
+            var userId = _userService.GetUserId();
+            var result = await _outfitService.ToggleFavouriteAsync(usageHistoryId, userId, cancellationToken);
 
-        if (!result)
-            return NotFound(new { message = "Usage history not found" });
+            if (!result)
+                return NotFound(new { message = "Usage history not found" });
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 }
