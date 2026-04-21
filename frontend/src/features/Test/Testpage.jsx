@@ -1,4 +1,4 @@
-export default function Testpage() {
+export default function TestPage() {
   return (
     <>
       <h1>Welcome to the Smart Wardrobe App!</h1>
