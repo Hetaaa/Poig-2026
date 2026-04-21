@@ -2,7 +2,7 @@ import React from "react";
 import App from "./App";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Testpage from "./features/Test/Testpage";
+import TestPage from "./features/Test/TestPage";
 import "./main.scss";
 
 // TODO: Replace with actual pages when they are created
@@ -17,11 +17,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Testpage />,
+        element: <TestPage />,
       },
       {
         path: "main-page",
-        element: <Testpage />,
+        element: <TestPage />,
       },
       {
         path: "favourites",
