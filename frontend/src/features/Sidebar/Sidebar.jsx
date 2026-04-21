@@ -41,7 +41,11 @@ export default function Sidebar() {
           <AiOutlineSetting className="sidebar-element-icon" />
           Ustawienia
         </NavLink>
-        <button className="sidebar-element" onClick={handleLogout}>
+        <button
+          type="button"
+          className="sidebar-element"
+          onClick={handleLogout}
+        >
           <MdLogout className="sidebar-element-icon" />
           Wyloguj się
         </button>
