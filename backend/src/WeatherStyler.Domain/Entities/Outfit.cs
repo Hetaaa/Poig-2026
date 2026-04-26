@@ -7,7 +7,6 @@ public class Outfit : DomainEntityBase
     public required string Name { get; set; }
     public DateTime DateCreated { get; set; }
 
-    public Guid UserId { get; set; }
     public User? User { get; set; }
 
     // Items that compose this outfit

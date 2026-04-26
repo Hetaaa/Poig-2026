@@ -1,17 +1,21 @@
 using Microsoft.EntityFrameworkCore;
-using WeatherStyler.Domain.Repositories;
+using WeatherStyler.Domain.Interfaces.Repositories;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
 namespace WeatherStyler.Infrastructure.Repositories;
 
+using AutoMapper;
+
 internal class ProgramVariableRepository : IProgramVariableRepository
 {
     private readonly AppDbContext _db;
+    private readonly IMapper _mapper;
 
-    public ProgramVariableRepository(AppDbContext db)
+    public ProgramVariableRepository(AppDbContext db, IMapper mapper)
     {
         _db = db;
+        _mapper = mapper;
     }
 
     public async Task<string?> GetValueAsync(string key, CancellationToken cancellationToken = default)

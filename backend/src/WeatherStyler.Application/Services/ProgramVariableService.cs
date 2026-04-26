@@ -1,8 +1,11 @@
-using WeatherStyler.Domain.Repositories;
+
+
+using WeatherStyler.Domain.Interfaces.Repositories;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Application.Services;
 
-public class ProgramVariableService
+public class ProgramVariableService : IProgramVariableService
 {
     private readonly IProgramVariableRepository _repo;
 

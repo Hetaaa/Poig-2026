@@ -1,49 +1,59 @@
 using Microsoft.EntityFrameworkCore;
 using WeatherStyler.Domain.Entities;
-using WeatherStyler.Domain.Repositories;
+
 using WeatherStyler.Domain.Entities;
+using WeatherStyler.Domain.Interfaces.Repositories;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
 namespace WeatherStyler.Infrastructure.Repositories;
 
+
+using AutoMapper;
+
 internal class ClothingAttributesRepository : IClothingAttributesRepository
 {
     private readonly AppDbContext _db;
+    private readonly IMapper _mapper;
 
-    public ClothingAttributesRepository(AppDbContext db)
+    public ClothingAttributesRepository(AppDbContext db, IMapper mapper)
     {
         _db = db;
+        _mapper = mapper;
     }
 
     // Categories
+
     public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.Categories.AsNoTracking().Select(c => new Category { Id = c.Id, Name = c.Name, LayerIndex = c.LayerIndex }).ToListAsync(cancellationToken);
+        var entities = await _db.Categories.AsNoTracking().ToListAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<Category>>(entities);
     }
+
 
     public async Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await _db.Categories.FindAsync(new object[] { id }, cancellationToken);
         if (e is null) return null;
-        return new Category { Id = e.Id, Name = e.Name, LayerIndex = e.LayerIndex };
+        return _mapper.Map<Category>(e);
     }
+
 
     public async Task<Category> AddCategoryAsync(Category category, CancellationToken cancellationToken = default)
     {
-        var e = new CategoryEntity { Id = category.Id == Guid.Empty ? Guid.NewGuid() : category.Id, Name = category.Name, LayerIndex = category.LayerIndex };
+        var e = _mapper.Map<CategoryEntity>(category);
+        if (e.Id == Guid.Empty) e.Id = Guid.NewGuid();
         _db.Categories.Add(e);
         await _db.SaveChangesAsync(cancellationToken);
-        category.Id = e.Id;
-        return category;
+        return _mapper.Map<Category>(e);
     }
+
 
     public async Task UpdateCategoryAsync(Category category, CancellationToken cancellationToken = default)
     {
         var e = await _db.Categories.FindAsync(new object[] { category.Id }, cancellationToken);
         if (e is null) throw new InvalidOperationException("Not found");
-        e.Name = category.Name;
-        e.LayerIndex = category.LayerIndex;
+        _mapper.Map(category, e);
         await _db.SaveChangesAsync(cancellationToken);
     }
 
@@ -56,32 +66,37 @@ internal class ClothingAttributesRepository : IClothingAttributesRepository
     }
 
     // Styles
+
     public async Task<IReadOnlyList<Style>> GetAllStylesAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.Styles.AsNoTracking().Select(s => new Style { Id = s.Id, Name = s.Name }).ToListAsync(cancellationToken);
+        var entities = await _db.Styles.AsNoTracking().ToListAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<Style>>(entities);
     }
+
 
     public async Task<Style?> GetStyleByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await _db.Styles.FindAsync(new object[] { id }, cancellationToken);
         if (e is null) return null;
-        return new Style { Id = e.Id, Name = e.Name };
+        return _mapper.Map<Style>(e);
     }
+
 
     public async Task<Style> AddStyleAsync(Style style, CancellationToken cancellationToken = default)
     {
-        var e = new StyleEntity { Id = style.Id == Guid.Empty ? Guid.NewGuid() : style.Id, Name = style.Name };
+        var e = _mapper.Map<StyleEntity>(style);
+        if (e.Id == Guid.Empty) e.Id = Guid.NewGuid();
         _db.Styles.Add(e);
         await _db.SaveChangesAsync(cancellationToken);
-        style.Id = e.Id;
-        return style;
+        return _mapper.Map<Style>(e);
     }
+
 
     public async Task UpdateStyleAsync(Style style, CancellationToken cancellationToken = default)
     {
         var e = await _db.Styles.FindAsync(new object[] { style.Id }, cancellationToken);
         if (e is null) throw new InvalidOperationException("Not found");
-        e.Name = style.Name;
+        _mapper.Map(style, e);
         await _db.SaveChangesAsync(cancellationToken);
     }
 
@@ -94,33 +109,37 @@ internal class ClothingAttributesRepository : IClothingAttributesRepository
     }
 
     // Colors
+
     public async Task<IReadOnlyList<Color>> GetAllColorsAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.Colors.AsNoTracking().Select(c => new Color { Id = c.Id, Name = c.Name, IsNeutral = c.IsNeutral }).ToListAsync(cancellationToken);
+        var entities = await _db.Colors.AsNoTracking().ToListAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<Color>>(entities);
     }
+
 
     public async Task<Color?> GetColorByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await _db.Colors.FindAsync(new object[] { id }, cancellationToken);
         if (e is null) return null;
-        return new Color { Id = e.Id, Name = e.Name, IsNeutral = e.IsNeutral };
+        return _mapper.Map<Color>(e);
     }
+
 
     public async Task<Color> AddColorAsync(Color color, CancellationToken cancellationToken = default)
     {
-        var e = new ColorEntity { Id = color.Id == Guid.Empty ? Guid.NewGuid() : color.Id, Name = color.Name, IsNeutral = color.IsNeutral };
+        var e = _mapper.Map<ColorEntity>(color);
+        if (e.Id == Guid.Empty) e.Id = Guid.NewGuid();
         _db.Colors.Add(e);
         await _db.SaveChangesAsync(cancellationToken);
-        color.Id = e.Id;
-        return color;
+        return _mapper.Map<Color>(e);
     }
+
 
     public async Task UpdateColorAsync(Color color, CancellationToken cancellationToken = default)
     {
         var e = await _db.Colors.FindAsync(new object[] { color.Id }, cancellationToken);
         if (e is null) throw new InvalidOperationException("Not found");
-        e.Name = color.Name;
-        e.IsNeutral = color.IsNeutral;
+        _mapper.Map(color, e);
         await _db.SaveChangesAsync(cancellationToken);
     }
 
@@ -133,33 +152,37 @@ internal class ClothingAttributesRepository : IClothingAttributesRepository
     }
 
     // Clothing properties
+
     public async Task<IReadOnlyList<ClothingProperty>> GetAllPropertiesAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.ClothingProperties.AsNoTracking().Select(p => new ClothingProperty { Id = p.Id, Name = p.Name, Value = p.Value, ClothingItemId = p.ClothingItemId }).ToListAsync(cancellationToken);
+        var entities = await _db.ClothingProperties.AsNoTracking().ToListAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<ClothingProperty>>(entities);
     }
+
 
     public async Task<ClothingProperty?> GetPropertyByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await _db.ClothingProperties.FindAsync(new object[] { id }, cancellationToken);
         if (e is null) return null;
-        return new ClothingProperty { Id = e.Id, Name = e.Name, Value = e.Value, ClothingItemId = e.ClothingItemId };
+        return _mapper.Map<ClothingProperty>(e);
     }
+
 
     public async Task<ClothingProperty> AddPropertyAsync(ClothingProperty property, CancellationToken cancellationToken = default)
     {
-        var e = new ClothingPropertyEntity { Id = property.Id == Guid.Empty ? Guid.NewGuid() : property.Id, Name = property.Name, Value = property.Value, ClothingItemId = property.ClothingItemId };
+        var e = _mapper.Map<ClothingPropertyEntity>(property);
+        if (e.Id == Guid.Empty) e.Id = Guid.NewGuid();
         _db.ClothingProperties.Add(e);
         await _db.SaveChangesAsync(cancellationToken);
-        property.Id = e.Id;
-        return property;
+        return _mapper.Map<ClothingProperty>(e);
     }
+
 
     public async Task UpdatePropertyAsync(ClothingProperty property, CancellationToken cancellationToken = default)
     {
         var e = await _db.ClothingProperties.FindAsync(new object[] { property.Id }, cancellationToken);
         if (e is null) throw new InvalidOperationException("Not found");
-        e.Name = property.Name;
-        e.Value = property.Value;
+        _mapper.Map(property, e);
         await _db.SaveChangesAsync(cancellationToken);
     }
 
@@ -172,25 +195,29 @@ internal class ClothingAttributesRepository : IClothingAttributesRepository
     }
 
     // Clothing slots
+
     public async Task<IReadOnlyList<ClothingSlot>> GetAllClothingSlotsAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.ClothingSlots.AsNoTracking().Select(s => new ClothingSlot { Id = s.Id, Name = s.Name }).ToListAsync(cancellationToken);
+        var entities = await _db.ClothingSlots.AsNoTracking().ToListAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<ClothingSlot>>(entities);
     }
+
 
     public async Task<ClothingSlot?> GetClothingSlotByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         var e = await _db.ClothingSlots.FirstOrDefaultAsync(s => s.Name == name, cancellationToken);
         if (e is null) return null;
-        return new ClothingSlot { Id = e.Id, Name = e.Name };
+        return _mapper.Map<ClothingSlot>(e);
     }
+
 
     public async Task<ClothingSlot> AddClothingSlotAsync(ClothingSlot slot, CancellationToken cancellationToken = default)
     {
-        var e = new ClothingSlotEntity { Id = slot.Id == Guid.Empty ? Guid.NewGuid() : slot.Id, Name = slot.Name };
+        var e = _mapper.Map<ClothingSlotEntity>(slot);
+        if (e.Id == Guid.Empty) e.Id = Guid.NewGuid();
         _db.ClothingSlots.Add(e);
         await _db.SaveChangesAsync(cancellationToken);
-        slot.Id = e.Id;
-        return slot;
+        return _mapper.Map<ClothingSlot>(e);
     }
 
     public async Task AssociateCategoryWithSlotsAsync(Guid categoryId, IEnumerable<Guid> slotIds, CancellationToken cancellationToken = default)

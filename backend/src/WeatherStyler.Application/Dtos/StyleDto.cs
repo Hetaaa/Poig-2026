@@ -1,3 +1,3 @@
-namespace WeatherStyler.Application.Contracts;
+namespace WeatherStyler.Application.Dtos;
 
 public record StyleDto(Guid Id, string Name);

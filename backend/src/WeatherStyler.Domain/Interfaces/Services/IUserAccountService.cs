@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace WeatherStyler.Application.Services;
+namespace WeatherStyler.Domain.Interfaces.Services;
 
 public record AuthResult(string Token, string Username);
 

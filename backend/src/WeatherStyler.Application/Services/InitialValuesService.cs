@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using WeatherStyler.Domain.Repositories;
+
 using WeatherStyler.Domain.Entities;
+using WeatherStyler.Domain.Interfaces.Repositories;
 
 namespace WeatherStyler.Application.Services;
 
@@ -27,7 +28,7 @@ public class InitialValuesService
             var existing = await _attributesRepo.GetClothingSlotByNameAsync(s, cancellationToken);
             if (existing is null)
             {
-                var created = await _attributesRepo.AddClothingSlotAsync(new WeatherStyler.Domain.Entities.ClothingSlot { Name = s }, cancellationToken);
+                var created = await _attributesRepo.AddClothingSlotAsync(new ClothingSlot { Name = s }, cancellationToken);
                 slotEntities[s] = created.Id;
             }
             else
@@ -45,13 +46,13 @@ public class InitialValuesService
             var isNeutral = neutralColorNames.Contains(c);
             if (existing is null)
             {
-                await _attributesRepo.AddColorAsync(new WeatherStyler.Domain.Entities.Color { Name = c, IsNeutral = isNeutral }, cancellationToken);
+                await _attributesRepo.AddColorAsync(new Color { Name = c, IsNeutral = isNeutral }, cancellationToken);
             }
             else if (existing.IsNeutral != isNeutral)
             {
                 // normalize IsNeutral flag
                 existing.IsNeutral = isNeutral;
-                await _attributesRepo.UpdateColorAsync(new WeatherStyler.Domain.Entities.Color { Id = existing.Id, Name = existing.Name, IsNeutral = existing.IsNeutral }, cancellationToken);
+                await _attributesRepo.UpdateColorAsync(new Color { Id = existing.Id, Name = existing.Name, IsNeutral = existing.IsNeutral }, cancellationToken);
             }
         }
 
@@ -62,7 +63,7 @@ public class InitialValuesService
             var existingStyle = (await _attributesRepo.GetAllStylesAsync(cancellationToken)).FirstOrDefault(x => x.Name == s);
             if (existingStyle is null)
             {
-                await _attributesRepo.AddStyleAsync(new WeatherStyler.Domain.Entities.Style { Name = s }, cancellationToken);
+                await _attributesRepo.AddStyleAsync(new Style { Name = s }, cancellationToken);
             }
         }
 
@@ -105,7 +106,7 @@ public class InitialValuesService
 
             if (existing is null)
             {
-                var created = await _attributesRepo.AddCategoryAsync(new WeatherStyler.Domain.Entities.Category { Name = kv.Key, LayerIndex = layerIndex }, cancellationToken);
+                var created = await _attributesRepo.AddCategoryAsync(new Category { Name = kv.Key, LayerIndex = layerIndex }, cancellationToken);
                 categoryId = created.Id;
             }
             else
@@ -114,7 +115,7 @@ public class InitialValuesService
                 if (existing.LayerIndex != layerIndex)
                 {
                     existing.LayerIndex = layerIndex;
-                    await _attributesRepo.UpdateCategoryAsync(new WeatherStyler.Domain.Entities.Category { Id = existing.Id, Name = existing.Name, LayerIndex = existing.LayerIndex }, cancellationToken);
+                    await _attributesRepo.UpdateCategoryAsync(new Category { Id = existing.Id, Name = existing.Name, LayerIndex = existing.LayerIndex }, cancellationToken);
                 }
             }
 

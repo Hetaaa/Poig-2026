@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using WeatherStyler.Application.Services;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Infrastructure.Services;
 

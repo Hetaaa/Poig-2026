@@ -1,4 +1,6 @@
-using WeatherStyler.Domain.Repositories;
+
+
+using WeatherStyler.Domain.Interfaces.Repositories;
 
 namespace WeatherStyler.Infrastructure.Repositories;
 

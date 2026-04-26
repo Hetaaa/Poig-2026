@@ -28,7 +28,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration); // JWT jest tutaj
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // ─── OpenAPI + JWT ────────────────────────────────────────────────────────────
 builder.Services.AddOpenApi(options =>

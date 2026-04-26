@@ -1,6 +1,6 @@
 using WeatherStyler.Domain.Entities;
 
-namespace WeatherStyler.Domain.Repositories;
+namespace WeatherStyler.Domain.Interfaces.Repositories;
 
 public interface IClothingPropertyRepository
 {

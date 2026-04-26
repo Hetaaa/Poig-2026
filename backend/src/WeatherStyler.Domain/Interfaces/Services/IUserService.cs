@@ -1,6 +1,6 @@
 using System;
 
-namespace WeatherStyler.Application.Services;
+namespace WeatherStyler.Domain.Interfaces.Services;
 
 public interface IUserService
 {

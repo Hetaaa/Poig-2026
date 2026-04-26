@@ -1,16 +1,18 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using WeatherStyler.Infrastructure.Mapping;
-using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Infrastructure.Repositories;
-using WeatherStyler.Infrastructure.Persistence;
-using WeatherStyler.Infrastructure.Entities;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WeatherStyler.Domain.Interfaces.Repositories;
+using WeatherStyler.Domain.Interfaces.Services;
+using WeatherStyler.Infrastructure.Entities;
+using WeatherStyler.Infrastructure.Mapping;
+using WeatherStyler.Infrastructure.Persistence;
+using WeatherStyler.Infrastructure.Repositories;
+using WeatherStyler.Infrastructure.Services;
 
 namespace WeatherStyler.Infrastructure;
 
@@ -23,23 +25,22 @@ public static class DependencyInjection
 
         services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
         services.AddAutoMapper(cfg => cfg.AddMaps(typeof(WardrobeMappingProfile).Assembly));
-        // register infra repositories
+
+        // Register infrastructure repositories
         services.AddScoped<IClothingItemRepository, ClothingItemRepository>();
         services.AddScoped<ILookupRepository, LookupRepository>();
         services.AddScoped<IClothingPropertyRepository, ClothingPropertyRepository>();
-        // Clothing attributes repository (categories, styles, colors, properties CRUD)
         services.AddScoped<IClothingAttributesRepository, ClothingAttributesRepository>();
         services.AddScoped<IProgramVariableRepository, ProgramVariableRepository>();
-        // ensure IHttpContextAccessor available to application
-        services.AddSingleton(typeof(Microsoft.AspNetCore.Http.IHttpContextAccessor), typeof(Microsoft.AspNetCore.Http.HttpContextAccessor));
-        // register IUserService implementation
-        services.AddScoped<WeatherStyler.Application.Services.IUserService, WeatherStyler.Infrastructure.Services.HttpContextUserService>();
-        // register initial values service
-        services.AddScoped<WeatherStyler.Application.Services.InitialValuesService>();
-        services.AddScoped<WeatherStyler.Application.Services.IUserAccountService, WeatherStyler.Infrastructure.Services.UserAccountService>();
-        services.AddScoped<WeatherStyler.Domain.Repositories.IUsageHistoryRepository, WeatherStyler.Infrastructure.Repositories.UsageHistoryRepository>();
-        services.AddScoped<WeatherStyler.Domain.Repositories.IWeatherHistoryQueryRepository, WeatherStyler.Infrastructure.Repositories.WeatherHistoryQueryRepository>();
-        services.AddScoped<WeatherStyler.Infrastructure.Services.OutfitService>();
+        services.AddScoped<IUsageHistoryRepository, UsageHistoryRepository>();
+        services.AddScoped<IWeatherHistoryQueryRepository, WeatherHistoryQueryRepository>();
+        services.AddScoped<IOutfitRepository, OutfitService>();
+
+        // Register infrastructure services
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserService, HttpContextUserService>();
+        services.AddScoped<IUserAccountService, UserAccountService>();
+        services.AddScoped<OutfitService>();
 
         // Identity - use ApplicationUser with GUID primary key and IdentityRole<Guid>
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options => { })

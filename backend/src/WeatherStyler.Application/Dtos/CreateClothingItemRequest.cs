@@ -1,4 +1,4 @@
-namespace WeatherStyler.Application.Contracts;
+namespace WeatherStyler.Application.Dtos;
 
 public record CreateClothingItemRequest(
     string Name,

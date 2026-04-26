@@ -1,8 +1,6 @@
-using WeatherStyler.Domain.Entities;
+namespace WeatherStyler.Domain.Interfaces.Services;
 
-namespace WeatherStyler.Domain.Repositories;
-
-public interface IProgramVariableRepository
+public interface IProgramVariableService
 {
     Task<string?> GetValueAsync(string key, CancellationToken cancellationToken = default);
     Task<string?> GetValueAsync(string key, Guid userId, CancellationToken cancellationToken = default);

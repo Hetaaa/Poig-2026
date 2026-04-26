@@ -1,12 +1,13 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using WeatherStyler.Infrastructure.Entities;
+using WeatherStyler.Application.Dtos;
+using WeatherStyler.Domain.Interfaces.Repositories;
+using WeatherStyler.Domain.Interfaces.Services;
 using WeatherStyler.Application.Services;
-using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Application.Contracts;
-using WeatherStyler.Infrastructure.Services;
 
 namespace WeatherStyler.Controllers;
 
@@ -19,8 +20,9 @@ public class DebugController : ControllerBase
     private readonly IClothingItemService _clothingService;
     private readonly IClothingAttributesRepository _attributesRepo;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly OutfitGeneratorService _outfitGenerator;
+    private readonly IOutfitManagerService _outfitGenerator;
     private readonly IUserService _userService;
+    private readonly IMapper _mapper;
     private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
     private readonly bool _isDevelopment;
 
@@ -30,8 +32,9 @@ public class DebugController : ControllerBase
         IClothingItemService clothingService,
         IClothingAttributesRepository attributesRepo,
         UserManager<ApplicationUser> userManager,
-        OutfitGeneratorService outfitGenerator,
+        IOutfitManagerService outfitGenerator,
         IUserService userService,
+        IMapper mapper,
         Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _db = db;
@@ -41,6 +44,7 @@ public class DebugController : ControllerBase
         _userManager = userManager;
         _outfitGenerator = outfitGenerator;
         _userService = userService;
+        _mapper = mapper;
         _configuration = configuration;
         _isDevelopment = _configuration.GetValue<bool>("IsDevelopment");
     }
@@ -237,7 +241,7 @@ public class DebugController : ControllerBase
                 return BadRequest(new { message = "Not enough lookup data (categories/styles/colors) in database to create mock items" });
 
             var rng = new Random();
-            var created = new List<WeatherStyler.Application.Contracts.ClothingItemDto>();
+            var created = new List<ClothingItemDto>();
 
             // create 300 mock items using existing lookups
             const int targetCount = 300;
@@ -246,23 +250,33 @@ public class DebugController : ControllerBase
                 var cat = categories[rng.Next(categories.Count)];
                 var styleIds = styles.OrderBy(_ => rng.Next()).Take(Math.Min(2, styles.Count)).Select(s => s.Id).ToList();
                 var colorIds = colors.OrderBy(_ => rng.Next()).Take(Math.Min(2, colors.Count)).Select(c => c.Id).ToList();
-                // add extra properties randomly (waterproof/windproof)
-                var propDtos = new List<ClothingPropertyDto>(properties.OrderBy(_ => rng.Next()).Take(Math.Min(2, properties.Count)).Select(p => new ClothingPropertyDto(p.Name, p.Value)));
-                if (rng.NextDouble() < 0.3) propDtos.Add(new ClothingPropertyDto("waterproof", "true"));
-                if (rng.NextDouble() < 0.2) propDtos.Add(new ClothingPropertyDto("windproof", "true"));
 
-                var req = new CreateClothingItemRequest(
-                    Name: $"{cat.Name} Mock Item {i + 1}",
-                    PhotoUrl: null,
-                    CategoryId: cat.Id,
-                    WarmthLevel: rng.Next(1, 11),
-                    StyleIds: styleIds,
-                    ColorIds: colorIds,
-                    Properties: propDtos
-                );
+                // Create domain entity directly
+                var propEntities = properties.OrderBy(_ => rng.Next()).Take(Math.Min(2, properties.Count))
+                    .Select(p => new WeatherStyler.Domain.Entities.ClothingProperty { Id = Guid.NewGuid(), Name = p.Name, Value = p.Value })
+                    .ToList();
 
-                var dto = await _clothingService.CreateAsync(req, userId, cancellationToken);
-                created.Add(dto);
+                if (rng.NextDouble() < 0.3) propEntities.Add(new WeatherStyler.Domain.Entities.ClothingProperty { Id = Guid.NewGuid(), Name = "waterproof", Value = "true" });
+                if (rng.NextDouble() < 0.2) propEntities.Add(new WeatherStyler.Domain.Entities.ClothingProperty { Id = Guid.NewGuid(), Name = "windproof", Value = "true" });
+
+                var clothingItem = new WeatherStyler.Domain.Entities.ClothingItem
+                {
+                    Id = Guid.NewGuid(),
+                    Name = $"{cat.Name} Mock Item {i + 1}",
+                    PhotoUrl = null,
+                    CategoryId = cat.Id,
+                    WarmthLevel = rng.Next(1, 11),
+                    Styles = styles.OrderBy(_ => rng.Next()).Take(Math.Min(2, styles.Count))
+                        .Select(s => new WeatherStyler.Domain.Entities.Style { Id = s.Id, Name = s.Name })
+                        .ToList(),
+                    Colors = colors.OrderBy(_ => rng.Next()).Take(Math.Min(2, colors.Count))
+                        .Select(c => new WeatherStyler.Domain.Entities.Color { Id = c.Id, Name = c.Name, IsNeutral = c.IsNeutral })
+                        .ToList(),
+                    Properties = propEntities
+                };
+
+                var dto = await _clothingService.CreateAsync(clothingItem, userId, cancellationToken);
+                created.Add(_mapper.Map<ClothingItemDto>(dto));
             }
 
             // Add one sunglasses item in the 'Oczy' slot for the user
@@ -270,18 +284,23 @@ public class DebugController : ControllerBase
             {
                 if (glassesCategory != null)
                 {
-                    var sunglassesReq = new CreateClothingItemRequest(
-                        Name: "Okulary przeciws³oneczne - Mock",
-                        PhotoUrl: null,
-                        CategoryId: glassesCategory.Id,
-                        WarmthLevel: 1,
-                        StyleIds: new List<Guid>(),
-                        ColorIds: new List<Guid>(),
-                        Properties: new List<ClothingPropertyDto> { new ClothingPropertyDto("is_sunglasses", "true") }
-                    );
+                    var sunglassesItem = new WeatherStyler.Domain.Entities.ClothingItem
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Okulary przeciws³oneczne - Mock",
+                        PhotoUrl = null,
+                        CategoryId = glassesCategory.Id,
+                        WarmthLevel = 1,
+                        Styles = new List<WeatherStyler.Domain.Entities.Style>(),
+                        Colors = new List<WeatherStyler.Domain.Entities.Color>(),
+                        Properties = new List<WeatherStyler.Domain.Entities.ClothingProperty>
+                        {
+                            new WeatherStyler.Domain.Entities.ClothingProperty { Id = Guid.NewGuid(), Name = "is_sunglasses", Value = "true" }
+                        }
+                    };
 
-                    var sunDto = await _clothingService.CreateAsync(sunglassesReq, userId, cancellationToken);
-                    created.Add(sunDto);
+                    var sunDto = await _clothingService.CreateAsync(sunglassesItem, userId, cancellationToken);
+                    created.Add(_mapper.Map<ClothingItemDto>(sunDto));
                 }
             }
             catch
@@ -353,29 +372,15 @@ public class DebugController : ControllerBase
                     isRaining = outfitResult.IsRaining
                 });
 
-            // Return generated outfit now (was placeholder note previously)
-                // map outfit to DTO with trimmed fields (no created/user metadata)
-                var outfitDto = new
-                {
-                    name = outfitResult.Outfit?.Name,
-                    clothingItems = outfitResult.Outfit?.ClothingItems.Select(ci => new
-                    {
-                        name = ci.Name,
-                        photoUrl = ci.PhotoUrl,
-                        categoryId = ci.CategoryId,
-                        warmthLevel = ci.WarmthLevel,
-                        properties = ci.Properties.Select(p => new { name = p.Name, value = p.Value }),
-                        styles = ci.Styles.Select(s => new { id = s.Id, name = s.Name }),
-                        colors = ci.Colors.Select(c => new { id = c.Id, name = c.Name, isNeutral = c.IsNeutral })
-                    })
-                };
+            // Map outfit to DTO
+            var outfitDto = _mapper.Map<OutfitDto>(outfitResult.Outfit);
 
-                return Ok(new
-                {
-                    message = "Outfit generated",
-                    outfit = outfitDto,
-                    warnings = outfitResult.Warnings
-                });
+            return Ok(new
+            {
+                message = "Outfit generated",
+                outfit = outfitDto,
+                warnings = outfitResult.Warnings
+            });
         }
         catch (Exception ex)
         {

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WeatherStyler.Application.Dtos;
 using WeatherStyler.Application.Services;
-using WeatherStyler.Application.Contracts;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Controllers;
 
@@ -9,17 +10,57 @@ namespace WeatherStyler.Controllers;
 [Route("api/[controller]")]
 public class WeatherPickerController : ControllerBase
 {
-    private readonly ProgramVariableService _vars;
-    private readonly WeatherStyler.Application.Services.IUserService _userService;
+    private readonly IProgramVariableService _vars;
+    private readonly IUserService _userService;
+    private readonly IWeatherService _weatherService;
     private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
     private readonly bool _isDevelopment;
 
-    public WeatherPickerController(ProgramVariableService vars, WeatherStyler.Application.Services.IUserService userService, Microsoft.Extensions.Configuration.IConfiguration configuration)
+    public WeatherPickerController(
+        IProgramVariableService vars,
+        IUserService userService,
+        IWeatherService weatherService,
+        Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _vars = vars;
         _userService = userService;
+        _weatherService = weatherService;
         _configuration = configuration;
         _isDevelopment = _configuration.GetValue<bool>("IsDevelopment");
+    }
+
+    [HttpGet("daily/{date}")]
+    [Authorize]
+    public async Task<IActionResult> GetDailyWeather(DateTime date, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var userId = _userService.GetUserIdOrNull();
+            if (userId == null) return Unauthorized();
+
+            var lat = await _vars.GetValueAsync("last_location_lat", userId.Value, cancellationToken);
+            var lon = await _vars.GetValueAsync("last_location_lon", userId.Value, cancellationToken);
+            if (lat is null || lon is null) return BadRequest(new { message = "No location set" });
+
+            var summary = await _weatherService.GetDailySummaryAsync(double.Parse(lat), double.Parse(lon), date, cancellationToken);
+            if (summary is null) return StatusCode(502, new { message = "Could not fetch weather" });
+
+            return Ok(new
+            {
+                date = summary.Date,
+                temperature = summary.Temperature,
+                feelsLike = summary.FeelsLike,
+                humidity = summary.Humidity,
+                windSpeed = summary.WindSpeed,
+                precipitation = summary.Precipitation,
+                cloudCover = summary.CloudCover
+            });
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     [HttpPost("pick")]

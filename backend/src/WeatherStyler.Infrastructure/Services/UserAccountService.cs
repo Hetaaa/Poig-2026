@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Application.Services;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Infrastructure.Services;
 

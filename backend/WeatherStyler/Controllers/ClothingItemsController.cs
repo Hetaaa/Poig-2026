@@ -1,8 +1,9 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WeatherStyler.Application.Contracts;
-using WeatherStyler.Application.Services;
+using WeatherStyler.Application.Dtos;
+using WeatherStyler.Domain.Entities;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Controllers;
 
@@ -12,14 +13,16 @@ namespace WeatherStyler.Controllers;
 public class ClothingItemsController : ControllerBase
 {
     private readonly IClothingItemService _service;
-    private readonly WeatherStyler.Application.Services.IUserService _userService;
+    private readonly IUserService _userService;
+    private readonly IMapper _mapper;
     private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
     private readonly bool _isDevelopment;
 
-    public ClothingItemsController(WeatherStyler.Application.Services.IClothingItemService service, WeatherStyler.Application.Services.IUserService userService, Microsoft.Extensions.Configuration.IConfiguration configuration)
+    public ClothingItemsController(IClothingItemService service, IUserService userService, IMapper mapper, IConfiguration configuration)
     {
         _service = service;
         _userService = userService;
+        _mapper = mapper;
         _configuration = configuration;
         _isDevelopment = _configuration.GetValue<bool>("IsDevelopment");
     }
@@ -30,7 +33,8 @@ public class ClothingItemsController : ControllerBase
         try
         {
             var userId = _userService.GetUserId();
-            var dtos = await _service.GetAllAsync(userId, cancellationToken);
+            var items = await _service.GetAllAsync(userId, cancellationToken);
+            var dtos = items.Select(item => _mapper.Map<ClothingItemDto>(item));
             return Ok(dtos);
         }
         catch (Exception ex)
@@ -46,8 +50,9 @@ public class ClothingItemsController : ControllerBase
         try
         {
             var userId = _userService.GetUserId();
-            var dto = await _service.GetByIdAsync(id, userId, cancellationToken);
-            if (dto is null) return NotFound();
+            var item = await _service.GetByIdAsync(id, userId, cancellationToken);
+            if (item is null) return NotFound();
+            var dto = _mapper.Map<ClothingItemDto>(item);
             return Ok(dto);
         }
         catch (Exception ex)
@@ -64,7 +69,9 @@ public class ClothingItemsController : ControllerBase
         try
         {
             var userId = _userService.GetUserId();
-            var dto = await _service.CreateAsync(request, userId, cancellationToken);
+            var clothingItem = _mapper.Map<ClothingItem>(request);
+            var created = await _service.CreateAsync(clothingItem, userId, cancellationToken);
+            var dto = _mapper.Map<ClothingItemDto>(created);
             return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
         }
         catch (Exception ex)
@@ -81,7 +88,8 @@ public class ClothingItemsController : ControllerBase
         try
         {
             var userId = _userService.GetUserId();
-            await _service.UpdateAsync(id, request, userId, cancellationToken);
+            var clothingItem = _mapper.Map<ClothingItem>(request);
+            await _service.UpdateAsync(id, clothingItem, userId, cancellationToken);
             return NoContent();
         }
         catch (Exception ex)

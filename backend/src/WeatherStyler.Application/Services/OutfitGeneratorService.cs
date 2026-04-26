@@ -1,6 +1,8 @@
 using WeatherStyler.Domain.Entities;
-using WeatherStyler.Domain.Repositories;
+
 using WeatherStyler.Domain.Entities.BuisnessLogic;
+using WeatherStyler.Domain.Interfaces.Repositories;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Application.Services;
 
@@ -59,13 +61,14 @@ internal class ScoredCandidate
 /// przy małej szafie outfit prawie zawsze zostaje zbudowany.
 /// Twarde return null tylko gdy pula dla slotu/warstwy jest dosłownie pusta.
 /// </summary>
-public class OutfitGeneratorService
+public class OutfitManagerService : IOutfitManagerService
 {
     private readonly IProgramVariableRepository _programVars;
     private readonly IClothingItemRepository _clothingRepo;
     private readonly ILookupRepository _lookupRepo;
     private readonly IUsageHistoryRepository _usageHistoryRepo;
-    private readonly WeatherService _weatherService;
+    private readonly IWeatherService _weatherService;
+    private readonly IOutfitRepository _outfitRepo;
     private readonly Random _random = new Random();
 
     // Wagi punktów dla kryteriów jakościowych
@@ -77,18 +80,65 @@ public class OutfitGeneratorService
     private const double ScoreWindproof = 3.0;  // wiatroszczelne gdy wieje
     private const double PenaltyNonNeutralColor = -2.0;  // każdy nadmiarowy kolor nie-neutralny
 
-    public OutfitGeneratorService(
+    public OutfitManagerService(
         IProgramVariableRepository programVars,
         IClothingItemRepository clothingRepo,
         ILookupRepository lookupRepo,
         IUsageHistoryRepository usageHistoryRepo,
-        WeatherService weatherService)
+        IWeatherService weatherService,
+        IOutfitRepository outfitRepo)
     {
         _programVars = programVars;
         _clothingRepo = clothingRepo;
         _lookupRepo = lookupRepo;
         _usageHistoryRepo = usageHistoryRepo;
         _weatherService = weatherService;
+        _outfitRepo = outfitRepo;
+    }
+
+    /// <summary>
+    /// If there's an outfit saved in usage history for today, return its summary.
+    /// Otherwise generate a new outfit, persist Outfit + UsageHistory and return the saved summary.
+    /// Returns (summaries, null) on success, or (null, warnings) on generation failure.
+    /// </summary>
+    public async Task<OutfitGeneratorResult> GetOrGenerateTodayAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var today = DateTime.UtcNow.Date;
+
+        // check existing via repository
+        var existingOutfits = (await _outfitRepo.GetOutfitsAsync(userId, today, today.AddDays(1).AddTicks(-1), cancellationToken)).ToList();
+        if (existingOutfits.Any())
+        {
+            return new OutfitGeneratorResult
+            {
+                Outfit = existingOutfits.First(),
+                Warnings = null
+            };
+        }
+
+        // generate
+        var outfitResult = await GenerateOutfitForTodayAsync(userId, cancellationToken);
+        if (outfitResult.Outfit == null)
+            return outfitResult;
+
+        // ensure user exists via repository
+        if (!await _outfitRepo.UserExistsAsync(userId, cancellationToken))
+            return new OutfitGeneratorResult
+            {
+                Outfit = null,
+                Warnings = new List<string> { "Current user not found in database. Cannot save usage history." }
+            };
+
+        // collect clothing item ids
+        var itemIds = outfitResult.Outfit.ClothingItems.Select(ci => ci.Id).ToList();
+
+        var outfitId = outfitResult.Outfit.Id == Guid.Empty ? Guid.NewGuid() : outfitResult.Outfit.Id;
+
+        // persist via repository
+        await _outfitRepo.SaveGeneratedOutfitAsync(outfitId, outfitResult.Outfit.Name, outfitResult.Outfit.DateCreated, userId, itemIds, today, cancellationToken);
+
+        // return the generated outfit
+        return outfitResult;
     }
 
     // ──────────────────────────────────────────────────────────────────────────

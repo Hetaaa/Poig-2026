@@ -1,63 +1,68 @@
 using Microsoft.EntityFrameworkCore;
 using WeatherStyler.Domain.Entities;
-using WeatherStyler.Domain.Repositories;
+
 using WeatherStyler.Domain.Entities;
+using WeatherStyler.Domain.Interfaces.Repositories;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
 namespace WeatherStyler.Infrastructure.Repositories;
 
+
+using AutoMapper;
+
 internal class LookupRepository : ILookupRepository
 {
     private readonly AppDbContext _db;
+    private readonly IMapper _mapper;
 
-    public LookupRepository(AppDbContext db)
+    public LookupRepository(AppDbContext db, IMapper mapper)
     {
         _db = db;
+        _mapper = mapper;
     }
 
     public async Task<IReadOnlyList<Category>> GetCategoriesAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.Categories
+        var entities = await _db.Categories
+            .Include(c => c.ClothingSlots)
             .AsNoTracking()
-            .Select(c => new Category
-            {
-                Id = c.Id,
-                Name = c.Name,
-                LayerIndex = c.LayerIndex,
-                ClothingSlots = c.ClothingSlots.Select(s => new ClothingSlot { Id = s.Id, Name = s.Name }).ToList()
-            })
             .ToListAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<Category>>(entities);
     }
 
     public async Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var e = await _db.Categories.FindAsync(new object[] { id }, cancellationToken);
+        var e = await _db.Categories
+            .Include(c => c.ClothingSlots)
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
         if (e is null) return null;
-        return new Category { Id = e.Id, Name = e.Name, LayerIndex = e.LayerIndex, ClothingSlots = e.ClothingSlots.Select(s => new ClothingSlot { Id = s.Id, Name = s.Name }).ToList() };
+        return _mapper.Map<Category>(e);
     }
 
     public async Task<IReadOnlyList<Style>> GetStylesAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.Styles.AsNoTracking().Select(s => new Style { Id = s.Id, Name = s.Name }).ToListAsync(cancellationToken);
+        var entities = await _db.Styles.AsNoTracking().ToListAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<Style>>(entities);
     }
 
     public async Task<Style?> GetStyleByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await _db.Styles.FindAsync(new object[] { id }, cancellationToken);
         if (e is null) return null;
-        return new Style { Id = e.Id, Name = e.Name };
+        return _mapper.Map<Style>(e);
     }
 
     public async Task<IReadOnlyList<Color>> GetColorsAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.Colors.AsNoTracking().Select(c => new Color { Id = c.Id, Name = c.Name, IsNeutral = c.IsNeutral }).ToListAsync(cancellationToken);
+        var entities = await _db.Colors.AsNoTracking().ToListAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<Color>>(entities);
     }
 
     public async Task<Color?> GetColorByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await _db.Colors.FindAsync(new object[] { id }, cancellationToken);
         if (e is null) return null;
-        return new Color { Id = e.Id, Name = e.Name, IsNeutral = e.IsNeutral };
+        return _mapper.Map<Color>(e);
     }
 }

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WeatherStyler.Application.Services;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Controllers;
 
@@ -7,11 +7,11 @@ namespace WeatherStyler.Controllers;
 [Route("api/[controller]")]
 public class LookupController : ControllerBase
 {
-    private readonly WeatherStyler.Application.Services.LookupService _service;
+    private readonly ILookupService _service;
     private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
     private readonly bool _isDevelopment;
 
-    public LookupController(WeatherStyler.Application.Services.LookupService service, Microsoft.Extensions.Configuration.IConfiguration configuration)
+    public LookupController(ILookupService service, Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _service = service;
         _configuration = configuration;

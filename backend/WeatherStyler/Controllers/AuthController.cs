@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WeatherStyler.Contracts;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Controllers;
 
@@ -8,11 +9,11 @@ namespace WeatherStyler.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly WeatherStyler.Application.Services.IUserAccountService _userAccountService;
+    private readonly IUserAccountService _userAccountService;
     private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
     private readonly bool _isDevelopment;
 
-    public AuthController(WeatherStyler.Application.Services.IUserAccountService userAccountService, Microsoft.Extensions.Configuration.IConfiguration configuration)
+    public AuthController(IUserAccountService userAccountService, Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _userAccountService = userAccountService;
         _configuration = configuration;

@@ -1,4 +1,4 @@
-using WeatherStyler.Application.Contracts;
+using WeatherStyler.Application.Dtos;
 
 namespace WeatherStyler.Contracts;
 

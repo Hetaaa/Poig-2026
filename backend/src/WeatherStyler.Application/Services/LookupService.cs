@@ -1,9 +1,12 @@
-using WeatherStyler.Domain.Repositories;
-using WeatherStyler.Application.Contracts;
+
+using WeatherStyler.Application.Dtos;
+using WeatherStyler.Domain.Entities;
+using WeatherStyler.Domain.Interfaces.Repositories;
+using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Application.Services;
 
-public class LookupService
+public class LookupService : ILookupService
 {
     private readonly ILookupRepository _lookupRepo;
     private readonly IClothingPropertyRepository _propertyRepo;
@@ -14,51 +17,45 @@ public class LookupService
         _propertyRepo = propertyRepo;
     }
 
-    public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Category>> GetCategoriesAsync(CancellationToken cancellationToken = default)
     {
-        var cats = await _lookupRepo.GetCategoriesAsync(cancellationToken);
-        return cats.Select(c => new CategoryDto(c.Id, c.Name, c.LayerIndex));
+        return await _lookupRepo.GetCategoriesAsync(cancellationToken);
     }
 
-    public async Task<CategoryDto?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var c = await _lookupRepo.GetCategoryByIdAsync(id, cancellationToken);
-        return c is null ? null : new CategoryDto(c.Id, c.Name, c.LayerIndex);
+        return await _lookupRepo.GetCategoryByIdAsync(id, cancellationToken);
     }
 
-    public async Task<IEnumerable<StyleDto>> GetStylesAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Style>> GetStylesAsync(CancellationToken cancellationToken = default)
     {
-        var styles = await _lookupRepo.GetStylesAsync(cancellationToken);
-        return styles.Select(s => new StyleDto(s.Id, s.Name));
+        return await _lookupRepo.GetStylesAsync(cancellationToken);
     }
 
-    public async Task<StyleDto?> GetStyleByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Style?> GetStyleByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var s = await _lookupRepo.GetStyleByIdAsync(id, cancellationToken);
-        return s is null ? null : new StyleDto(s.Id, s.Name);
+        return await _lookupRepo.GetStyleByIdAsync(id, cancellationToken);
     }
 
-    public async Task<IEnumerable<ColorDto>> GetColorsAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Color>> GetColorsAsync(CancellationToken cancellationToken = default)
     {
-        var colors = await _lookupRepo.GetColorsAsync(cancellationToken);
-        return colors.Select(c => new ColorDto(c.Id, c.Name, c.IsNeutral));
+        return await _lookupRepo.GetColorsAsync(cancellationToken);
     }
 
-    public async Task<ColorDto?> GetColorByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Color?> GetColorByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var c = await _lookupRepo.GetColorByIdAsync(id, cancellationToken);
-        return c is null ? null : new ColorDto(c.Id, c.Name, c.IsNeutral);
+        return await _lookupRepo.GetColorByIdAsync(id, cancellationToken);
+        
     }
 
-    public async Task<IEnumerable<ClothingPropertyDto>> GetPropertiesAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ClothingProperty>> GetPropertiesAsync(CancellationToken cancellationToken = default)
     {
-        var props = await _propertyRepo.GetAllAsync(cancellationToken);
-        return props.Select(p => new ClothingPropertyDto(p.Name, p.Value));
+        return await _propertyRepo.GetAllAsync(cancellationToken);
+
     }
 
-    public async Task<ClothingPropertyDto?> GetPropertyByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ClothingProperty?> GetPropertyByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var p = await _propertyRepo.GetByIdAsync(id, cancellationToken);
-        return p is null ? null : new ClothingPropertyDto(p.Name, p.Value);
+        return await _propertyRepo.GetByIdAsync(id, cancellationToken);
     }
 }

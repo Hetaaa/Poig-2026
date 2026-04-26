@@ -1,18 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using WeatherStyler.Domain.Repositories;
+
 using WeatherStyler.Domain.Entities;
+using WeatherStyler.Domain.Interfaces.Repositories;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
 namespace WeatherStyler.Infrastructure.Repositories;
 
+
+using AutoMapper;
+
 internal class ClothingItemRepository : IClothingItemRepository
 {
     private readonly AppDbContext _db;
+    private readonly IMapper _mapper;
 
-    public ClothingItemRepository(AppDbContext db)
+    public ClothingItemRepository(AppDbContext db, IMapper mapper)
     {
         _db = db;
+        _mapper = mapper;
     }
 
     public async Task<IReadOnlyList<ClothingItem>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -26,26 +32,7 @@ internal class ClothingItemRepository : IClothingItemRepository
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        // map to domain
-        return entities.Select(e => new ClothingItem
-        {
-            Id = e.Id,
-            Name = e.Name,
-            PhotoUrl = e.PhotoUrl,
-            CategoryId = e.CategoryId,
-            UserId = e.UserId,
-            WarmthLevel = e.WarmthLevel,
-            Properties = e.Properties.Select(p => new ClothingProperty { Id = p.Id, Name = p.Name, Value = p.Value, ClothingItemId = p.ClothingItemId }).ToList(),
-            Styles = e.Styles.Select(s => new Style { Id = s.Id, Name = s.Name }).ToList(),
-            Colors = e.Colors.Select(c => new Color { Id = c.Id, Name = c.Name, IsNeutral = c.IsNeutral }).ToList(),
-            Category = e.Category == null ? null : new Category
-            {
-                Id = e.Category.Id,
-                Name = e.Category.Name,
-                LayerIndex = e.Category.LayerIndex,
-                ClothingSlots = e.Category.ClothingSlots.Select(cs => new ClothingSlot { Id = cs.Id, Name = cs.Name }).ToList()
-            }
-        }).ToList();
+        return _mapper.Map<IReadOnlyList<ClothingItem>>(entities);
     }
 
     public async Task<ClothingItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -59,52 +46,29 @@ internal class ClothingItemRepository : IClothingItemRepository
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         if (e is null) return null;
-
-        return new ClothingItem
-        {
-            Id = e.Id,
-            Name = e.Name,
-            PhotoUrl = e.PhotoUrl,
-            CategoryId = e.CategoryId,
-            UserId = e.UserId,
-            WarmthLevel = e.WarmthLevel,
-            Properties = e.Properties.Select(p => new ClothingProperty { Id = p.Id, Name = p.Name, Value = p.Value, ClothingItemId = p.ClothingItemId }).ToList(),
-            Styles = e.Styles.Select(s => new Style { Id = s.Id, Name = s.Name }).ToList(),
-            Colors = e.Colors.Select(c => new Color { Id = c.Id, Name = c.Name, IsNeutral = c.IsNeutral }).ToList(),
-            Category = e.Category == null ? null : new Category
-            {
-                Id = e.Category.Id,
-                Name = e.Category.Name,
-                LayerIndex = e.Category.LayerIndex,
-                ClothingSlots = e.Category.ClothingSlots.Select(cs => new ClothingSlot { Id = cs.Id, Name = cs.Name }).ToList()
-            }
-        };
+        return _mapper.Map<ClothingItem>(e);
     }
 
     public async Task<ClothingItem> AddAsync(ClothingItem item, CancellationToken cancellationToken = default)
     {
-        var e = new ClothingItemEntity
-        {
-            // Always generate a new Id on create to prevent client-supplied ids
-            Id = Guid.NewGuid(),
-            Name = item.Name,
-            PhotoUrl = item.PhotoUrl,
-            CategoryId = item.CategoryId,
-            UserId = item.UserId,
-            WarmthLevel = item.WarmthLevel
-        };
+        var e = _mapper.Map<ClothingItemEntity>(item);
+        // Always generate a new Id on create to prevent client-supplied ids
+        e.Id = Guid.NewGuid();
 
         // Generate new ids for properties on create - do not trust client-supplied ids
-        if (item.Properties != null)
+        if (e.Properties != null)
         {
-            foreach (var p in item.Properties)
+            foreach (var p in e.Properties)
             {
-                e.Properties.Add(new ClothingPropertyEntity { Id = Guid.NewGuid(), Name = p.Name, Value = p.Value, ClothingItemId = e.Id });
+                p.Id = Guid.NewGuid();
+                p.ClothingItemId = e.Id;
             }
         }
 
+        // Attach existing styles
         if (item.Styles != null)
         {
+            e.Styles.Clear();
             foreach (var s in item.Styles)
             {
                 var styleEntity = await _db.Styles.FindAsync(new object?[] { s.Id }, cancellationToken);
@@ -112,8 +76,10 @@ internal class ClothingItemRepository : IClothingItemRepository
             }
         }
 
+        // Attach existing colors
         if (item.Colors != null)
         {
+            e.Colors.Clear();
             foreach (var c in item.Colors)
             {
                 var colorEntity = await _db.Colors.FindAsync(new object?[] { c.Id }, cancellationToken);
@@ -124,8 +90,7 @@ internal class ClothingItemRepository : IClothingItemRepository
         _db.ClothingItems.Add(e);
         await _db.SaveChangesAsync(cancellationToken);
 
-        item.Id = e.Id;
-        return item;
+        return _mapper.Map<ClothingItem>(e);
     }
 
     public async Task<IEnumerable<Guid>> FindMissingStyleIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
@@ -157,10 +122,8 @@ internal class ClothingItemRepository : IClothingItemRepository
 
         if (e is null) throw new InvalidOperationException("Not found");
 
-        e.Name = item.Name;
-        e.PhotoUrl = item.PhotoUrl;
-        e.CategoryId = item.CategoryId;
-        e.WarmthLevel = item.WarmthLevel;
+        // Map simple properties
+        _mapper.Map(item, e);
 
         // replace properties
         _db.ClothingProperties.RemoveRange(e.Properties);

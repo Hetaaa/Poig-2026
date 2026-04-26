@@ -17,15 +17,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<ClothingSlotEntity> ClothingSlots => Set<ClothingSlotEntity>();
     public DbSet<ClothingItemEntity> ClothingItems => Set<ClothingItemEntity>();
     public DbSet<ClothingPropertyEntity> ClothingProperties => Set<ClothingPropertyEntity>();
-    // WarmthRating removed; using WarmthLevel int on ClothingItem instead
     public DbSet<StyleEntity> Styles => Set<StyleEntity>();
     public DbSet<ColorEntity> Colors => Set<ColorEntity>();
     public DbSet<ProgramVariableEntity> ProgramVariables => Set<ProgramVariableEntity>();
     public DbSet<OutfitEntity> Outfits => Set<OutfitEntity>();
     public DbSet<UsageHistoryEntity> UsageHistories => Set<UsageHistoryEntity>();
-    // OutfitClothingItems handled via many-to-many join table configuration
-    // WeatherHistories removed - weather data is fetched on-demand only
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
