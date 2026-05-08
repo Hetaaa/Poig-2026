@@ -25,7 +25,7 @@ export function AuthSidePanel({ isRegister, onSwitch }) {
           </button>
         </div>
       </div>
-      <div className="auth-note">Token zapisywany lokalnie w przegladarce.</div>
+      <div className="auth-note">Ubieraj się po swojemu ale z głową w chmurze.</div>
     </aside>
   );
 }
