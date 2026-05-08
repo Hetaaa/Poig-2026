@@ -1,0 +1,90 @@
+@use "../../variables" as *;
+@use "./Components/AuthPanel/AuthPanel";
+@use "./Components/AuthSidePanel/AuthSidePanel";
+
+.auth-page {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: $bg;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &::before {
+    top: -10rem;
+    left: -8rem;
+    width: 32rem;
+    height: 32rem;
+    background: radial-gradient(
+      circle at 30% 30%,
+      rgba(80, 118, 250, 0.2),
+      transparent 60%
+    );
+  }
+
+  &::after {
+    right: -12rem;
+    bottom: -14rem;
+    width: 34rem;
+    height: 34rem;
+    background: radial-gradient(
+      circle at 70% 70%,
+      rgba(80, 118, 250, 0.18),
+      transparent 65%
+    );
+  }
+}
+
+.auth-card {
+  width: min(61.25rem, 92vw);
+  height: min(40rem, 90vh);
+  background: #fff;
+  border-radius: 1.5rem;
+  border: 0.0625rem solid $border-light;
+  box-shadow: 0 1.5rem 3.75rem rgba(15, 23, 42, 0.12);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+
+  .auth-forms {
+    overflow: hidden;
+    background: #fff;
+    height: 100%;
+  }
+
+  .auth-panels {
+    width: 200%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+  }
+
+  &.is-register {
+    .auth-panels {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@media (max-width: 56.25rem) {
+  .auth-card {
+    grid-template-columns: 1fr;
+    height: min(47.5rem, 94vh);
+  }
+}

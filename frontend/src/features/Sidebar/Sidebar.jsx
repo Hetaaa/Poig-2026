@@ -4,15 +4,19 @@ import {
   AiOutlinePlus,
   AiOutlineSetting,
 } from "react-icons/ai";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { CgShoppingBag } from "react-icons/cg";
 import { MdLogout } from "react-icons/md";
+import { useAuthStore } from "../Auth/authStore";
 import "./Sidebar.scss";
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+
   function handleLogout() {
-    // TODO: Implement logout logic here
-    console.log("User logged out");
+    logout();
+    navigate("/auth");
   }
 
   return (

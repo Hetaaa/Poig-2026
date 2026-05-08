@@ -46,11 +46,11 @@ internal class UserAccountService : IUserAccountService
     {
         var user = await _userManager.FindByNameAsync(username);
         if (user is null)
-            throw new InvalidOperationException("Invalid credentials");
+            throw new InvalidOperationException("Błędne dane logowania");
 
         var valid = await _userManager.CheckPasswordAsync(user, password);
         if (!valid)
-            throw new InvalidOperationException("Invalid credentials");
+            throw new InvalidOperationException("Błędne dane logowania");
 
         var token = await GenerateJwtTokenAsync(user);
         return new AuthResult(token, user.UserName ?? string.Empty);

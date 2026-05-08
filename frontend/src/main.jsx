@@ -3,6 +3,8 @@ import App from "./App";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import TestPage from "./features/Test/TestPage";
+import AuthPage from "./features/Auth/AuthPage";
+import RequireAuth from "./guards/RequireAuth";
 import "./main.scss";
 
 // TODO: Replace with actual pages when they are created
@@ -12,8 +14,16 @@ function PlaceholderPage({ title }) {
 
 const router = createBrowserRouter([
   {
+    path: "/auth",
+    element: <AuthPage />,
+  },
+  {
     path: "/",
-    element: <App />,
+    element: (
+      <RequireAuth>
+        <App />
+      </RequireAuth>
+    ),
     children: [
       {
         index: true,

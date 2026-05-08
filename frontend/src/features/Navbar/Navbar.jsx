@@ -1,9 +1,12 @@
 import { CgShoppingBag } from "react-icons/cg";
 import { AiOutlineUser } from "react-icons/ai";
+import { useAuthStore } from "../Auth/authStore";
 
 import "./Navbar.scss";
 
 export default function Navbar() {
+  const { username } = useAuthStore();
+
   return (
     <div className="navbar">
       <aside className="left">
@@ -13,7 +16,7 @@ export default function Navbar() {
         <span>Smart Wardrobe - Projekt na POIG</span>
       </aside>
       <aside className="right">
-        <span>Jan Kowalski</span>
+        <span>{username || "Użytkownik"}</span>
         <div className="user-avatar">
           <AiOutlineUser
             style={{ strokeWidth: 30 }}

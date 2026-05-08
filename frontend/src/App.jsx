@@ -13,7 +13,7 @@ export default function App() {
         <Sidebar />
         <main className="app-main">
           <Greetings />
-          <Weather/>
+          <Weather />
         </main>
       </div>
     </>
