@@ -2,10 +2,11 @@ import React from "react";
 import App from "./App";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import TestPage from "./features/Test/TestPage";
-import AuthPage from "./features/Auth/AuthPage";
+import { AuthPage } from "./features/Auth/AuthPage";
 import RequireAuth from "./guards/RequireAuth";
 import "./main.scss";
+
+import { MainPage } from "./features/MainPage/MainPage";
 
 // TODO: Replace with actual pages when they are created
 function PlaceholderPage({ title }) {
@@ -27,11 +28,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <TestPage />,
+        element: <MainPage />,
       },
       {
         path: "main-page",
-        element: <TestPage />,
+        element: <MainPage />,
       },
       {
         path: "favourites",

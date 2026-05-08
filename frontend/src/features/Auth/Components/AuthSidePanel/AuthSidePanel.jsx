@@ -1,4 +1,4 @@
-export default function AuthSidePanel({ isRegister, onSwitch }) {
+export function AuthSidePanel({ isRegister, onSwitch }) {
   return (
     <aside className="auth-side">
       <div className="auth-brand">Smart Wardrobe</div>

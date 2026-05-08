@@ -1,4 +1,4 @@
-export default function AuthPanel({
+export function AuthPanel({
   title,
   subtitle,
   fields,

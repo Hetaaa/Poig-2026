@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "./authStore";
-import AuthPanel from "./Components/AuthPanel/AuthPanel";
-import AuthSidePanel from "./Components/AuthSidePanel/AuthSidePanel";
+import { AuthPanel } from "./Components/AuthPanel/AuthPanel";
+import { AuthSidePanel } from "./Components/AuthSidePanel/AuthSidePanel";
 import "./AuthPage.scss";
 
 const initialForm = {
@@ -52,7 +52,7 @@ const registerFields = [
   },
 ];
 
-export default function AuthPage() {
+export function AuthPage() {
   const [mode, setMode] = useState("login");
   const [form, setForm] = useState(initialForm);
   const [formError, setFormError] = useState("");

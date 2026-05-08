@@ -2,9 +2,8 @@ import { create } from "zustand";
 import {
   getDailyWeather,
   setLastLocation as setLastLocationRequest,
-} from "./weatherService";
-import { getErrorMessage } from "../../utils/helpers";
-import { formatDate } from "../../utils/dateUtil";
+} from "../features/MainPage/Components/Weather/weatherService";
+import { getErrorMessage } from "../utils/helpers";
 
 const initialState = {
   weather: null,
@@ -17,7 +16,7 @@ export const useWeatherStore = create((set) => ({
   async fetchDailyWeather(date = new Date()) {
     set({ status: "loading", error: null });
     try {
-      const dateStr = formatDate(date);
+      const dateStr = date instanceof Date ? date.toISOString() : date;
       const data = await getDailyWeather(dateStr);
       set({ weather: data, status: "success" });
     } catch (error) {

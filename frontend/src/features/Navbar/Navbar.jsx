@@ -4,7 +4,7 @@ import { useAuthStore } from "../Auth/authStore";
 
 import "./Navbar.scss";
 
-export default function Navbar() {
+export function Navbar() {
   const { username } = useAuthStore();
 
   return (

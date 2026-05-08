@@ -3,7 +3,7 @@ import "./Weather.scss";
 import { useWeatherStore } from "./weatherStore";
 import { AiOutlineCloud } from "react-icons/ai";
 
-export default function Weather() {
+export function Weather() {
   const { weather, status, error, fetchDailyWeather, setLastLocation } =
     useWeatherStore();
 

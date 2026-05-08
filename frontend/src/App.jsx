@@ -1,8 +1,6 @@
-import Navbar from "./features/Navbar/Navbar";
-import Sidebar from "./features/Sidebar/Sidebar";
+import { Navbar } from "./features/Navbar/Navbar";
+import { Sidebar } from "./features/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
-import Greetings from "./features/Greetings/Greetings";
-import Weather from "./features/Weather/Weather";
 import "./App.scss";
 
 export default function App() {
@@ -12,8 +10,7 @@ export default function App() {
       <div className="app-content">
         <Sidebar />
         <main className="app-main">
-          <Greetings />
-          <Weather />
+          <Outlet />
         </main>
       </div>
     </>

@@ -10,7 +10,7 @@ import { MdLogout } from "react-icons/md";
 import { useAuthStore } from "../Auth/authStore";
 import "./Sidebar.scss";
 
-export default function Sidebar() {
+export function Sidebar() {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
 

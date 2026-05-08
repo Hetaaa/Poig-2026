@@ -1,4 +1,4 @@
-import { apiClient } from "../../api/apiClient";
+import { apiClient } from "../../../../api/apiClient";
 
 export async function getDailyWeather(date) {
   const response = await apiClient.get(`/WeatherPicker/daily/${date}`);
