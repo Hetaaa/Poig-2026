@@ -4,7 +4,7 @@ import { BiCalendarAlt } from "react-icons/bi";
 
 
 
-export default function Greetings() {
+export default function PlannerTitle() {
     const [currentDate, setCurrentDate] = useState(new Date())
     return (
     <>
