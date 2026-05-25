@@ -91,7 +91,7 @@ export function AuthPage() {
 
     const username = form.username.trim();
     if (!username || !form.password) {
-      setFormError("Wypelnij wszystkie pola");
+      setFormError("Wypełnij wszystkie pola");
       return;
     }
 
