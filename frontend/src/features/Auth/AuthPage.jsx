@@ -96,7 +96,7 @@ export function AuthPage() {
     }
 
     if (isRegister && form.password !== form.confirmPassword) {
-      setFormError("Hasla sie nie zgadzaja");
+      setFormError("Hasła się nie zgadzają");
       return;
     }
     setFormError("");
