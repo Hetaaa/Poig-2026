@@ -1,15 +1,15 @@
 @use "./../../../../variables" as *;
 
 .Weather-block {
-  background: linear-gradient(90deg, #3c70fe 0%, #3e74ff 50%, #3b70fe 100%);
+  border-radius: 0.625rem;
+  background: linear-gradient(90deg, #3C70FE 0%, #3E74FF 50%, #3B70FE 100%);
   display: flex;
-  padding: 16px 24px;
+  padding: 1rem 1.5rem;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 16px;
+  gap: 1rem;
   align-self: stretch;
-  border-radius: 10px;
 
   .info {
     display: flex;
@@ -20,85 +20,84 @@
     .city-info {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      align-items: flex-start;
+      gap: 0.75rem;
 
       .city-text {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 10px;
+        gap: 0.625rem;
 
         .city-icon {
           color: white;
-          width: 12px;
-          height: 12px;
+          width: 0.75rem;
+          height: 0.75rem;
         }
 
         .city {
-          color: #fff;
+          color: #FFF;
           text-align: center;
           font-family: Inter;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-style: normal;
           font-weight: 400;
-          line-height: 18px;
+          line-height: 1.125rem;
         }
       }
 
       .city-temperature {
         display: flex;
         align-items: baseline;
-        gap: 4px;
+        gap: 0.15px;
 
         .temp-big {
-          color: #fff;
+          color: #FFF;
           text-align: center;
           font-family: Inter;
-          font-size: 32px;
+          font-size: 2rem;
           font-style: normal;
           font-weight: 600;
-          line-height: 18px;
+          line-height: 1.125rem;
         }
 
         .temp-small {
-          color: #fff;
+          color: #FFF;
           font-family: Inter;
-          font-size: 16px;
+          font-size: 1rem;
           font-style: normal;
           font-weight: 400;
-          line-height: 18px;
+          line-height: 1.125rem;
         }
       }
 
       .opis {
-        color: #fff;
+        color: #FFF;
         text-align: center;
         font-family: Inter;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-style: normal;
         font-weight: 400;
-        line-height: 18px;
+        line-height: 1.125rem;
       }
     }
 
     .weather-icon {
-      width: 75px;
-      height: 75px;
+      width: 4.6875rem;
+      height: 4.6875rem;
       aspect-ratio: 1/1;
     }
   }
 
   .line {
-    height: 1px;
-    background: #7598fe;
     width: 100%;
-    margin: 15px 0;
-    border: none;
+    height: 0.0625rem;
+    background: #7598fe;
   }
 
   .weather-info {
     display: flex;
-    padding: 0 24px;
+    padding: 0 1.5rem;
     justify-content: space-between;
     align-items: center;
     align-self: stretch;
@@ -111,7 +110,7 @@
       .frame {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 0.25rem;
 
         .weather-text {
           display: flex;
@@ -119,23 +118,23 @@
           align-items: flex-start;
 
           .label {
-            color: var(--border-light, #e3e8f0);
+            color: var(--border-light, #E3E8F0);
             text-align: center;
             font-family: Inter;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-style: normal;
             font-weight: 400;
-            line-height: 18px;
+            line-height: 1.125rem;
           }
 
           .value {
-            color: #fff;
+            color: #FFF;
             text-align: center;
             font-family: Inter;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-style: normal;
             font-weight: 600;
-            line-height: 18px;
+            line-height: 1.125rem;
           }
         }
       }

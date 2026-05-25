@@ -30,7 +30,9 @@ export function Greetings() {
           <h1 className="title">Dzień dobry!</h1>
           <p className="date">{formattedDate}</p>
         </div>
-        <div className="time">{formattedTime}</div>
+        <div className="Greetings_time">
+          <div className="time">{formattedTime}</div>
+        </div>
       </div>
     </>
   );

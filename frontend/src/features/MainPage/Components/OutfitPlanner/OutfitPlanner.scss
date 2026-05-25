@@ -1,0 +1,78 @@
+@use "./../../../../variables" as *;
+@use "./../../../../common_component" as *;
+
+
+.OutfitPlan{
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    align-self: stretch;
+    
+    .OutfitCard{
+        display: flex;
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.625rem;
+        flex: 1 0 0;
+        align-self: stretch;
+        border-radius: 0.625rem;
+        border: 1px solid var(--border-light, #E3E8F0);
+        background: #FFF;
+
+        .color{
+            color: #5076FA;
+        }
+
+        .Description{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            align-self: stretch;
+
+            .description-text{
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+
+                .description-date{
+                    color: #000;
+                    text-align: center;
+                    font-family: Inter;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: 1.125rem; 
+                }
+
+                .description-weather{
+                    color: #48556C;
+                    text-align: center;
+                    font-family: Inter;
+                    font-size: 0.75rem;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: 1.125rem;
+                }
+            }
+        }
+
+        .OutfitItem{
+            display: flex;
+            align-items: flex-end;
+            gap: 0.625rem;
+            align-self: stretch;
+        }
+        
+        .ItemCount{
+            color: var(--secodary-text, #48556C);
+            text-align: center;
+            font-family: Inter;
+            font-size: 0.75rem;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 1.125rem;
+        }
+    }
+}
