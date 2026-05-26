@@ -19,16 +19,20 @@ export default function Outerlayer(){
                         <span className="description-text">Kurtka</span>
                         <div className="description-rate">
                             <div className="description-rate-text">8/10</div>
-                            <BiSolidHot className="small-icon"/>
+                            <BiSolidHot className="small-icon color"/>
                         </div>
                     </div>
                 </div>
             <div className="out-icons">
                 <div className="bck-icon color">
-                    <BiEdit  className="mini-icon"/>
+                <button className="icon-btn edit">
+                    <BiEdit className="mini-icon"/>
+                </button>
                 </div>
                 <div className="bck-icon color1">
-                    <RiDeleteBin6Line className="mini-icon color-icon"/>
+                    <button className="icon-btn">
+                        <RiDeleteBin6Line className="mini-icon color-icon"/>
+                    </button>
                 </div>
             </div>
         </div>
@@ -48,16 +52,20 @@ export default function Outerlayer(){
                         <span className="description-text">Bluza</span>
                         <div className="description-rate">
                             <div className="description-rate-text">7/10</div>
-                            <BiSolidHot className="small-icon"/>
+                            <BiSolidHot className="small-icon color"/>
                         </div>
                     </div>
                 </div>
                 <div className="out-icons">
                     <div className="bck-icon color">
-                        <BiEdit  className="mini-icon"/>
+                    <button className="icon-btn edit">
+                        <BiEdit className="mini-icon"/>
+                    </button>
                     </div>
                     <div className="bck-icon color1">
-                        <RiDeleteBin6Line className="mini-icon color-icon"/>
+                        <button className="icon-btn">
+                            <RiDeleteBin6Line className="mini-icon color-icon"/>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -70,7 +78,7 @@ export default function Outerlayer(){
                         <span className="description-text">Bluza</span>
                         <div className="description-rate">
                             <div className="description-rate-text">7/10</div>
-                            <BiSolidHot className="small-icon"/>
+                            <BiSolidHot className="small-icon color"/>
                         </div>
                     </div>
                 </div>
@@ -91,16 +99,20 @@ export default function Outerlayer(){
                         <span className="description-text">Bluza</span>
                         <div className="description-rate">
                             <div className="description-rate-text">7/10</div>
-                            <BiSolidHot className="small-icon"/>
+                            <BiSolidHot className="small-icon color"/>
                         </div>
                     </div>
                 </div>
                 <div className="out-icons">
                     <div className="bck-icon color">
-                        <BiEdit  className="mini-icon"/>
+                    <button className="icon-btn edit">
+                        <BiEdit className="mini-icon"/>
+                    </button>
                     </div>
                     <div className="bck-icon color1">
-                        <RiDeleteBin6Line className="mini-icon color-icon"/>
+                        <button className="icon-btn">
+                            <RiDeleteBin6Line className="mini-icon color-icon"/>
+                        </button>
                     </div>
                 </div>
             </div>

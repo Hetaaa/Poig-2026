@@ -59,7 +59,7 @@
                     .description-text{
                         color: var(--secodary-text, #48556C);
                         text-align: center;
-                        font-family: Lato;
+                        font-family: Inter;
                         font-size: 0.875rem;
                         font-style: normal;
                         font-weight: 400;
@@ -81,6 +81,10 @@
                             font-weight: 400;
                             line-height: 1.125rem; 
                         }
+
+                        .color{
+                            color: $red;
+                        }
                     }
                 }
             }
@@ -92,6 +96,7 @@
             gap: 0.625rem;
             align-self: stretch;
 
+
             .bck-icon{
                 display: flex;
                 padding: 0.25rem 0.5rem;
@@ -101,13 +106,27 @@
                 flex: 1 0 0;
                 border-radius: 0.625rem;
 
+                &:hover{
+                    cursor: pointer;
+                    transform: scale(1.15);
+                }
+
                 &.color{
                     background: var(--light-blue-bg, #F0F6FF);
+                }
+
+                &.color:hover{
+                    background: var(--light-blue-bg, #d3e5ff);
                 }
 
                 &.color1{
                     border-radius: 0.625rem;
                     background: var(--light-red-bg, #FFE6E7);     
+    
+                }
+
+                &.color1:hover{
+                    background: var(--light-red-bg, #ffc3c5); 
                 }
             }
 

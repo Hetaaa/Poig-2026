@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./Outfit.scss";
 import { BiShuffle } from "react-icons/bi";
-import { AiOutlineHeart } from "react-icons/ai";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
 export default function Outfit() {
     return (
@@ -15,8 +15,14 @@ export default function Outfit() {
                     <span className="description">96% Dopasowania • Idealny na dzisiejszą pogodę</span>
                 </div>
                 <div className="React-img">
-                    <BiShuffle className="medium-icon" />
-                    <AiOutlineHeart className="medium-icon"/>
+                    <button className="icon-btn">
+                        <BiShuffle className="medium-icon" />
+                    </button>
+
+                    <button className="icon-btn">
+                        <AiOutlineHeart className="medium-icon heart"/>
+                        <AiFillHeart className="medium-icon heart"/>
+                    </button>
                 </div>
            </div>
            <div className="clothes">

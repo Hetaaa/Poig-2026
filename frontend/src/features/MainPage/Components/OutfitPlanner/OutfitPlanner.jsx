@@ -13,7 +13,9 @@ export default function OutfitPlanner() {
                         <span className="description-date">Wtorek, 8 Kwietnia</span>
                         <span className="description-weather">19°C • Ciepło, bez kurtki</span>
                     </div>
-                    <BiLinkExternal className="medium-icon color" />
+                    <button className="icon-btn">
+                        <BiLinkExternal className="medium-icon color" />
+                    </button>
                 </div>
                 <div className="OutfitItem">
                     <div className="small-component"></div>
@@ -28,7 +30,9 @@ export default function OutfitPlanner() {
                         <span className="description-date">Wtorek, 8 Kwietnia</span>
                         <span className="description-weather">15°C • Chłodniej, potrzebny sweter</span>
                     </div>
-                    <BiLinkExternal className="medium-icon color" />
+                    <button className="icon-btn">
+                        <BiLinkExternal className="medium-icon color" />
+                    </button>
                 </div>
                 <div className="OutfitItem">
                     <div className="small-component"></div>
@@ -43,7 +47,9 @@ export default function OutfitPlanner() {
                         <span className="description-date">Wtorek, 8 Kwietnia</span>
                         <span className="description-weather">11°C • Zimno, kurtka obowiązkowa</span>
                     </div>
-                    <BiLinkExternal className="medium-icon color" />
+                    <button className="icon-btn">
+                        <BiLinkExternal className="medium-icon color" />
+                    </button>
                 </div>
                 <div className="OutfitItem">
                     <div className="small-component"></div>

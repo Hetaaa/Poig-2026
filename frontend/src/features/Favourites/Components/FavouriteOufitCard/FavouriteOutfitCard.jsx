@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./FavouriteOutfitCard.scss";
-import { AiOutlineHeart } from "react-icons/ai";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
 export default function FavouriteOutfitCard(){
     return (
@@ -15,7 +15,10 @@ export default function FavouriteOutfitCard(){
                 </div>
                 <div className="Outfit-date">
                     <span className="date-text">Zapisano 15 Marca 2026</span>
-                    <AiOutlineHeart className="medium-icon color"/>
+                    <button className="icon-btn">
+                        <AiOutlineHeart className="medium-icon color"/>
+                        <AiFillHeart className="medium-icon color"/>
+                    </button>
                 </div>
             </div>
             <div className="favourite-clothes">

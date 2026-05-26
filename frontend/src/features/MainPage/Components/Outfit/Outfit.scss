@@ -64,6 +64,16 @@
             font-weight: 400;
             line-height: 1.125rem; /* 112.5% */
         }
+
+        .icon-btn{
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .heart{
+            color: $red;
+        }
     }
 
     .clothes {
@@ -95,7 +105,7 @@
             .item-title {
                 color: #000;
                 text-align: center;
-                font-family: Lato;
+                font-family: Inter;
                 font-size: 1rem;
                 font-style: normal;
                 font-weight: 600;
@@ -117,7 +127,7 @@
             .item-name {
                 color: var(--secodary-text, #48556C);
                 text-align: center;
-                font-family: Lato;
+                font-family: Inter;
                 font-size: 0.875rem;
                 font-style: normal;
                 font-weight: 400;
