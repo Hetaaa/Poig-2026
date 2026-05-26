@@ -15,11 +15,11 @@ export default function Outfit() {
                     <span className="description">96% Dopasowania • Idealny na dzisiejszą pogodę</span>
                 </div>
                 <div className="React-img">
-                    <button className="icon-btn">
+                    <button className="icon-btn" aria-label="Shuffle outfit">
                         <BiShuffle className="medium-icon" />
                     </button>
 
-                    <button className="icon-btn">
+                    <button className="icon-btn" aria-label="Add outfit to favorites">
                         <AiOutlineHeart className="medium-icon heart"/>
                         <AiFillHeart className="medium-icon heart"/>
                     </button>
