@@ -13,7 +13,7 @@ export default function OutfitPlanner() {
                         <span className="description-date">Wtorek, 8 Kwietnia</span>
                         <span className="description-weather">19°C • Ciepło, bez kurtki</span>
                     </div>
-                    <button className="icon-btn">
+                    <button className="icon-btn" aria-label="Open outfit details">
                         <BiLinkExternal className="medium-icon color" />
                     </button>
                 </div>
