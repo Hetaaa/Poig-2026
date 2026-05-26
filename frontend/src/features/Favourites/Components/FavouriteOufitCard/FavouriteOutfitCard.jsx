@@ -15,7 +15,7 @@ export default function FavouriteOutfitCard(){
                 </div>
                 <div className="Outfit-date">
                     <span className="date-text">Zapisano 15 Marca 2026</span>
-                    <button className="icon-btn">
+                    <button className="icon-btn" aria-label="Usuń z ulubionych">
                         <AiOutlineHeart className="medium-icon color"/>
                         <AiFillHeart className="medium-icon color"/>
                     </button>
