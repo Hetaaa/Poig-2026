@@ -25,12 +25,12 @@ export default function Outerlayer(){
                 </div>
             <div className="out-icons">
                 <div className="bck-icon color">
-                <button className="icon-btn edit">
+                <button className="icon-btn edit" aria-label="Edytuj ubranie">
                     <BiEdit className="mini-icon"/>
                 </button>
                 </div>
                 <div className="bck-icon color1">
-                    <button className="icon-btn">
+                    <button className="icon-btn" aria-label="Usuń ubranie">
                         <RiDeleteBin6Line className="mini-icon color-icon"/>
                     </button>
                 </div>
@@ -58,12 +58,12 @@ export default function Outerlayer(){
                 </div>
                 <div className="out-icons">
                     <div className="bck-icon color">
-                    <button className="icon-btn edit">
+                    <button className="icon-btn edit" aria-label="Edytuj ubranie">
                         <BiEdit className="mini-icon"/>
                     </button>
                     </div>
                     <div className="bck-icon color1">
-                        <button className="icon-btn">
+                        <button className="icon-btn" aria-label="Usuń ubranie">
                             <RiDeleteBin6Line className="mini-icon color-icon"/>
                         </button>
                     </div>
@@ -105,12 +105,12 @@ export default function Outerlayer(){
                 </div>
                 <div className="out-icons">
                     <div className="bck-icon color">
-                    <button className="icon-btn edit">
+                    <button className="icon-btn edit" aria-label="Edytuj ubranie">
                         <BiEdit className="mini-icon"/>
                     </button>
                     </div>
                     <div className="bck-icon color1">
-                        <button className="icon-btn">
+                        <button className="icon-btn" aria-label="Usuń ubranie">
                             <RiDeleteBin6Line className="mini-icon color-icon"/>
                         </button>
                     </div>
