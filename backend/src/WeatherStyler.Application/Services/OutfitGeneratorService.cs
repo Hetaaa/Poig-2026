@@ -1,14 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization; // Dodane dla InvariantCulture
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using WeatherStyler.Domain.Entities;
-
 using WeatherStyler.Domain.Entities.BuisnessLogic;
 using WeatherStyler.Domain.Interfaces.Repositories;
 using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Application.Services;
 
-/// <summary>
-/// Wymagania dla konkretnego slotu ciała (np. "Core" z warstwami [1,2,3])
-/// </summary>
 internal class SlotRequirement
 {
     public string SlotName { get; set; } = string.Empty;
@@ -17,50 +19,14 @@ internal class SlotRequirement
     public int MaxWarmth { get; set; } = 100;
 }
 
-/// <summary>
-/// Klucz unikalnie identyfikujący zajęcie fizycznego slotu na konkretnej warstwie.
-/// Np. ("Core", 1), ("Nogi", 1), ("Core", 2)
-/// Używany do wykrywania kolizji: sukienka zajmująca Core+Nogi/warstwa-1
-/// blokuje oba te klucze — spodnie na warstwę 1 nie zostaną już dobrane.
-/// </summary>
 internal readonly record struct SlotLayerKey(string SlotName, int Layer);
 
-/// <summary>
-/// Wewnętrzny wynik punktacji kandydata na ubranie
-/// </summary>
 internal class ScoredCandidate
 {
     public ClothingItem Item { get; set; } = null!;
     public double Score { get; set; }
 }
 
-/// <summary>
-/// Serwis generujący outfity dla użytkownika na dzień dzisiejszy.
-///
-/// KLUCZOWA LOGIKA SLOTÓW — zapobieganie kolizjom:
-/// ─────────────────────────────────────────────────
-/// Każde ubranie należy do kategorii, która może zajmować WIELE fizycznych slotów
-/// (np. sukienka → ClothingSlots = [Core, Nogi], LayerIndex = 1).
-///
-/// Gdy ubranie zostanie wybrane, wszystkie jego sloty na tej warstwie trafiają
-/// do zbioru `occupiedSlotLayers`. Kolejne wymagania których klucz (slot, warstwa)
-/// jest już w tym zbiorze są pomijane — nie szukamy drugiego ubrania na to miejsce.
-///
-/// Przykład przy temp < 10°C (wymagania: Core/1,2,3 + Nogi/1):
-///   Iteracja Core/warstwa-1 → kandydaci: koszulki + sukienki
-///     → wybrano sukienkę (ClothingSlots=[Core,Nogi], LayerIndex=1)
-///     → occupied: {(Core,1), (Nogi,1)}
-///   Iteracja Core/warstwa-2 → (Core,2) wolne → szukamy swetra ✓
-///   Iteracja Core/warstwa-3 → (Core,3) wolne → szukamy kurtki ✓
-///   Iteracja Nogi/warstwa-1 → (Nogi,1) ZAJĘTE → skip (brak spodni!) ✓
-///
-/// STRATEGIA JAKOŚCI (scoring zamiast hard-filtering):
-/// ─────────────────────────────────────────────────────
-/// Zamiast twardych filtrów, każde ubranie dostaje wynik punktowy.
-/// Fallback stopniowo obniża minimalny akceptowany próg — dzięki temu
-/// przy małej szafie outfit prawie zawsze zostaje zbudowany.
-/// Twarde return null tylko gdy pula dla slotu/warstwy jest dosłownie pusta.
-/// </summary>
 public class OutfitManagerService : IOutfitManagerService
 {
     private readonly IProgramVariableRepository _programVars;
@@ -71,14 +37,13 @@ public class OutfitManagerService : IOutfitManagerService
     private readonly IOutfitRepository _outfitRepo;
     private readonly Random _random = new Random();
 
-    // Wagi punktów dla kryteriów jakościowych
-    private const double ScoreDiversity = 3.0;  // nie noszono w ostatnich 3 dniach
-    private const double ScoreStyleMatch = 2.0;  // pasuje do wylosowanego stylu
-    private const double ScoreWarmthIdeal = 2.0;  // ciepłota w oknie ±3
-    private const double ScoreWarmthAccepted = 0.5;  // ciepłota w oknie ±6
-    private const double ScoreWaterproof = 4.0;  // wodoodporne gdy pada
-    private const double ScoreWindproof = 3.0;  // wiatroszczelne gdy wieje
-    private const double PenaltyNonNeutralColor = -2.0;  // każdy nadmiarowy kolor nie-neutralny
+    private const double ScoreDiversity = 3.0;
+    private const double ScoreStyleMatch = 2.0;
+    private const double ScoreWarmthIdeal = 2.0;
+    private const double ScoreWarmthAccepted = 0.5;
+    private const double ScoreWaterproof = 4.0;
+    private const double ScoreWindproof = 3.0;
+    private const double PenaltyNonNeutralColor = -2.0;
 
     public OutfitManagerService(
         IProgramVariableRepository programVars,
@@ -96,16 +61,10 @@ public class OutfitManagerService : IOutfitManagerService
         _outfitRepo = outfitRepo;
     }
 
-    /// <summary>
-    /// If there's an outfit saved in usage history for today, return its summary.
-    /// Otherwise generate a new outfit, persist Outfit + UsageHistory and return the saved summary.
-    /// Returns (summaries, null) on success, or (null, warnings) on generation failure.
-    /// </summary>
     public async Task<OutfitGeneratorResult> GetOrGenerateTodayAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var today = DateTime.UtcNow.Date;
 
-        // check existing via repository
         var existingOutfits = (await _outfitRepo.GetOutfitsAsync(userId, today, today.AddDays(1).AddTicks(-1), cancellationToken)).ToList();
         if (existingOutfits.Any())
         {
@@ -116,12 +75,10 @@ public class OutfitManagerService : IOutfitManagerService
             };
         }
 
-        // generate
         var outfitResult = await GenerateOutfitForTodayAsync(userId, cancellationToken);
         if (outfitResult.Outfit == null)
             return outfitResult;
 
-        // ensure user exists via repository
         if (!await _outfitRepo.UserExistsAsync(userId, cancellationToken))
             return new OutfitGeneratorResult
             {
@@ -129,21 +86,13 @@ public class OutfitManagerService : IOutfitManagerService
                 Warnings = new List<string> { "Current user not found in database. Cannot save usage history." }
             };
 
-        // collect clothing item ids
         var itemIds = outfitResult.Outfit.ClothingItems.Select(ci => ci.Id).ToList();
-
         var outfitId = outfitResult.Outfit.Id == Guid.Empty ? Guid.NewGuid() : outfitResult.Outfit.Id;
 
-        // persist via repository
         await _outfitRepo.SaveGeneratedOutfitAsync(outfitId, outfitResult.Outfit.Name, outfitResult.Outfit.DateCreated, userId, itemIds, today, cancellationToken);
 
-        // return the generated outfit
         return outfitResult;
     }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // Publiczne API
-    // ──────────────────────────────────────────────────────────────────────────
 
     public async Task<OutfitGeneratorResult> GenerateOutfitForTodayAsync(
         Guid userId,
@@ -155,8 +104,14 @@ public class OutfitManagerService : IOutfitManagerService
         if (lat is null || lon is null)
             return Failure("Brak zapisanej lokacji użytkownika. Ustaw lokację aby generować outfity.");
 
-        var weather = await _weatherService.GetWeatherForLocationAsync(
-            double.Parse(lat), double.Parse(lon), cancellationToken);
+        // POPRAWKA: Użycie CultureInfo.InvariantCulture zapobiega błędom FormatException na systemach z polską kulturą
+        if (!double.TryParse(lat, CultureInfo.InvariantCulture, out double parsedLat) ||
+            !double.TryParse(lon, CultureInfo.InvariantCulture, out double parsedLon))
+        {
+            return Failure("Zapisana lokacja użytkownika ma niepoprawny format numeryczny.");
+        }
+
+        var weather = await _weatherService.GetWeatherForLocationAsync(parsedLat, parsedLon, cancellationToken);
 
         if (weather is null)
             return Failure("Nie udało się pobrać danych pogodowych.");
@@ -189,7 +144,6 @@ public class OutfitManagerService : IOutfitManagerService
 
         for (int fallbackLevel = 0; fallbackLevel <= 5; fallbackLevel++)
         {
-            // Minimalny wynik punktowy kandydata — spada z każdym poziomem fallbacku
             double minimumScore = fallbackLevel switch
             {
                 0 => 5.0,
@@ -200,7 +154,6 @@ public class OutfitManagerService : IOutfitManagerService
                 _ => double.MinValue
             };
 
-            // Kara kolorystyczna aktywna tylko na poziomach 0–1
             bool applyColorPenalty = fallbackLevel < 2;
 
             var result = TryBuildOutfit(
@@ -236,14 +189,6 @@ public class OutfitManagerService : IOutfitManagerService
         };
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // Budowanie outfitu z respektowaniem kolizji slotów
-    // ──────────────────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Próbuje zbudować outfit. Zwraca null tylko gdy pula dla jakiegoś
-    /// wymaganego (i niezajętego) slotu/warstwy jest dosłownie pusta.
-    /// </summary>
     private Outfit? TryBuildOutfit(
         List<ClothingItem> wardrobe,
         List<SlotRequirement> requirements,
@@ -261,37 +206,29 @@ public class OutfitManagerService : IOutfitManagerService
             DateCreated = DateTime.UtcNow
         };
 
-        // Zbiór par (slot, warstwa) już zajętych przez wybrane ubrania.
-        // Gdy sukienka zajmuje Core+Nogi na warstwie 1, obie pary trafiają tutaj.
         var occupiedSlotLayers = new HashSet<SlotLayerKey>();
-
-        // Licznik non-neutral dla harmonii kolorów
         int nonNeutralAccumulator = 0;
 
         foreach (var requirement in requirements)
         {
-            int outerLayer = requirement.RequiredLayers.Max();
+            int outerLayer = requirement.RequiredLayers.Count > 0 ? requirement.RequiredLayers.Max() : 0;
 
             foreach (int layer in requirement.RequiredLayers)
             {
                 var key = new SlotLayerKey(requirement.SlotName, layer);
 
-                // Ten slot+warstwa już zajęty (np. sukienka "wzięła" Nogi/1) — skip
                 if (occupiedSlotLayers.Contains(key))
                     continue;
 
-                // Pula kandydatów: ubrania pasujące do tego konkretnego slotu i warstwy
                 var pool = wardrobe
                     .Where(c => c.Category?.ClothingSlots != null
                              && c.Category.ClothingSlots.Any(s => s.Name == requirement.SlotName)
                              && c.Category.LayerIndex == layer)
                     .ToList();
 
-                // Brak ubrań w szafie dla tego slotu/warstwy — nie da się naprawić fallbackiem
                 if (!pool.Any())
                     return null;
 
-                // Oceń i posortuj kandydatów
                 var scored = pool
                     .Select(item => new ScoredCandidate
                     {
@@ -309,7 +246,6 @@ public class OutfitManagerService : IOutfitManagerService
                     .OrderByDescending(s => s.Score)
                     .ToList();
 
-                // Wybierz losowo z Top-3 nad progiem; jeśli nikt progu nie spełnia — weź najlepszego
                 var aboveThreshold = scored.Where(s => s.Score >= minimumScore).ToList();
                 var chosen = aboveThreshold.Any()
                     ? aboveThreshold.Take(3).ToList()[_random.Next(Math.Min(3, aboveThreshold.Count))]
@@ -318,12 +254,6 @@ public class OutfitManagerService : IOutfitManagerService
                 outfit.ClothingItems.Add(chosen.Item);
                 nonNeutralAccumulator += chosen.Item.Colors.Count(c => !c.IsNeutral);
 
-                // Zarejestruj WSZYSTKIE sloty zajmowane przez wybrane ubranie na tej warstwie.
-                //
-                // Dlaczego wszystkie sloty kategorii, nie tylko bieżący?
-                // Bo sukienka (ClothingSlots=[Core,Nogi]) wybrana przy okazji szukania
-                // ubrania na slot Core/warstwa-1, pokrywa RÓWNIEŻ Nogi/warstwa-1.
-                // Bez tego moglibyśmy później dobrać spodnie na te same nogi.
                 if (chosen.Item.Category?.ClothingSlots != null)
                 {
                     foreach (var coveredSlot in chosen.Item.Category.ClothingSlots)
@@ -336,10 +266,6 @@ public class OutfitManagerService : IOutfitManagerService
 
         return outfit;
     }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // Scoring
-    // ──────────────────────────────────────────────────────────────────────────
 
     private double ScoreItem(
         ClothingItem item,
@@ -385,10 +311,6 @@ public class OutfitManagerService : IOutfitManagerService
         return score;
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // Wymagania pogodowe
-    // ──────────────────────────────────────────────────────────────────────────
-
     private static List<SlotRequirement> DetermineRequirements(WeatherDataForGeneration weather)
     {
         var req = new List<SlotRequirement>();
@@ -418,10 +340,6 @@ public class OutfitManagerService : IOutfitManagerService
         return req;
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // Helpery
-    // ──────────────────────────────────────────────────────────────────────────
-
     private static bool HasProperty(ClothingItem item, params string[] keywords) =>
         item.Properties.Any(p =>
             keywords.Any(kw => p.Name.Contains(kw, StringComparison.OrdinalIgnoreCase)));
@@ -442,7 +360,7 @@ public class OutfitManagerService : IOutfitManagerService
         if (fallbackLevel >= 1) w.Add("Ostrzeżenie: Może być noszone ubranie z ostatnich 3 dni.");
         if (fallbackLevel >= 2) w.Add("Ostrzeżenie: Outfit może nie mieć harmonijnych kolorów.");
         if (fallbackLevel >= 3) w.Add("Ostrzeżenie: Outfit może być niespójny stylowo.");
-        if (fallbackLevel >= 4) w.Add("Ostrzeżenie: Outfit może nie spełniać optymalnych wymagań ciepła.");
+        if (fallbackLevel >= 4) w.Add("Ostrzeżenie: Outfit może być niespójny pod kątem ciepła.");
         if (fallbackLevel >= 5 && weather.IsRaining)
             w.Add("Ostrzeżenie: Wybrano odzież nieodporną na deszcz. Zabierz parasol!");
         if (weather.IsWindy && fallbackLevel >= 4)

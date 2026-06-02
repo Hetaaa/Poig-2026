@@ -15,16 +15,20 @@ public class ClothingItemsController : ControllerBase
     private readonly IClothingItemService _service;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
-    private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+    private readonly IWebHostEnvironment _env; // Wstrzykujemy środowisko webowe (zamiast IConfiguration)
     private readonly bool _isDevelopment;
 
-    public ClothingItemsController(IClothingItemService service, IUserService userService, IMapper mapper, IConfiguration configuration)
+    public ClothingItemsController(
+        IClothingItemService service,
+        IUserService userService,
+        IMapper mapper,
+        IWebHostEnvironment env)
     {
         _service = service;
         _userService = userService;
         _mapper = mapper;
-        _configuration = configuration;
-        _isDevelopment = _configuration.GetValue<bool>("IsDevelopment");
+        _env = env;
+        _isDevelopment = env.IsDevelopment();
     }
 
     [HttpGet]
@@ -63,15 +67,34 @@ public class ClothingItemsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
-    public async Task<IActionResult> Create([FromBody] CreateClothingItemRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromForm] CreateClothingItemRequest request, CancellationToken cancellationToken)
     {
         try
         {
             var userId = _userService.GetUserId();
             var clothingItem = _mapper.Map<ClothingItem>(request);
+
+            // --- LOGIKA ZAPISU PLIKU ---
+            if (request.PhotoFile != null && request.PhotoFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.PhotoFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.PhotoFile.CopyToAsync(fileStream);
+                }
+
+                clothingItem.PhotoUrl = $"/images/{uniqueFileName}";
+            }
+
             var created = await _service.CreateAsync(clothingItem, userId, cancellationToken);
             var dto = _mapper.Map<ClothingItemDto>(created);
+
             return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
         }
         catch (Exception ex)
@@ -82,7 +105,6 @@ public class ClothingItemsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize]
     public async Task<IActionResult> Update(Guid id, [FromBody] CreateClothingItemRequest request, CancellationToken cancellationToken)
     {
         try
@@ -100,7 +122,6 @@ public class ClothingItemsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         try
@@ -115,5 +136,4 @@ public class ClothingItemsController : ControllerBase
             return StatusCode(500, new { message = ex.Message });
         }
     }
-
 }

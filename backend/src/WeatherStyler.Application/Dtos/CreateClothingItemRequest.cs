@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Http;
+
 namespace WeatherStyler.Application.Dtos;
 
 public record CreateClothingItemRequest(
     string Name,
-    string? PhotoUrl,
+    IFormFile? PhotoFile,
     Guid CategoryId,
     int WarmthLevel,
     IEnumerable<Guid>? StyleIds,

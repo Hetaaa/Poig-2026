@@ -77,7 +77,7 @@ if (app.Environment.IsDevelopment())
             });
     });
 }
-
+app.UseStaticFiles();
 app.UseCors("LocalhostPolicy");
 app.UseAuthentication();
 app.UseAuthorization();

@@ -8,11 +8,11 @@ namespace WeatherStyler.Application.Services;
 
 public class WeatherService : IWeatherService
 {
-    private readonly HttpClient _http = new();
+    private readonly HttpClient _http;
     private readonly IConfiguration _configuration;
-
-    public WeatherService(IConfiguration configuration)
+    public WeatherService(HttpClient http, IConfiguration configuration)
     {
+        _http = http;
         _configuration = configuration;
     }
 
