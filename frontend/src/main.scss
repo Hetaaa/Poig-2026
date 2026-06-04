@@ -4,6 +4,7 @@
 html,
 body,
 #root {
+  margin: 0;
   width: 100%;
   min-height: 100vh;
 }
@@ -79,3 +80,4 @@ hr {
   height: 4.6875rem;
   aspect-ratio: 1/1;
 }
+

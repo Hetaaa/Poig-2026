@@ -1,65 +1,30 @@
 import { useState, useEffect } from "react";
 import "./FavouriteOutfitCard.scss";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import {ClothingItem} from "../../../../common/components/ClothingItem";
 
-export default function FavouriteOutfitCard(){
+export function FavouriteOutfitCard(){
     return (
-    <>
-        <div className="Favourite-container">
-            <div className="Outfit-header">
+        <div className="favourite-container">
+            <div className="outfit-header">
                 <div className="header-title">
-                    <div className="favourite-outfit-title">
-                        <span className="favourite-outfit-text">Outfit #1 </span>
-                    </div>
+                    <span className="favourite-outfit-text">Outfit #1 </span>
                     <span className="header-description">Bardzo wygodny na zimniejsze letnie dni</span>
                 </div>
-                <div className="Outfit-date">
+                <div className="outfit-date">
                     <span className="date-text">Zapisano 15 Marca 2026</span>
                     <button className="icon-btn" aria-label="Usuń z ulubionych">
-                        <AiOutlineHeart className="medium-icon color"/>
                         <AiFillHeart className="medium-icon color"/>
                     </button>
                 </div>
             </div>
+
             <div className="favourite-clothes">
-                <div className="favourite-item">
-                    <div className="medium-component">
-                    </div>
-                    <div className="item-text">
-                        <p className="item-title">Czarna MISBHV</p>
-                        <p className="item-layer">Warstwa średnia</p>
-                        <p className="item-name">Bluza</p>
-                    </div>
-                </div>
-                <div className="favourite-item">
-                    <div className="medium-component">
-                    </div>
-                    <div className="item-text">
-                       <p className="item-title">Biała koszulka</p>
-                        <p className="item-layer">Warstwa bazowa</p>
-                        <p className="item-name">Koszulka</p>
-                    </div>
-                </div>
-                <div className="favourite-item">
-                    <div className="medium-component">
-                    </div>
-                    <div className="item-text">
-                        <p className="item-title">Jeansy niebieskie</p>
-                        <p className="item-layer">Dół</p>
-                        <p className="item-name">Spodnie</p>
-                    </div>
-                </div>
-                <div className="favourite-item">
-                    <div className="medium-component">
-                    </div>
-                    <div className="item-text">
-                        <p className="item-title">Nike</p>
-                        <p className="item-layer">Obuwie</p>
-                        <p className="item-name">buty</p>
-                    </div>
-                </div>
+                <ClothingItem name="Czarna MISBHV" layer="Warstwa średnia" category="Bluza" />
+                <ClothingItem name="Biała koszulka" layer="Warstwa bazowa" category="Koszulka" />
+                <ClothingItem name="Jeansy niebieskie" layer="Dół" category="Spodnie" />
+                <ClothingItem name="Nike" layer="Obuwie" category="Buty" />
             </div>
         </div>
-    </>
     )
 }

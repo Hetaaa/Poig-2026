@@ -2,63 +2,48 @@ import { useState, useEffect } from "react";
 import "./OutfitPlanner.scss";
 import { BiLinkExternal } from "react-icons/bi";
 
-
-export default function OutfitPlanner() {   
-    return (
-    <>
-        <div className="OutfitPlan">
-            <div className="OutfitCard">
-                <div className="Description">
-                    <div className="description-text">
-                        <span className="description-date">Wtorek, 8 Kwietnia</span>
-                        <span className="description-weather">19°C • Ciepło, bez kurtki</span>
-                    </div>
-                    <button className="icon-btn" aria-label="Open outfit details">
-                        <BiLinkExternal className="medium-icon color" />
-                    </button>
-                </div>
-                <div className="OutfitItem">
-                    <div className="small-component"></div>
-                    <div className="small-component"></div>
-                    <div className="small-component"></div>
-                </div>
-                <span className="ItemCount">3 elementy</span>
+function OutfitCard({date, weather, description, itemCount}) {
+  return (
+    <div className="outfit-card">
+        <div className="description">
+            <div className="description-text">
+                <span className="description-date">{date}</span>
+                <span className="description-weather">{weather}°C • {description}</span>
             </div>
-            <div className="OutfitCard">
-                <div className="Description">
-                    <div className="description-text">
-                        <span className="description-date">Wtorek, 8 Kwietnia</span>
-                        <span className="description-weather">15°C • Chłodniej, potrzebny sweter</span>
-                    </div>
-                    <button className="icon-btn">
-                        <BiLinkExternal className="medium-icon color" />
-                    </button>
-                </div>
-                <div className="OutfitItem">
-                    <div className="small-component"></div>
-                    <div className="small-component"></div>
-                    <div className="small-component"></div>
-                </div>
-                <span className="ItemCount">4 elementy</span>
-            </div>
-            <div className="OutfitCard">
-                <div className="Description">
-                    <div className="description-text">
-                        <span className="description-date">Wtorek, 8 Kwietnia</span>
-                        <span className="description-weather">11°C • Zimno, kurtka obowiązkowa</span>
-                    </div>
-                    <button className="icon-btn">
-                        <BiLinkExternal className="medium-icon color" />
-                    </button>
-                </div>
-                <div className="OutfitItem">
-                    <div className="small-component"></div>
-                    <div className="small-component"></div>
-                    <div className="small-component"></div>
-                </div>
-                <span className="ItemCount">5 elementów</span>
-            </div>
+            <button className="icon-btn" aria-label="Open outfit details">
+                <BiLinkExternal className="medium-icon color" />
+            </button>
         </div>
-    </>
+        <div className="outfit-item">
+            <div className="small-component"></div>
+            <div className="small-component"></div>
+            <div className="small-component"></div>
+        </div>
+        <span className="item-count">{itemCount}</span>
+    </div>
+  );
+}
+
+export function OutfitPlanner() {   
+    return (
+    <div className="outfit-plan">
+      <OutfitCard
+        date="Wtorek, 8 Kwietnia"
+        weather="19°C • Ciepło, bez kurtki"
+        itemCount="3 elementy"
+      />
+
+      <OutfitCard
+        date="Wtorek, 8 Kwietnia"
+        weather="15°C • Chłodniej, potrzebny sweter"
+        itemCount="4 elementy"
+      />
+
+      <OutfitCard
+        date="Wtorek, 8 Kwietnia"
+        weather="11°C • Zimno, kurtka obowiązkowa"
+        itemCount="5 elementów"
+      />
+    </div>
   );
 }

@@ -1,0 +1,50 @@
+
+@use "./../../variables" as *;
+
+
+.clothing-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+
+    .clothing-item-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        text-align: center;
+
+        p {
+            margin: 0;
+        }
+
+        .clothing-item-name {
+            color: #000;
+            text-align: center;
+             
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.125rem;
+        }
+
+        .clothing-item-layer {
+            color: $blue;
+            text-align: center;
+             
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 1.125rem;
+        }
+
+        .clothing-item-category {
+            color: $secondary-text;
+            text-align: center;
+             
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 1.125rem;
+        }
+    }
+}

@@ -1,8 +1,8 @@
-@use "./../../../../variables" as *;
 @use "./../../../../common_component" as *;
+@use "./../../../../variables.scss" as *;
 
 
-.Out-layer{
+.out-layer{
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -11,9 +11,7 @@
     .out-text{
         color: #000;
         text-align: center;
-        font-family: Inter;
         font-size: 1rem;
-        font-style: normal;
         font-weight: 600;
         line-height: 1.125rem;
     }
@@ -31,7 +29,7 @@
             align-items: flex-start;
             gap: 0.625rem;
             border-radius: 0.625rem;
-            border: 1px solid var(--border-light, #E3E8F0);
+            border: 1px solid $border-light;
             background: #FFF;
 
             .wardrobe-text{
@@ -43,9 +41,7 @@
                 .wardrobe-title{
                     color: #000;
                     text-align: center;
-                    font-family: Inter;
                     font-size: 0.875rem;
-                    font-style: normal;
                     font-weight: 500;
                     line-height: 1.125rem; 
                 }
@@ -57,11 +53,9 @@
                     align-self: stretch;
 
                     .description-text{
-                        color: var(--secodary-text, #48556C);
+                        color: $secondary-text;
                         text-align: center;
-                        font-family: Inter;
                         font-size: 0.875rem;
-                        font-style: normal;
                         font-weight: 400;
                         line-height: 1.125rem; 
                     }
@@ -73,11 +67,9 @@
                         gap: 0.25rem;
 
                         .description-rate-text{
-                            color: #FF3C00;
+                            color: $red;
                             text-align: center;
-                            font-family: Inter;
                             font-size: 0.75rem;
-                            font-style: normal;
                             font-weight: 400;
                             line-height: 1.125rem; 
                         }
@@ -112,33 +104,33 @@
                 }
 
                 &.color{
-                    background: var(--light-blue-bg, #F0F6FF);
+                    background: $light-blue-bg;
                 }
 
                 &.color:hover{
-                    background: var(--light-blue-bg, #d3e5ff);
+                    background: $light-blue-bg;;
                 }
 
                 &.color1{
                     border-radius: 0.625rem;
-                    background: var(--light-red-bg, #FFE6E7);     
+                    background: $light-blue-bg;;     
     
                 }
 
                 &.color1:hover{
-                    background: var(--light-red-bg, #ffc3c5); 
+                    background: $light-blue-bg;; 
                 }
             }
 
             .color-icon{
-                fill: var(--red, #E50000);
+                fill: $red;
             }
         }
     }
 }
 
 .line{
-    width: 60.5625rem;
+    width: 100%;
     height: 0.0625rem;
-    background: var(--border-light, #E3E8F0);
+    background: $border-light;
 }

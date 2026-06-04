@@ -1,7 +1,7 @@
 @use "./../../../../variables" as *;
 @use "./../../../../common_component" as *;
 
-.Outfit-container {
+.outfit-container {
     display: flex;
     padding: 1.5rem;
     flex-direction: column;
@@ -14,24 +14,23 @@
     border: 1px solid #E5E5E5;
     background: #FFF;
 
-    .Header {
+    .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         align-self: stretch;
 
-        .React-img{
+        .react-img{
             display: flex;
             align-items: flex-start;
             gap: 2.25rem;
 
             .color{
-                color: red;
+                color: $red;
             }
         }
         
-
-        .Title {
+        .title {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -46,9 +45,7 @@
                 .title-description {
                     color: #000;
                     text-align: center;
-                    font-family: Inter;
                     font-size: 1rem;
-                    font-style: normal;
                     font-weight: 600;
                     line-height: 1.125rem; /* 112.5% */
                 }
@@ -56,11 +53,9 @@
         }
 
         .description {
-            color: #48556C;
+            color: $secondary-text;
             text-align: center;
-            font-family: Inter;
             font-size: 1rem;
-            font-style: normal;
             font-weight: 400;
             line-height: 1.125rem; /* 112.5% */
         }
@@ -82,58 +77,5 @@
         align-items: flex-start;
         gap: 1.5rem;
         align-self: stretch;
-
-        .item {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 0.25rem;
-
-            .item-text p{
-                margin: 0rem;
-            }
-
-            .item-text{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.4rem; 
-            text-align: center;
-            
-
-            .item-title {
-                color: #000;
-                text-align: center;
-                font-family: Inter;
-                font-size: 1rem;
-                font-style: normal;
-                font-weight: 600;
-                line-height: 1.125rem;
-                margin:0;
-            }
-
-            .item-layer {
-                color: var(--blue, #5076FA);
-                text-align: center;
-                font-family: Inter;
-                font-size: 0.875rem;
-                font-style: normal;
-                font-weight: 400;
-                line-height: 1.125rem;
-                
-            }
-
-            .item-name {
-                color: var(--secodary-text, #48556C);
-                text-align: center;
-                font-family: Inter;
-                font-size: 0.875rem;
-                font-style: normal;
-                font-weight: 400;
-                line-height: 1.125rem;
-            }
-            }
-        }
     }
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatFullDate, formatTime } from "../../../../utils/dateUtil";
 import "./Greetings.scss";
 
 export function Greetings() {
@@ -11,26 +12,17 @@ export function Greetings() {
     return () => clearInterval(intervalId);
   }, []);
 
-  const formattedDate = currentDate.toLocaleDateString("pl-PL", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
-  const formattedTime = currentDate.toLocaleTimeString("pl-PL", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+const formattedDate = formatFullDate(currentDate);
+const formattedTime = formatTime(currentDate);
 
   return (
     <>
-      <div className="Greetings">
-        <div className="Greetings_content">
+      <div className="greetings">
+        <div className="greetings-content">
           <h1 className="title">Dzień dobry!</h1>
           <p className="date">{formattedDate}</p>
         </div>
-        <div className="Greetings_time">
+        <div className="greetings-time">
           <div className="time">{formattedTime}</div>
         </div>
       </div>

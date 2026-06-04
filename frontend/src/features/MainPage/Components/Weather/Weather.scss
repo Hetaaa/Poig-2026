@@ -1,8 +1,7 @@
 @use "./../../../../variables" as *;
 
-.Weather-block {
+.weather-block {
   border-radius: 0.625rem;
-  background: linear-gradient(90deg, #3C70FE 0%, #3E74FF 50%, #3B70FE 100%);
   display: flex;
   padding: 1rem 1.5rem;
   flex-direction: column;
@@ -10,6 +9,34 @@
   align-items: flex-start;
   gap: 1rem;
   align-self: stretch;
+  border-radius: 0.625rem;
+  background: linear-gradient(90deg, #3C70FE 0%, #3E74FF 50%, #3B70FE 100%);
+
+  &.weather-cloudy,
+  &.weather-sunny,
+  &.weather-raining,
+  &.weather-windy {
+    background-color: lightgray;
+    background-position: 0.103px -111.433px;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  &.weather-cloudy {
+    background-image: url("/src/assets/weather-cloudy.png");
+  }
+
+  &.weather-sunny {
+    background-image: url("/src/assets/weather-sunny.png");
+  }
+
+  &.weather-raining {
+    background-image: url("/src/assets/weather-raining.png");
+  }
+
+  &.weather-windy {
+    background-image: url("/src/assets/weather-windy.png");
+  }
 
   .info {
     display: flex;
@@ -38,9 +65,7 @@
         .city {
           color: #FFF;
           text-align: center;
-          font-family: Inter;
           font-size: 0.875rem;
-          font-style: normal;
           font-weight: 400;
           line-height: 1.125rem;
         }
@@ -54,18 +79,14 @@
         .temp-big {
           color: #FFF;
           text-align: center;
-          font-family: Inter;
           font-size: 2rem;
-          font-style: normal;
           font-weight: 600;
           line-height: 1.125rem;
         }
 
         .temp-small {
           color: #FFF;
-          font-family: Inter;
           font-size: 1rem;
-          font-style: normal;
           font-weight: 400;
           line-height: 1.125rem;
         }
@@ -74,9 +95,7 @@
       .opis {
         color: #FFF;
         text-align: center;
-        font-family: Inter;
         font-size: 0.875rem;
-        font-style: normal;
         font-weight: 400;
         line-height: 1.125rem;
       }
@@ -92,7 +111,7 @@
   .line {
     width: 100%;
     height: 0.0625rem;
-    background: #7598fe;
+    background: #ffffff;
   }
 
   .weather-info {
@@ -118,11 +137,9 @@
           align-items: flex-start;
 
           .label {
-            color: var(--border-light, #E3E8F0);
+            color: $border-light;
             text-align: center;
-            font-family: Inter;
             font-size: 0.75rem;
-            font-style: normal;
             font-weight: 400;
             line-height: 1.125rem;
           }
@@ -130,9 +147,7 @@
           .value {
             color: #FFF;
             text-align: center;
-            font-family: Inter;
             font-size: 0.875rem;
-            font-style: normal;
             font-weight: 600;
             line-height: 1.125rem;
           }
