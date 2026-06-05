@@ -55,12 +55,16 @@ export function Weather() {
     loadWeather();
   }, [setLastLocation, fetchDailyWeather]);
 
-  useEffect(() => {
-    console.log("Pogoda:", weather);
-  }, [weather]);
+  if (status === "loading") {
+    return <p>Ładowanie pogody...</p>;
+  }
 
-  if(!weather){
-    return <p>Ładowanie pogody...</p>
+  if (status === "error") {
+    return <p>{error}</p>;
+  }
+
+  if (!weather) {
+    return null;
   }
 
   const temperature = weather?.temperature?.toFixed(0) ?? "-";
