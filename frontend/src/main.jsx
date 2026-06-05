@@ -9,7 +9,6 @@ import "./main.scss";
 import { MainPage } from "./features/MainPage/MainPage";
 import { Favourites } from "./features/Favourites/Favourites";
 import { Wardrobe} from "./features/Wardrobe/Wardrobe"
-import { AddClothing } from "./features/AddClothing/AddClothing";
 
 // TODO: Replace with actual pages when they are created
 function PlaceholderPage({ title }) {
