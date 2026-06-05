@@ -1,4 +1,4 @@
-import "./ClothingItem.scss";
+import "./Clothingitem.scss";
 
 export function ClothingItem({name, layer, category, className = ""}) {
   return (
