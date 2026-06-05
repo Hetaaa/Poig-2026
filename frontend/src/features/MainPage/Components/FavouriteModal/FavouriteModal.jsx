@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
 import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
-import { ModalFooter } from "../../../../common/components/ModalFooter/ModalFooter"; 
+import { ModalFooter } from "../../../../common/components/ModalFooter/ModalFooter";
 import "./FavouriteModal.scss";
-import { AiOutlineClose, AiOutlineHeart} from "react-icons/ai";
-import { FiSave } from "react-icons/fi";
+import { AiOutlineHeart } from "react-icons/ai";
 
 
 export function FavouriteModal({clothes, onClose}) {
