@@ -14,7 +14,12 @@ export function OutfitModal({date, weather, description, clothes, onClose}) {
                         <span className="text-title">{date}</span>
                         <span className="text-details">{weather}°C • {description}</span>
                     </div>
-                    <button type="button" className="header-icon" onClick={onClose}>
+                    <button
+                      type="button"
+                      className="header-icon"
+                      aria-label="Zamknij podgląd outfitu"
+                      onClick={onClose}
+                    >
                         <AiOutlineClose/>
                     </button>
                 </div>
