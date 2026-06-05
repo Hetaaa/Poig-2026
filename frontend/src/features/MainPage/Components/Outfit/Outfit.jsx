@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./Outfit.scss";
 import { BiShuffle } from "react-icons/bi";
 import { AiOutlineHeart} from "react-icons/ai";
