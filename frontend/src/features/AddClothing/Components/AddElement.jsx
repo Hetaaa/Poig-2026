@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { MdOutlineShoppingBag } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { ModalFooter } from "../../../common/components/ModalFooter/ModalFooter";
