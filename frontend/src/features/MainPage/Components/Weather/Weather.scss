@@ -23,19 +23,19 @@
   }
 
   &.weather-cloudy {
-    background-image: url("/src/assets/weather-cloudy.png");
+    background-image: url("../../../../assets/weather-cloudy.png");
   }
 
   &.weather-sunny {
-    background-image: url("/src/assets/weather-sunny.png");
+    background-image: url("../../../../assets/weather-sunny.png");
   }
 
   &.weather-raining {
-    background-image: url("/src/assets/weather-raining.png");
+    background-image: url("../../../../assets/weather-raining.png");
   }
 
   &.weather-windy {
-    background-image: url("/src/assets/weather-windy.png");
+    background-image: url("../../../../assets/weather-windy.png");
   }
 
   .info {
