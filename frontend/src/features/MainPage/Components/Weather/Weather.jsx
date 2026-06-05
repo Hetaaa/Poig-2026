@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./Weather.scss";
 import { useWeatherStore } from "./weatherStore";
-import { AiOutlineCloud, AiOutlineEye, AiOutlineSun } from "react-icons/ai";
+import { AiOutlineCloud, AiOutlineSun } from "react-icons/ai";
 import { CiTempHigh } from "react-icons/ci";
 import { IoWaterOutline, IoRainyOutline } from "react-icons/io5";
 import { BiWind } from "react-icons/bi";
