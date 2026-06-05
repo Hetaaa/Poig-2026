@@ -35,6 +35,12 @@
       font-size: 1.25rem;
     }
   }
+  
+  button.sidebar-element{
+      border:none;
+      background: transparent;
+      cursor: pointer;
+  }
 
   .sidebar-bottom {
     display: flex;

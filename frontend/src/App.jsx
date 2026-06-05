@@ -1,18 +1,26 @@
 import { Navbar } from "./features/Navbar/Navbar";
 import { Sidebar } from "./features/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
+import { useState } from "react";
+import { useAddElementStore } from "./features/AddClothing/addElementStore";
+
 import "./App.scss";
+import { AddElement } from "./features/AddClothing/Components/AddElement";
 
 export default function App() {
+  const {showAdd, closeAdd} = useAddElementStore();
+
   return (
     <>
       <Navbar />
       <div className="app-content">
         <Sidebar />
         <main className="app-main">
-          <Outlet />
+          <Outlet/>
         </main>
       </div>
+
+      {showAdd && <AddElement onClose={closeAdd}/>}
     </>
   );
 }
