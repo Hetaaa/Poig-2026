@@ -1,6 +1,5 @@
 import React from "react";
 import "./Wardrobe.scss";
-import { NavLink } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
 import {ClothingSection} from "./Components/ClothingSection/ClothingSection";
 import { useAddElementStore } from "../AddClothing/addElementStore";
