@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { OutfitModal } from "../OutfitModal/OutfitModal";
 import "./OutfitPlanner.scss";
 import { BiLinkExternal } from "react-icons/bi";
