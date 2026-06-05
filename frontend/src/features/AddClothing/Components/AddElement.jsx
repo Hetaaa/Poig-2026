@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FiSave } from "react-icons/fi";
 import { MdOutlineShoppingBag } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
+import { ModalFooter } from "../../../common/components/ModalFooter/ModalFooter";
 
 
 import "./AddElement.scss";
@@ -78,18 +77,7 @@ export function AddElement({onClose}) {
               <span className="waterproof-text">Wodoodporne</span>
             </div>
           </div>
-
-          <div className="card-footer">
-            <button className="footer-cancel" onClick={onClose}>
-              <AiOutlineClose className="micro-icon"/>
-              <span className="cancel-text">Anuluj</span>
-            </button>
-
-            <button className="footer-save">
-              <span className="footer-text">Zapisz</span>
-              <FiSave className="micro-icon footer-color"/>
-            </button>
-          </div>
+          <ModalFooter onClose={onClose}/>
         </div>
       </div>
     </div>

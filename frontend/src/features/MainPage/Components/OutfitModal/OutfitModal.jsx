@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ClothingItem } from "../../../../common/components/ClothingItem";
+import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
 import "./OutfitModal.scss";
 import { AiOutlineClose } from "react-icons/ai";
 

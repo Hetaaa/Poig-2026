@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./FavouriteOutfitCard.scss";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
-import {ClothingItem} from "../../../../common/components/ClothingItem";
+import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem"; 
 
 export function FavouriteOutfitCard(){
     return (
