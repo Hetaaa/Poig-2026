@@ -19,8 +19,8 @@ const formattedTime = formatTime(currentDate);
     <>
       <div className="greetings">
         <div className="greetings-content">
-          <h1 className="title">Dzień dobry!</h1>
-          <p className="date">{formattedDate}</p>
+          <span className="title">Dzień dobry!</span>
+          <span className="date">{formattedDate}</span>
         </div>
         <div className="greetings-time">
           <div className="time">{formattedTime}</div>

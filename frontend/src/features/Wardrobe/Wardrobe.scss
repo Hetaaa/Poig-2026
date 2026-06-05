@@ -71,8 +71,8 @@
         }
     }
 
-    .Button-add:hover{
-        filter: brightness(1.20);
+    .button-add:hover{
+        background: rgba($blue, 0.85);
         transform: scale(1.1);
     }
 }

@@ -217,10 +217,17 @@
                     justify-content: center;
                     align-items: center;
                     gap: 0.625rem;
+                    cursor: pointer;
 
                     border-radius: 0.625rem;
                     border: 1px solid #E5E5E5;
                     background: #FFF;
+
+                    transition: background 0.2s ease;
+
+                    &:hover {
+                        background: $item-bg;
+                    }
 
                     .cancel-text{
                         color: #000;
@@ -243,6 +250,10 @@
 
                     border-radius: 0.625rem;
                     background: $blue;
+
+                    &:hover{
+                        background: rgba($blue, 0.85);
+                    }
 
                     .footer-text{
                         color: #FFF;
