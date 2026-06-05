@@ -24,8 +24,6 @@ function WeatherDetail ({icon: Icon, label, value}){
 
 export function Weather() {
 
-  const weatherStatus = "windy";
-
   const weatherIcons = {
     cloudy: AiOutlineCloud, 
     sunny: AiOutlineSun, 
@@ -39,9 +37,6 @@ export function Weather() {
     raining: "Deszczowo", 
     windy: "Wietrznie",
   };
-
-  const WeatherIcon = weatherIcons[weatherStatus] || AiOutlineCloud
-  const weatherDescription = weatherDescriptions[weatherStatus] || "Zachmurzenie"
 
   const { weather, status, error, fetchDailyWeather, setLastLocation } =
     useWeatherStore();
@@ -64,6 +59,30 @@ export function Weather() {
     console.log("Pogoda:", weather);
   }, [weather]);
 
+  if(!weather){
+    return <p>Ładowanie pogody...</p>
+  }
+
+  const temperature = weather?.temperature?.toFixed(0) ?? "-";
+  const feelsLike = weather?.feelsLike?.toFixed(0) ?? "-";
+  const humidity = weather?.humidity?.toFixed(0) ?? "-";
+  const windSpeed = weather?.windSpeed?.toFixed(0) ?? "-";
+  const cloudCover = weather?.cloudCover?.toFixed(0) ?? "-";
+
+  function getWeatherStatus(weather) { 
+    if(!weather) return "cloudy";
+
+    if(weather.windSpeed > 25) return "windy";
+    if(weather.precipitation>0.5) return "raining";
+    if(weather.cloudCover>70) return "cloudy";
+
+    return "sunny";
+  }
+
+  const weatherStatus = getWeatherStatus(weather);
+  const WeatherIcon = weatherIcons[weatherStatus]
+  const weatherDescription = weatherDescriptions[weatherStatus]
+  
   return (
       <div className={`weather-block weather-${weatherStatus}`}>
         <div className="info">
@@ -73,8 +92,8 @@ export function Weather() {
               <span className="city">Warszawa, Polska</span>
             </div>
             <div className="city-temperature">
-              <h1 className="temp-big">18°C</h1>
-              <span className="temp-small">/ 15°C</span>
+              <h1 className="temp-big">{temperature}°C</h1>
+              <span className="temp-small">/{feelsLike}°C</span>
             </div>
             <p className="opis">{weatherDescription}</p>
           </div>
@@ -82,10 +101,10 @@ export function Weather() {
         </div>
         <div className="line"></div>
         <div className="weather-info">
-          <WeatherDetail icon = {CiTempHigh} label="Odczuwalna" value = "16°C"/>
-          <WeatherDetail icon = {IoWaterOutline} label="Wilgotność" value = "67%"/>
-          <WeatherDetail icon = {BiWind} label="Wiatr" value = "12km"/>
-          <WeatherDetail icon= {AiOutlineEye} label="Widoczność" value="10km"/>
+          <WeatherDetail icon = {CiTempHigh} label="Odczuwalna" value = {`${feelsLike}°C`}/>
+          <WeatherDetail icon = {IoWaterOutline} label="Wilgotność" value = {`${humidity}%`}/>
+          <WeatherDetail icon = {BiWind} label="Wiatr" value = {`${windSpeed} km/h`}/>
+          <WeatherDetail icon= {AiOutlineCloud} label="Zachmurzenie" value={`${cloudCover}%`}/>
         </div>
       </div>
   );
