@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import "./ClothingSection.scss";
 import { BiSolidHot } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
