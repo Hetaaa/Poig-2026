@@ -20,7 +20,7 @@ export function FavouriteModal({clothes, outfitId, onClose}) {
             return;
         }
 
-        if(alreadyExists(useFavouriteOutfitStore, outfitName)){
+        if (alreadyExists(useFavouriteOutfitStore.getState().favouriteOutfits, outfitName)) {
             alert("Outfit o takiej nazwie już istnieje w ulubionych");
             return;
         }
