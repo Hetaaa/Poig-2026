@@ -71,9 +71,12 @@ export function AddElement({onClose, ClothingItems=[]}) {
 
             <div className="clothes-option">
               <span className="clothes-title">Nazwa ubrania</span>
-              <input className="clothes-input"
+              <input
+                className="clothes-input"
                 type="text"
                 placeholder="Czarna bluza..."
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 
