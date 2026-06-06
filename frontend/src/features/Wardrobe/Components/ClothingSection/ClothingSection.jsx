@@ -77,8 +77,6 @@ function OuterLayer ({title, category, warmth}) {
 export function ClothingSection(){
     const {clothingItems} = useClothingItemsStore();
 
-    console.log("RESPONSE /ClothingItems:", clothingItems);
-    console.log("Pierwszy item:", clothingItems?.[0]);    
 
     const items = Array.isArray(clothingItems) ? clothingItems : [];
 
