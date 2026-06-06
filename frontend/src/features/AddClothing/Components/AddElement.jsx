@@ -1,8 +1,7 @@
+import { useState } from "react";
 import { MdOutlineShoppingBag } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { ModalFooter } from "../../../common/components/ModalFooter/ModalFooter";
-
-
 import "./AddElement.scss";
 
 function CategoryOptions() {
@@ -11,15 +10,14 @@ function CategoryOptions() {
       <option value="base">Koszulka (warstwa bazowa)</option>
       <option value="base">Koszula (warstwa bazowa)</option>
 
-      <option value="bottom">Spodnie (warstwa dolna)</option>
-      <option value="bottom">Spodenki (warstwa dolna)</option>
-      <option value="bottom">Spódnica (warstwa dolna)</option>
-
       <option value="middle">Bluza (warstwa średnia)</option>
       <option value="middle">Sweter (warstwa średnia)</option>
 
       <option value="outer">Kurtka (warstwa wierzchnia)</option>
-      <option value="outer">Sweter (warstwa wierzchnia)</option>
+
+      <option value="bottom">Spodnie (warstwa dolna)</option>
+      <option value="bottom">Spodenki (warstwa dolna)</option>
+      <option value="bottom">Spódnica (warstwa dolna)</option>
 
       <option value="shoes">Obuwie</option>
     </>
@@ -27,6 +25,15 @@ function CategoryOptions() {
 }
 
 export function AddElement({onClose}) {
+  const [photoPreview, setPhotoPreview] = useState(null);
+
+  function PhotoChange(e){
+    const file = e.target.files[0];
+    
+    if(file){
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  }
   return (
     <div className="add-page">
       <div className="add-card">
@@ -42,15 +49,15 @@ export function AddElement({onClose}) {
             <div className="clothes-image">
               <span className="image-description">Zdjęcie ubrania</span>
               <label className="image-upload">
-                <input type="file" accept="image/*" hidden />
-                <span className="upload-icon">+</span>
+                <input type="file" accept="image/*" hidden onChange={PhotoChange} />
+                {photoPreview ? (<img src={photoPreview} className="uploaded-image"></img>):(
+                <span className="upload-icon">+</span>)}
               </label>
             </div>
 
             <div className="clothes-option">
               <span className="clothes-title">Nazwa ubrania</span>
-              <input
-                className="clothes-input"
+              <input className="clothes-input"
                 type="text"
                 placeholder="Czarna bluza..."
               />
@@ -67,12 +74,14 @@ export function AddElement({onClose}) {
             <div className="clothes-warmth">
               <div className="warmth-form">
                 <span className="warmth-title">Poziom ciepła (1-10)</span>
-                <input className="warmth-range" type="range" min="1" max="10"/>
+                <input name = "warmthLevel"
+                className="warmth-range" type="range" min="1" max="10"/>
               </div>
             </div>
 
             <div className="clothes-waterproof">
-              <input type="checkbox" className="waterproof-checkbox" />
+              <input name="waterproof"
+              type="checkbox" className="waterproof-checkbox" />
               <span className="waterproof-text">Wodoodporne</span>
             </div>
           </div>

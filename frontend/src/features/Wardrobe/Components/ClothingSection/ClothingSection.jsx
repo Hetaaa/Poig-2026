@@ -3,6 +3,45 @@ import "./ClothingSection.scss";
 import { BiSolidHot } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { useClothingItemsStore } from "../../../../common/components/ClothingItem/clothingItemsStore";
+
+function getLayerByCategory(category){
+    if (["Koszulka", "Koszula"].includes(category)) return "base";
+    if (["Bluza", "Sweter"].includes(category)) return "middle";
+    if (["Spodnie", "Spódnica"].includes(category)) return "outer";
+    if (["Kurtka"].includes(category)) return "outer";
+    if (["Obuwie"].includes(category)) return "shoes";
+
+    return "other";
+}
+
+function mappingItem(items){
+    if (!Array.isArray(items)) return null;
+
+    return items.map((item)=>(
+        <OuterLayer
+            key = {item.id}
+            title = {item.name}
+            category = {item.category?.name}
+            warmth = {item.warmthLevel}
+        />
+    ));
+}
+
+function layer(title, items) {
+    if (!items.length) return null;
+
+    return (
+        <>
+            <div className="out-layer">
+                <h3 className="out-text">{title}</h3>
+                <div className="out-card">{mappingItem(items)}</div>
+            </div>
+            
+            <div className="line"></div>
+        </>
+    )
+}
 
 function OuterLayer ({title, category, warmth}) {
     return (
@@ -34,29 +73,42 @@ function OuterLayer ({title, category, warmth}) {
     );
 }
 
+
 export function ClothingSection(){
+    const {clothingItems} = useClothingItemsStore();
+
+    console.log("RESPONSE /ClothingItems:", clothingItems);
+    console.log("Pierwszy item:", clothingItems?.[0]);    
+
+    const items = Array.isArray(clothingItems) ? clothingItems : [];
+
+    const baseLayer = items.filter(
+        (item) => getLayerByCategory(item.category?.name) === "base"
+    );
+
+    const middleLayer = items.filter(
+        (item) => getLayerByCategory(item.category?.name) === "middle"
+    );
+
+    const outerLayer = items.filter(
+        (item) => getLayerByCategory(item.category?.name) === "outer"
+    );
+
+    const bottomLayer = items.filter(
+        (item) => getLayerByCategory(item.category?.name) === "bottom"
+    );
+
+    const shoeLayer = items.filter(
+        (item) => getLayerByCategory(item.category?.name) === "shoes"
+    );
+
     return (
     <>
-    <div className="out-layer">
-        <h3 className="out-text">Warstwa średnia</h3>
-        <div className="out-card">
-            <OuterLayer title = "Kurtka sztruks" category="Kurtka" warmth={8}/>
-        </div>
-    </div>
-    
-    <div className="line"></div>
-
-    <div className="out-layer">
-        <h3 className="out-text">Warstwa średnia</h3>
-        <div className="out-card">
-            <OuterLayer title = "Czarna MISBHV" category="Bluza" warmth={7}/>
-            <OuterLayer title = "Czarna MISBHV" category="Bluza" warmth={7}/>
-            <OuterLayer title = "Czarna MISBHV" category="Bluza" warmth={7}/>
-        </div>
-    </div>
-
-    <div className="line"></div>
-
+        {layer("Warstwa bazowa", baseLayer)}
+        {layer("Warstwa średnia", middleLayer)}
+        {layer("Warstwa dolna", bottomLayer)}
+        {layer("Warstwa wierzchnia", outerLayer)}
+        {layer("Obuwie", shoeLayer)}
     </>
     )
 }

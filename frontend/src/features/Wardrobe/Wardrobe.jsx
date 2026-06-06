@@ -1,11 +1,18 @@
-import React from "react";
+import React, {useEffect} from "react";
 import "./Wardrobe.scss";
 import { AiOutlinePlus } from "react-icons/ai";
 import {ClothingSection} from "./Components/ClothingSection/ClothingSection";
 import { useAddElementStore } from "../AddClothing/addElementStore";
+import { useClothingItemsStore } from "../../common/components/ClothingItem/clothingItemsStore";
 
 export function Wardrobe() {
   const {openAdd} = useAddElementStore();
+  const {status, error, fetchClothingItems} = useClothingItemsStore();
+  
+  useEffect(()=>{
+    fetchClothingItems();
+  }, [fetchClothingItems]);
+
   return (
     <>
       <div className="wardrobe-header">
@@ -19,7 +26,8 @@ export function Wardrobe() {
             <AiOutlinePlus className="button-icon"/>
         </button>
       </div>
-
+      {status === "loading" && <p>Ładowanie ubrań...</p>}
+      {status === "error" && <p>Błąd: {error} </p>}
       <ClothingSection/>
     </>
   );

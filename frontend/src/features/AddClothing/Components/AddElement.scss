@@ -92,6 +92,13 @@
                         align-self: stretch;
                         border-radius: 0.625rem;
                         border: 1px dashed #E5E5E5;
+                        overflow: hidden;
+
+                        .uploaded-image{
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
 
                         .upload-icon{
                             color: #000;
@@ -203,71 +210,7 @@
                             line-height: 150%; 
                         }
                     }
-            }
-
-            .card-footer{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                align-self: stretch;
-
-                .footer-cancel{
-                    display: flex;
-                    padding: 0.5rem 0.75rem;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 0.625rem;
-                    cursor: pointer;
-
-                    border-radius: 0.625rem;
-                    border: 1px solid #E5E5E5;
-                    background: #FFF;
-
-                    transition: background 0.2s ease;
-
-                    &:hover {
-                        background: $item-bg;
-                    }
-
-                    .cancel-text{
-                        color: #000;
-                        text-align: center;
-                        font-family: Inter;
-                        font-size: 0.875rem;
-                        font-style: normal;
-                        font-weight: 500;
-                        line-height: 1.125rem; 
-                    }
                 }
-
-                .footer-save{
-                    display: flex;
-                    padding: 0.5rem 0.75rem;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 0.625rem;
-                    border: none;
-
-                    border-radius: 0.625rem;
-                    background: $blue;
-
-                    &:hover{
-                        background: rgba($blue, 0.85);
-                    }
-
-                    .footer-text{
-                        color: #FFF;
-                        text-align: center;
-                        font-size: 0.875rem;
-                        font-weight: 600;
-                        line-height: 1.125rem;
-                    }
-
-                    .footer-color{
-                        color: #fff;
-                    }
-                }
-            }
         }
     }
 }
