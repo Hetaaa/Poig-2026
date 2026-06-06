@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<IOutfitManagerService, OutfitManagerService>();
         services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DomainToDtoProfile).Assembly));
         services.AddScoped<InitialValuesService>();
+        services.AddHttpClient<IWeatherService, WeatherService>(client =>{});
         return services;
     }
 }

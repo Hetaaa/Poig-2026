@@ -18,7 +18,7 @@ namespace WeatherStyler.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
         var connectionString = configuration.GetConnectionString("WeatherStylerDb")
             ?? "Data Source=weatherstyler.db";
@@ -65,7 +65,9 @@ public static class DependencyInjection
                 ValidateAudience = false,
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtIssuer,
+                ValidateLifetime = !isDevelopment,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+
             };
         });
 

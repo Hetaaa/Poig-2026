@@ -28,7 +28,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.IsDevelopment());
 
 // ─── OpenAPI + JWT ────────────────────────────────────────────────────────────
 builder.Services.AddOpenApi(options =>
@@ -73,7 +73,7 @@ if (app.Environment.IsDevelopment())
             .AddPreferredSecuritySchemes("Bearer")
             .AddHttpAuthentication("Bearer", auth =>
             {
-                auth.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzYzA3NWRhNy1jY2ViLTQ0NTQtYTY2Zi1kZTk2NTIwMTA5MWIiLCJ1bmlxdWVfbmFtZSI6IngiLCJqdGkiOiJiYWM0MzFjOS0yYjY4LTQ0MWItOTgxNC04Yjc2Mjk4MDFkZjQiLCJleHAiOjE3NzY2Nzk3NzUsImlzcyI6IldlYXRoZXJTdHlsZXIifQ.T_ZfH029liG4pxZn_JIpBIEOb2S3f2axDdwsIsFARks";
+                auth.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlNjNjMDA4MC1jMzIzLTQzYTgtYWJkOC1hYzA1Yjc0ZTVlZTAiLCJ1bmlxdWVfbmFtZSI6Inh4eCIsImp0aSI6IjdlZWQ0OTNlLTA4NTctNGZjNi04YjBhLTc3MWYwZTllNzAyMCIsImV4cCI6MTc4MDgyMDkzMywiaXNzIjoiV2VhdGhlclN0eWxlciJ9.jmJMc-SkvN89OQhEWtFcA7lzPvYlM8ZV-vYfZACoR1I";
             });
     });
 }
