@@ -13,9 +13,13 @@
   background: linear-gradient(90deg, #3C70FE 0%, #3E74FF 50%, #3B70FE 100%);
 
   &.weather-cloudy,
+  &.weather-night-cloudy,
   &.weather-sunny,
   &.weather-raining,
-  &.weather-windy {
+  &.weather-night-raining,
+  &.weather-windy,
+  &.weather-night-windy,
+  &.weather-night-clear {
     background-color: lightgray;
     background-position: 0.103px -111.433px;
     background-size: cover;
