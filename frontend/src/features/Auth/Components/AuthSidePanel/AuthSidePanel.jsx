@@ -2,9 +2,9 @@ export function AuthSidePanel({ isRegister, onSwitch }) {
   return (
     <aside className="auth-side">
       <div className="auth-brand">Smart Wardrobe</div>
-      <div className="auth-side-title">Styl pod pogode, bez zgadywania.</div>
+      <div className="auth-side-title">Styl pod pogodę, bez zgadywania.</div>
       <p className="auth-side-text">
-        Twoj outfit startuje od prognozy. Dzisiaj wygladasz dobrze, jutro tez.
+        Twój outfit startuje od prognozy. Dzisiaj wyglądasz dobrze, jutro też.
       </p>
       <div className="auth-switch">
         <div className="switch-track">
