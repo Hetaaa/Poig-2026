@@ -22,19 +22,25 @@
     background-repeat: no-repeat;
   }
 
-  &.weather-cloudy {
+  &.weather-cloudy,
+  &.weather-night-cloudy {
     background-image: url("../../../../assets/weather-cloudy.png");
   }
 
+  &.weather-night-clear{
+    background-image: url("../../../../assets/weather-night.png");
+  }
   &.weather-sunny {
     background-image: url("../../../../assets/weather-sunny.png");
   }
 
-  &.weather-raining {
+  &.weather-raining
+  &.weather-night-raining {
     background-image: url("../../../../assets/weather-raining.png");
   }
 
-  &.weather-windy {
+  &.weather-windy
+  &.weather-night-windy {
     background-image: url("../../../../assets/weather-windy.png");
   }
 

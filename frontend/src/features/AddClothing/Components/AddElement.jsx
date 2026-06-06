@@ -27,6 +27,7 @@ function CategoryOptions() {
 }
 export function AddElement({onClose, ClothingItems=[]}) {
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [warmthLevel, setWarmthLevel] = useState(5);
   
   function Save(){
     if(!isTextValid(name,3,50)){
@@ -86,9 +87,9 @@ export function AddElement({onClose, ClothingItems=[]}) {
 
             <div className="clothes-warmth">
               <div className="warmth-form">
-                <span className="warmth-title">Poziom ciepła (1-10)</span>
+                <span className="warmth-title">Poziom ciepła: {warmthLevel}/10</span>
                 <input name = "warmthLevel"
-                className="warmth-range" type="range" min="1" max="10"/>
+                className="warmth-range" type="range" min="1" max="10" value={warmthLevel} onChange={(e)=> setWarmthLevel(Number(e.target.value))}/>
               </div>
             </div>
 

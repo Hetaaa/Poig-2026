@@ -3,6 +3,7 @@ import "./Weather.scss";
 import { useWeatherStore } from "./weatherStore";
 import { AiOutlineCloud, AiOutlineSun } from "react-icons/ai";
 import { CiTempHigh } from "react-icons/ci";
+import { BsMoonStars } from "react-icons/bs";
 import { IoWaterOutline, IoRainyOutline } from "react-icons/io5";
 import { BiWind } from "react-icons/bi";
 import { TiWeatherWindyCloudy } from "react-icons/ti";
@@ -30,6 +31,11 @@ export function Weather() {
     sunny: AiOutlineSun, 
     raining: IoRainyOutline, 
     windy: TiWeatherWindyCloudy,
+
+    "night-clear": BsMoonStars,
+    "night-cloudy": AiOutlineCloud,
+    "night-raining": IoRainyOutline,
+    "night-windy": TiWeatherWindyCloudy,
   };
 
 
