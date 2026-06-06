@@ -2,7 +2,9 @@ import { useState } from "react";
 import { MdOutlineShoppingBag } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { ModalFooter } from "../../../common/components/ModalFooter/ModalFooter";
+import { isTextValid, alreadyExists } from "../../../utils/helpers";
 import "./AddElement.scss";
+import { ClothingItem } from "../../../common/components/ClothingItem/ClothingItem";
 
 function CategoryOptions() {
   return (
@@ -23,8 +25,20 @@ function CategoryOptions() {
     </>
   );
 }
-export function AddElement({onClose}) {
+export function AddElement({onClose, ClothingItems=[]}) {
   const [photoPreview, setPhotoPreview] = useState(null);
+  
+  function Save(){
+    if(!isTextValid(name,3,50)){
+      alert("Nazwa ubrania musi mieć od 3 do 50 znaków");
+      return;
+    }
+
+    if (alreadyExists(ClothingItems,name)){
+      alert("Takie ubranie już istnieje");
+      return;
+    }
+  }
 
   function PhotoChange(e){
     const file = e.target.files[0];

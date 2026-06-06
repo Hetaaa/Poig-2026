@@ -7,7 +7,7 @@ import { useClothingItemsStore } from "../../common/components/ClothingItem/clot
 
 export function Wardrobe() {
   const {openAdd} = useAddElementStore();
-  const {status, error, fetchClothingItems} = useClothingItemsStore();
+  const {clothingItems, status, error, fetchClothingItems} = useClothingItemsStore();
   
   useEffect(()=>{
     fetchClothingItems();
@@ -28,7 +28,8 @@ export function Wardrobe() {
       </div>
       {status === "loading" && <p>Ładowanie ubrań...</p>}
       {status === "error" && <p>Błąd: {error} </p>}
-      <ClothingSection/>
+      {status==="success" && clothingItems.length===0 && <p>Nie masz jeszcze żadnych ubrań w szafie</p>}
+      {status === "success" && clothingItems.length > 0 && <ClothingSection />}
     </>
   );
 }
