@@ -1,7 +1,6 @@
 import { Navbar } from "./features/Navbar/Navbar";
 import { Sidebar } from "./features/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
-import { useState } from "react";
 import { useAddElementStore } from "./features/AddClothing/addElementStore";
 
 import "./App.scss";
