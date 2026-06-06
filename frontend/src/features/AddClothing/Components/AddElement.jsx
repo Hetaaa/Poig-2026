@@ -4,7 +4,6 @@ import { IoIosArrowDown } from "react-icons/io";
 import { ModalFooter } from "../../../common/components/ModalFooter/ModalFooter";
 import { isTextValid, alreadyExists } from "../../../utils/helpers";
 import "./AddElement.scss";
-import { ClothingItem } from "../../../common/components/ClothingItem/ClothingItem";
 
 function CategoryOptions() {
   return (
@@ -25,18 +24,23 @@ function CategoryOptions() {
     </>
   );
 }
-export function AddElement({onClose, ClothingItems=[]}) {
+export function AddElement({onClose, clothingItems=[]}) {
   const [photoPreview, setPhotoPreview] = useState(null);
   const [warmthLevel, setWarmthLevel] = useState(5);
   const [name, setName] = useState("");
   
-  function Save(){
-    if(!isTextValid(name,3,50)){
+  function Save() {
+    if (!isTextValid(name, 3, 50)) {
+      alert("Nazwa ubrania musi mieć od 3 do 50 znaków");
+      return;
+    }
 
-    if (alreadyExists(ClothingItems,name)){
+    if (alreadyExists(ClothingItems, name)) {
       alert("Takie ubranie już istnieje");
       return;
     }
+
+    onClose();
   }
 
   function PhotoChange(e){
@@ -63,8 +67,14 @@ export function AddElement({onClose, ClothingItems=[]}) {
               <label className="image-upload">
                 <input type="file" accept="image/*" hidden onChange={PhotoChange} />
                 {photoPreview ? (
-                  <img src={photoPreview} alt="Podgląd ubrania" className="uploaded-image" />
+                  <img
+                    src={photoPreview}
+                    alt="Podgląd ubrania"
+                    className="uploaded-image"
+                  />
                 ) : (
+                  <span className="upload-icon">+</span>
+                )}
               </label>
             </div>
 
@@ -104,6 +114,6 @@ export function AddElement({onClose, ClothingItems=[]}) {
           <ModalFooter onClose={onClose} onSave={Save} />
         </div>
       </div>
-    </div>
-  );
-}
+      </div>
+    );
+  }

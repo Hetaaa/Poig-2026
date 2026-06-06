@@ -1,6 +1,5 @@
 import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
 import { ModalFooter } from "../../../../common/components/ModalFooter/ModalFooter";
-import { useFavouriteOutfitStore } from "../../../Favourites/favouriteStore";
 import "./FavouriteModal.scss";
 import { AiOutlineHeart } from "react-icons/ai";
 import { useState } from "react";
@@ -8,7 +7,6 @@ import { alreadyExists, isTextValid} from "../../../../utils/helpers";
 
 export function FavouriteModal({clothes, outfitId, onClose}) {
 
-    const {addFavouriteOutfit} = useFavouriteOutfitStore();
     const [outfitName, setOutfitName] = useState("");
     const [outfitDescription, setOutfitDescription] = useState("");
 
@@ -20,22 +18,6 @@ export function FavouriteModal({clothes, outfitId, onClose}) {
             return;
         }
 
-        if (alreadyExists(useFavouriteOutfitStore.getState().favouriteOutfits, outfitName)) {
-            alert("Outfit o takiej nazwie już istnieje w ulubionych");
-            return;
-        }
-
-        if(outfitDescription && !isTextValid(outfitDescription, 0, 150)){
-            alert("Opis outfitu może mieć maksymalnie 150 znaków");
-            return;
-        }
-
-        await addFavouriteOutfit({
-            id: outfitId, 
-            name: outfitName, 
-            description: outfitDescription,
-            isFavourite: true, 
-        });
         onClose();
     }
     return (
