@@ -10,10 +10,11 @@ export function getMatchingOutfit(clothingItems, weather){
         if (weatherStatus ==="raining" && !item.waterproof) return false;
         if (weatherStatus === "windy" && !item.windproof) return false;
         
-        if (temperature < 5 && item.warmth<4) return false; 
-        if (temperature >=5 && temperature < 15 && item.warmth <3) return false; 
-        if (temperature >=15 && temperature < 23 && item.warmth <2) return false; 
-        if (temperature >= 23 && item.warmth > 2) return false; 
+        const warmth = item.warmthLevel ?? item.warmth;
+        if (temperature < 5 && warmth < 4) return false; 
+        if (temperature >= 5 && temperature < 15 && warmth < 3) return false; 
+        if (temperature >= 15 && temperature < 23 && warmth < 2) return false; 
+        if (temperature >= 23 && warmth > 2) return false;
 
         return true;
     });
