@@ -32,7 +32,7 @@ export function Outfit() {
             <div className="header">
                 <div className="title">
                     <div className= "title-header">
-                        <span className="title-description">Twój outfit na dzis</span>
+                        <span className="title-description">Twój outfit na dziś</span>
                     </div>
                     <span className="description">96% Dopasowania • Idealny na dzisiejszą pogodę</span>
                 </div>
