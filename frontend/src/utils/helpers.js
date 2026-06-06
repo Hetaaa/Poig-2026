@@ -3,7 +3,7 @@ export function getErrorMessage(error) {
   return (
     error?.response?.data?.message ||
     error?.message ||
-    "Nie udalo sie pobrac danych"
+    "Nie udało się pobrać danych"
   );
 }
 
