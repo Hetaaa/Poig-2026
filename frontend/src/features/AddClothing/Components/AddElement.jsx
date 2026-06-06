@@ -64,8 +64,9 @@ export function AddElement({onClose, ClothingItems=[]}) {
               <span className="image-description">Zdjęcie ubrania</span>
               <label className="image-upload">
                 <input type="file" accept="image/*" hidden onChange={PhotoChange} />
-                {photoPreview ? (<img src={photoPreview} className="uploaded-image"></img>):(
-                <span className="upload-icon">+</span>)}
+                {photoPreview ? (
+                  <img src={photoPreview} alt="Podgląd ubrania" className="uploaded-image" />
+                ) : (
               </label>
             </div>
 
