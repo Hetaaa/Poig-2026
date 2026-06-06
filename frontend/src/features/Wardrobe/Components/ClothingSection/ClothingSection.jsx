@@ -5,10 +5,10 @@ import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useClothingItemsStore } from "../../../../common/components/ClothingItem/clothingItemsStore";
 
-function getLayerByCategory(category){
+function getLayerByCategory(category) {
     if (["Koszulka", "Koszula"].includes(category)) return "base";
     if (["Bluza", "Sweter"].includes(category)) return "middle";
-    if (["Spodnie", "Spódnica"].includes(category)) return "outer";
+    if (["Spodnie", "Spódnica"].includes(category)) return "bottom";
     if (["Kurtka"].includes(category)) return "outer";
     if (["Obuwie"].includes(category)) return "shoes";
 
