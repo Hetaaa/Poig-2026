@@ -102,7 +102,7 @@ export function AddElement({onClose, ClothingItems=[]}) {
               <span className="waterproof-text">Wodoodporne</span>
             </div>
           </div>
-          <ModalFooter onClose={onClose}/>
+          <ModalFooter onClose={onClose} onSave={Save} />
         </div>
       </div>
     </div>
