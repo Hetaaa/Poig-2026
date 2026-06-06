@@ -10,7 +10,7 @@ export function ModalFooter({ onClose, onSave }) {
         <span className="cancel-text">Anuluj</span>
       </button>
 
-      <button type="button" className="footer-save" onClick={onSave}>
+      <button type="button" className="footer-save" onClick={onSave} disabled={!onSave}>
         <span className="footer-text">Zapisz</span>
         <FiSave className="micro-icon footer-color" />
       </button>
