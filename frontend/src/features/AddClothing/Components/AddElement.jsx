@@ -28,12 +28,10 @@ function CategoryOptions() {
 export function AddElement({onClose, ClothingItems=[]}) {
   const [photoPreview, setPhotoPreview] = useState(null);
   const [warmthLevel, setWarmthLevel] = useState(5);
+  const [name, setName] = useState("");
   
   function Save(){
     if(!isTextValid(name,3,50)){
-      alert("Nazwa ubrania musi mieć od 3 do 50 znaków");
-      return;
-    }
 
     if (alreadyExists(ClothingItems,name)){
       alert("Takie ubranie już istnieje");
