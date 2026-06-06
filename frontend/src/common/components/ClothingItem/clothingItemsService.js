@@ -9,3 +9,7 @@ export async function createClothingItem(item) {
     const response = await apiClient.post("/ClothingItems", item);
     return response.data;
 }
+
+export async function deleteClothingItem(id){
+    await apiClient.delete(`/ClothingItems/${id}`)
+}

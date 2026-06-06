@@ -19,6 +19,7 @@ export function Outfit() {
 
     const {weather} = useWeatherStore();
 
+
     function Shuffle() {
         if(!weather) return;
         const newOutfit = getRandomMatchingOutfit(clothes, weather);

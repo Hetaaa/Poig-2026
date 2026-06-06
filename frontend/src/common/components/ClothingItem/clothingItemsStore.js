@@ -1,21 +1,16 @@
 import { create } from "zustand";
 import { getClothingItems, 
-    createClothingItem
+    createClothingItem,
+    deleteClothingItem
 } from "./clothingItemsService";
+import { getErrorMessage } from "../../../utils/helpers";
+
 
 const initialState = {
   clothingItems: [],
   status: "idle",
   error: null,
 };
-
-function getErrorMessage(error) {
-  return (
-    error?.response?.data?.message ||
-    error?.message ||
-    "Nie udało się pobrać ubrań"
-  );
-}
 
 export const useClothingItemsStore = create((set) => ({
   ...initialState,
@@ -25,8 +20,6 @@ export const useClothingItemsStore = create((set) => ({
 
     try {
       const data = await getClothingItems();
-      console.log("DATA Z BACKENDU:", data);
-        console.log("Czy to tablica?", Array.isArray(data));
 
       set({
         clothingItems: data,
@@ -65,6 +58,28 @@ export const useClothingItemsStore = create((set) => ({
         });
 
         throw error;
+    }
+  },
+
+  async removeClothingItem(id) {
+    set({status:"loading", error: null});
+
+    try{
+      await deleteClothingItem(id);
+      set((state)=> ({
+        clothingItems: state.clothingItems.filter(
+          (item)=> item.id !== id
+        ),
+        status:"success", 
+        error: null,
+      }));
+    } catch(error){
+      set({
+        status: "error", 
+        error: getErrorMessage(error)
+      });
+
+      throw error;
     }
   },
 
