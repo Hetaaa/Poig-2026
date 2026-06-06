@@ -6,6 +6,7 @@ import { CiTempHigh } from "react-icons/ci";
 import { IoWaterOutline, IoRainyOutline } from "react-icons/io5";
 import { BiWind } from "react-icons/bi";
 import { TiWeatherWindyCloudy } from "react-icons/ti";
+import { getWeatherStatus, weatherDescriptions } from "../../../../utils/weatherHelpers";
 
 
 function WeatherDetail ({icon: Icon, label, value}){
@@ -31,12 +32,6 @@ export function Weather() {
     windy: TiWeatherWindyCloudy,
   };
 
-  const weatherDescriptions = {
-    cloudy: "Zachmurzenie", 
-    sunny: "Słonecznie", 
-    raining: "Deszczowo", 
-    windy: "Wietrznie",
-  };
 
   const { weather, status, error, fetchDailyWeather, setLastLocation } =
     useWeatherStore();
@@ -73,16 +68,7 @@ export function Weather() {
   const windSpeed = weather?.windSpeed?.toFixed(0) ?? "-";
   const cloudCover = weather?.cloudCover?.toFixed(0) ?? "-";
 
-  function getWeatherStatus(weather) { 
-    if(!weather) return "cloudy";
-
-    if(weather.windSpeed > 25) return "windy";
-    if(weather.precipitation>0.5) return "raining";
-    if(weather.cloudCover>70) return "cloudy";
-
-    return "sunny";
-  }
-
+ 
   const weatherStatus = getWeatherStatus(weather);
   const WeatherIcon = weatherIcons[weatherStatus]
   const weatherDescription = weatherDescriptions[weatherStatus]

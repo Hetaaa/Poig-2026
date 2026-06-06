@@ -4,15 +4,27 @@ import { BiShuffle } from "react-icons/bi";
 import { AiOutlineHeart} from "react-icons/ai";
 import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
 import { FavouriteModal } from "../FavouriteModal/FavouriteModal";
+import { getRandomMatchingOutfit } from "../../../../utils/matchingItem";
+import { useWeatherStore } from "../Weather/weatherStore";
 
 const clothes = [
-  { id: 1, name: "Czarna MISBHV", layer: "Warstwa średnia", category: "Bluza" },
-  { id: 2, name: "Biała koszulka", layer: "Warstwa bazowa", category: "Koszulka" },
-  { id: 3, name: "Jeansy niebieskie", layer: "Dół", category: "Spodnie" },
+  { id: 1, name: "Czarna MISBHV", layer: "Warstwa średnia", category: "Bluza", warmth: 3, waterproof: false},
+  { id: 2, name: "Biała koszulka", layer: "Warstwa bazowa", category: "Koszulka", warmth: 1, waterproof: false},
+  { id: 3, name: "Jeansy niebieskie", layer: "Dół", category: "Spodnie", warmth: 2, waterproof: false},
 ];
 
 export function Outfit() {
     const[showFavouriteModal, setShowFavouriteModal] = useState(false);
+    const[currentOutfit, setCurrentOutfit] = useState(clothes)
+
+    const {weather} = useWeatherStore();
+
+    function Shuffle() {
+        if(!weather) return;
+        const newOutfit = getRandomMatchingOutfit(clothes, weather);
+        setCurrentOutfit(newOutfit);
+    }
+
     return (
     <>
         <div className="outfit-container">
@@ -24,7 +36,7 @@ export function Outfit() {
                     <span className="description">96% Dopasowania • Idealny na dzisiejszą pogodę</span>
                 </div>
                 <div className="react-img">
-                    <button className="icon-btn" aria-label="Shuffle outfit">
+                    <button className="icon-btn" aria-label="Shuffle outfit" onClick ={Shuffle}>
                         <BiShuffle className="medium-icon" />
                     </button>
 
@@ -35,7 +47,7 @@ export function Outfit() {
            </div>
 
             <div className="clothes">
-                {clothes.map((item) => (
+                {currentOutfit.map((item) => (
                 <ClothingItem
                     key={item.id}
                     name={item.name}
@@ -45,7 +57,7 @@ export function Outfit() {
             ))}
       </div>
 
-           {showFavouriteModal && <FavouriteModal clothes={clothes} onClose={()=> setShowFavouriteModal(false)}/>}
+           {showFavouriteModal && <FavouriteModal clothes={currentOutfit} onClose={()=> setShowFavouriteModal(false)}/>}
         </div>
     </>
   );

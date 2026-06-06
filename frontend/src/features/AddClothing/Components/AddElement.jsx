@@ -23,7 +23,6 @@ function CategoryOptions() {
     </>
   );
 }
-
 export function AddElement({onClose}) {
   const [photoPreview, setPhotoPreview] = useState(null);
 
