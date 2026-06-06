@@ -41,6 +41,15 @@ export const useFavouriteOutfitStore = create((set) => ({
     }
   },
 
+  async addFavouriteOutfit(outfit) {
+    set((state) => ({
+      favouriteOutfits: [...state.favouriteOutfits, outfit],
+      status: "success",
+      error: null,
+    }));
+    return outfit;
+  },
+
   resetFavouriteOutfits() {
     set(initialState);
   },
