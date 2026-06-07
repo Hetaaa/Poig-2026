@@ -331,6 +331,8 @@ public class OutfitManagerService : IOutfitManagerService
             req.Add(new SlotRequirement { SlotName = "Nogi", RequiredLayers = new() { 1 }, MinWarmth = 5 });
         }
 
+        req.Add(new SlotRequirement { SlotName = "Stopy", RequiredLayers = new() { 1 }, MinWarmth = 1 });
+
         if (weather.IsWindy || weather.Temperature < 10)
             req.Add(new SlotRequirement { SlotName = "Głowa", RequiredLayers = new() { 1 }, MinWarmth = 0 });
 

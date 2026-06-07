@@ -21,7 +21,7 @@ var configuration = new ConfigurationBuilder()
     .Build();
 
 services.AddApplication();
-services.AddInfrastructure(configuration);
+services.AddInfrastructure(configuration, true);
 
 using var provider = services.BuildServiceProvider();
 using var scope = provider.CreateScope();

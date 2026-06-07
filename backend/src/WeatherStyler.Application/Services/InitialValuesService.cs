@@ -1,7 +1,8 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-
+using System.Threading;
+using System.Threading.Tasks;
 using WeatherStyler.Domain.Entities;
 using WeatherStyler.Domain.Interfaces.Repositories;
 
@@ -20,8 +21,7 @@ public class InitialValuesService
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
-        // seed clothing slots
-        var slots = new[] { "Głowa", "Core", "Ręce", "Nogi" };
+        var slots = new[] { "Głowa", "Core", "Ręce", "Nogi", "Stopy" };
         var slotEntities = new Dictionary<string, Guid>();
         foreach (var s in slots)
         {
@@ -38,7 +38,7 @@ public class InitialValuesService
         }
 
         // seed colors (mark neutral colors)
-        var colors = new[] { "Czarny","Biały","Szary","Granatowy","Beżowy","Brązowy","Szałwiowy","Oliwkowy","Błękitny","Bordowy","Pudrowy Róż","Maślany Żółty","Czerwony" };
+        var colors = new[] { "Czarny", "Biały", "Szary", "Granatowy", "Beżowy", "Brązowy", "Szałwiowy", "Oliwkowy", "Błękitny", "Bordowy", "Pudrowy Róż", "Maślany Żółty", "Czerwony" };
         var neutralColorNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Czarny", "Biały", "Szary", "Beżowy", "Brązowy" };
         foreach (var c in colors)
         {
@@ -67,7 +67,7 @@ public class InitialValuesService
             }
         }
 
-        // seed categories with slot associations
+        // 2. DODANO KATEGORIE BUTÓW PRZYPISANE DO SLOTU "Stopy"
         var categoryMap = new Dictionary<string, string[]>
         {
             ["T-shirt"] = new[] { "Core", "Ręce" },
@@ -89,7 +89,12 @@ public class InitialValuesService
             ["Legginsy"] = new[] { "Nogi" },
             ["Kardigan"] = new[] { "Core", "Ręce" },
             ["Spodnie dresowe"] = new[] { "Nogi" },
-            ["Body"] = new[] { "Core" }
+            ["Body"] = new[] { "Core" },
+            ["Sneakersy"] = new[] { "Stopy" },
+            ["Buty eleganckie"] = new[] { "Stopy" },
+            ["Sandały"] = new[] { "Stopy" },
+            ["Botki"] = new[] { "Stopy" },
+            ["Kozaki"] = new[] { "Stopy" }
         };
 
         foreach (var kv in categoryMap)
