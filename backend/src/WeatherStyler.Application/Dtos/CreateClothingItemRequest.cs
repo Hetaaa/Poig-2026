@@ -9,9 +9,9 @@ public record CreateClothingItemRequest(
     IFormFile? PhotoFile,
     Guid CategoryId,
     int WarmthLevel,
-    [ModelBinder(typeof(GuidArrayBinder))]
+    [ModelBinder(typeof(JsonModelBinder))]
     IEnumerable<Guid>? StyleIds,
-    [ModelBinder(typeof(GuidArrayBinder))]
+    [ModelBinder(typeof(JsonModelBinder))]
     IEnumerable<Guid>? ColorIds,
     [ModelBinder(typeof(JsonModelBinder))]
     IEnumerable<ClothingPropertyDto>? Properties
