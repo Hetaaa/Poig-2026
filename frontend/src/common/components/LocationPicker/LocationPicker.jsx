@@ -17,7 +17,10 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadowUrl,
 });
 
-const provider = new OpenStreetMapProvider();
+const provider = new OpenStreetMapProvider({
+  searchUrl: "/nominatim/search",
+  reverseUrl: "/nominatim/reverse",
+});
 
 function MapClickHandler({ onPick }) {
   useMapEvents({
