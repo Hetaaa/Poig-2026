@@ -1,6 +1,6 @@
 using WeatherStyler.Application.Dtos;
 
-namespace WeatherStyler.Contracts;
+namespace WeatherStyler;
 
 public record OutfitItemDto(
     Guid Id,

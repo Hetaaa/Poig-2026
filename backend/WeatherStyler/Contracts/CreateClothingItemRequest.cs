@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using WeatherStyler.Application.Dtos;
 using WeatherStyler.Application.Profiles;
 
 namespace WeatherStyler.Contracts;

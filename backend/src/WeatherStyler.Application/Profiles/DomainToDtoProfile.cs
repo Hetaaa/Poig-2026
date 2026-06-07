@@ -20,11 +20,12 @@ public class DomainToDtoProfile : Profile
         CreateMap<ClothingItem, OutfitClothingItemDto>().ReverseMap();
         CreateMap<ClothingItem, ClothingItemDto>().ReverseMap();
         CreateMap<Category, CategoryDto>().ReverseMap();
+        CreateMap<ClothingSlot, ClothingSlotDto>().ReverseMap();
         CreateMap<CreateClothingItemRequest, ClothingItem>()
             .ForMember(dest => dest.PhotoUrl, opt => opt.Ignore());
 
 
 
-
+            
     }
 }
