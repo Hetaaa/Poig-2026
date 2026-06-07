@@ -20,7 +20,6 @@
     <ProjectReference Include="..\backend\src\WeatherStyler.Application\WeatherStyler.Application.csproj" />
     <ProjectReference Include="..\backend\src\WeatherStyler.Domain\WeatherStyler.Domain.csproj" />
     <ProjectReference Include="..\backend\src\WeatherStyler.Infrastructure\WeatherStyler.Infrastructure.csproj" />
-    <ProjectReference Include="..\backend\src\WeatherStyler.MigrationService\WeatherStyler.MigrationService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -24,7 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\src\WeatherStyler.Application\WeatherStyler.Application.csproj" />
     <ProjectReference Include="..\src\WeatherStyler.Infrastructure\WeatherStyler.Infrastructure.csproj" />
-    <ProjectReference Include="..\src\WeatherStyler.MigrationService\WeatherStyler.MigrationService.csproj" />
   </ItemGroup>
 
 </Project>

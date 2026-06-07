@@ -11,8 +11,8 @@ using WeatherStyler.Infrastructure.Persistence;
 namespace WeatherStyler.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260418123117_niepamietamcotubylo")]
-    partial class niepamietamcotubylo
+    [Migration("20260607170648_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -191,6 +191,21 @@ namespace WeatherStyler.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("OutfitClothingItems", b =>
+                {
+                    b.Property<Guid>("OutfitId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ClothingItemId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("OutfitId", "ClothingItemId");
+
+                    b.HasIndex("ClothingItemId");
+
+                    b.ToTable("OutfitClothingItems", (string)null);
+                });
+
             modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -280,6 +295,9 @@ namespace WeatherStyler.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LayerIndex")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -417,6 +435,9 @@ namespace WeatherStyler.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsNeutral")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -433,55 +454,10 @@ namespace WeatherStyler.Infrastructure.Migrations
                     b.ToTable("Colors", (string)null);
                 });
 
-            modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.OutfitClothingItemEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ClothingItemId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ItemName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("OutfitId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PhotoUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("WarmthLevel")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClothingItemId");
-
-                    b.HasIndex("OutfitId");
-
-                    b.ToTable("OutfitClothingItems", (string)null);
-                });
-
             modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.OutfitEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("ClothingItemEntityId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
@@ -505,8 +481,6 @@ namespace WeatherStyler.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClothingItemEntityId");
 
                     b.HasIndex("UserId");
 
@@ -569,9 +543,6 @@ namespace WeatherStyler.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ClothingItemEntityId")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
@@ -579,6 +550,9 @@ namespace WeatherStyler.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsFavourite")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("OutfitId")
@@ -595,8 +569,6 @@ namespace WeatherStyler.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClothingItemEntityId");
-
                     b.HasIndex("OutfitId");
 
                     b.HasIndex("UserId");
@@ -605,39 +577,6 @@ namespace WeatherStyler.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_UsageHistories_Rating_Range", "Rating BETWEEN 1 AND 5");
                         });
-                });
-
-            modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.WeatherHistoryEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DataJson")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DateFetched")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UsageHistoryId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsageHistoryId")
-                        .IsUnique();
-
-                    b.ToTable("WeatherHistories", (string)null);
                 });
 
             modelBuilder.Entity("ClothingItemColors", b =>
@@ -736,6 +675,21 @@ namespace WeatherStyler.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("OutfitClothingItems", b =>
+                {
+                    b.HasOne("WeatherStyler.Infrastructure.Entities.ClothingItemEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ClothingItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WeatherStyler.Infrastructure.Entities.OutfitEntity", null)
+                        .WithMany()
+                        .HasForeignKey("OutfitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.ClothingItemEntity", b =>
                 {
                     b.HasOne("WeatherStyler.Infrastructure.Entities.CategoryEntity", "Category")
@@ -766,31 +720,8 @@ namespace WeatherStyler.Infrastructure.Migrations
                     b.Navigation("ClothingItem");
                 });
 
-            modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.OutfitClothingItemEntity", b =>
-                {
-                    b.HasOne("WeatherStyler.Infrastructure.Entities.ClothingItemEntity", "ClothingItem")
-                        .WithMany()
-                        .HasForeignKey("ClothingItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("WeatherStyler.Infrastructure.Entities.OutfitEntity", "Outfit")
-                        .WithMany("OutfitClothingItems")
-                        .HasForeignKey("OutfitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ClothingItem");
-
-                    b.Navigation("Outfit");
-                });
-
             modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.OutfitEntity", b =>
                 {
-                    b.HasOne("WeatherStyler.Infrastructure.Entities.ClothingItemEntity", null)
-                        .WithMany("Outfits")
-                        .HasForeignKey("ClothingItemEntityId");
-
                     b.HasOne("WeatherStyler.Infrastructure.Entities.ApplicationUser", "User")
                         .WithMany("Outfits")
                         .HasForeignKey("UserId")
@@ -802,10 +733,6 @@ namespace WeatherStyler.Infrastructure.Migrations
 
             modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.UsageHistoryEntity", b =>
                 {
-                    b.HasOne("WeatherStyler.Infrastructure.Entities.ClothingItemEntity", null)
-                        .WithMany("UsageHistories")
-                        .HasForeignKey("ClothingItemEntityId");
-
                     b.HasOne("WeatherStyler.Infrastructure.Entities.OutfitEntity", "Outfit")
                         .WithMany("UsageHistories")
                         .HasForeignKey("OutfitId")
@@ -820,17 +747,6 @@ namespace WeatherStyler.Infrastructure.Migrations
                     b.Navigation("Outfit");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.WeatherHistoryEntity", b =>
-                {
-                    b.HasOne("WeatherStyler.Infrastructure.Entities.UsageHistoryEntity", "UsageHistory")
-                        .WithOne()
-                        .HasForeignKey("WeatherStyler.Infrastructure.Entities.WeatherHistoryEntity", "UsageHistoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UsageHistory");
                 });
 
             modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.ApplicationUser", b =>
@@ -849,17 +765,11 @@ namespace WeatherStyler.Infrastructure.Migrations
 
             modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.ClothingItemEntity", b =>
                 {
-                    b.Navigation("Outfits");
-
                     b.Navigation("Properties");
-
-                    b.Navigation("UsageHistories");
                 });
 
             modelBuilder.Entity("WeatherStyler.Infrastructure.Entities.OutfitEntity", b =>
                 {
-                    b.Navigation("OutfitClothingItems");
-
                     b.Navigation("UsageHistories");
                 });
 #pragma warning restore 612, 618

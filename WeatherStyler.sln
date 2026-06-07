@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.5.11716.220 stable
+VisualStudioVersion = 18.5.11716.220
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherStyler.Domain", "backend\src\WeatherStyler.Domain\WeatherStyler.Domain.csproj", "{942FE415-C952-4AB5-BFC3-03289FF6EF6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherStyler.Application", "backend\src\WeatherStyler.Application\WeatherStyler.Application.csproj", "{EF5911C0-1D21-4296-A6E6-AEB944988B16}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherStyler.Infrastructure", "backend\src\WeatherStyler.Infrastructure\WeatherStyler.Infrastructure.csproj", "{6C88E171-EA7D-4464-B866-CB899E0DBEA1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherStyler.MigrationService", "backend\src\WeatherStyler.MigrationService\WeatherStyler.MigrationService.csproj", "{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherStyler", "backend\WeatherStyler\WeatherStyler.csproj", "{80E00EBC-A355-4632-96E1-34F5D9AFAB52}"
 EndProject
@@ -61,18 +59,6 @@ Global
 		{6C88E171-EA7D-4464-B866-CB899E0DBEA1}.Release|x64.Build.0 = Release|Any CPU
 		{6C88E171-EA7D-4464-B866-CB899E0DBEA1}.Release|x86.ActiveCfg = Release|Any CPU
 		{6C88E171-EA7D-4464-B866-CB899E0DBEA1}.Release|x86.Build.0 = Release|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Debug|x64.Build.0 = Debug|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Debug|x86.Build.0 = Debug|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Release|x64.ActiveCfg = Release|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Release|x64.Build.0 = Release|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Release|x86.ActiveCfg = Release|Any CPU
-		{0EA75E2A-E8D2-463F-AE1F-8BE9D8C0B4B8}.Release|x86.Build.0 = Release|Any CPU
 		{80E00EBC-A355-4632-96E1-34F5D9AFAB52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80E00EBC-A355-4632-96E1-34F5D9AFAB52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80E00EBC-A355-4632-96E1-34F5D9AFAB52}.Debug|x64.ActiveCfg = Debug|Any CPU

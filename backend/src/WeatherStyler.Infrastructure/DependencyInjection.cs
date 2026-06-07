@@ -24,7 +24,7 @@ public static class DependencyInjection
             ?? "Data Source=weatherstyler.db";
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(connectionString, b => b.MigrationsAssembly("WeatherStyler.MigrationService"))
+            options.UseSqlite(connectionString, b => b.MigrationsAssembly("WeatherStyler.Infrastructure"))
         );
         services.AddAutoMapper(cfg => cfg.AddMaps(typeof(WardrobeMappingProfile).Assembly));
 
