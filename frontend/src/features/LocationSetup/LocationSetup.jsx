@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LocationPicker } from "../../common/components/LocationPicker/LocationPicker";
 import { useLocationStore } from "../../common/stores/locationStore";
+import { useAuthStore } from "../Auth/authStore";
 import "./LocationSetup.scss";
 
 export function LocationSetup() {
   const { saveLocation } = useLocationStore();
+  const logout = useAuthStore((state) => state.logout);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -25,6 +27,12 @@ export function LocationSetup() {
 
   return (
     <div className="setup-page">
+      <button
+        type="button"
+        className="setup-debug-logout"
+        onClick={logout}
+        title="Wyloguj (debug)"
+      />
       <div className="setup-card">
         <aside className="setup-side">
           <div className="setup-brand">Smart Wardrobe</div>
