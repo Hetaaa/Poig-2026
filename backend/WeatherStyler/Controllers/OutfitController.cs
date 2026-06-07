@@ -100,6 +100,29 @@ public class OutfitController : ControllerBase
         }
     }
 
+    [HttpPost("today/regenerate")]
+    public async Task<IActionResult> RegenerateOutfitForToday(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var userId = _userService.GetUserId();
+
+            // Delegujemy usunięcie i ponowne wygenerowanie do managera ubrań
+            var result = await _outfitManager.RegenerateTodayAsync(userId, cancellationToken);
+
+            if (result.Outfit == null)
+                return BadRequest(new { message = "Could not regenerate outfit", warnings = result.Warnings });
+
+            var dto = _mapper.Map<OutfitDto>(result.Outfit);
+            return Ok(new { outfit = dto, warnings = result.Warnings });
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
     /// <summary>
     /// Get all favourite outfits for current user
     /// </summary>

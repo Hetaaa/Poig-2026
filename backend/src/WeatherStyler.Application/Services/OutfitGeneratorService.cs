@@ -113,8 +113,8 @@ public class OutfitManagerService : IOutfitManagerService
         if (lat is null || lon is null)
             return Failure("Brak zapisanej lokacji użytkownika. Ustaw lokację aby generować outfity.");
 
-        if (!double.TryParse(lat, CultureInfo.InvariantCulture, out double parsedLat) ||
-            !double.TryParse(lon, CultureInfo.InvariantCulture, out double parsedLon))
+        if (!double.TryParse(lat, CultureInfo.CurrentCulture, out double parsedLat) ||
+            !double.TryParse(lon, CultureInfo.CurrentCulture, out double parsedLon))
             return Failure("Zapisana lokacja użytkownika ma niepoprawny format numeryczny.");
 
         var daily = await _weatherService.GetDailySummaryAsync(parsedLat, parsedLon, dayStart, cancellationToken);
@@ -422,4 +422,24 @@ public class OutfitManagerService : IOutfitManagerService
 
     private static OutfitGeneratorResult Failure(string message) =>
         new() { Outfit = null, Warnings = new List<string> { message } };
+
+    // --- NOWA METODA REGENERATE ---
+    public async Task<OutfitGeneratorResult> RegenerateTodayAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var today = DateTime.UtcNow.Date;
+
+        // 1. Sprawdzamy, czy istnieje już dzisiejszy outfit w bazie danych
+        var existingOutfits = (await _outfitRepo.GetOutfitsAsync(userId, today, today.AddDays(1).AddTicks(-1), cancellationToken)).ToList();
+
+        if (existingOutfits.Any())
+        {
+            var outfitToDelete = existingOutfits.First();
+
+            // 2. Jeśli istnieje, wywołujemy nową metodę usuwającą z repozytorium
+            await _outfitRepo.DeleteOutfitWithHistoryAsync(outfitToDelete.Id, cancellationToken);
+        }
+
+        // 3. Po oczyszczeniu bazy, wywołujemy standardowy proces generowania i zapisu
+        return await GetOrGenerateTodayAsync(userId, cancellationToken);
+    }
 }

@@ -17,4 +17,6 @@ public interface IOutfitRepository
     Task<IEnumerable<UsageHistory>> GetOutfitsSummaryAsync(Guid userId, DateTime from, DateTime to, CancellationToken cancellationToken = default);
 
     Task SetFavouriteAsync(Guid outfitId, bool isFavourite, CancellationToken cancellationToken = default);
+    Task DeleteOutfitWithHistoryAsync(Guid outfitId, CancellationToken cancellationToken = default);
+
 }

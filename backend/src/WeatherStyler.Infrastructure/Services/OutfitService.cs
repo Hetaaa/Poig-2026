@@ -150,7 +150,6 @@ public class OutfitService : IOutfitRepository
             .ToList();
     }
 
-    // ZMIANA: Teraz modyfikujemy bezpośrednio OutfitEntity
     public async Task SetFavouriteAsync(Guid outfitId, bool isFavourite, CancellationToken cancellationToken = default)
     {
         var outfit = await _db.Outfits
@@ -164,6 +163,39 @@ public class OutfitService : IOutfitRepository
         else
         {
             throw new KeyNotFoundException($"Outfit with ID {outfitId} was not found.");
+        }
+    }
+
+    // --- NOWA METODA USUWAJĄCA OUTFIT I HISTORIĘ ---
+    public async Task DeleteOutfitWithHistoryAsync(Guid outfitId, CancellationToken cancellationToken = default)
+    {
+        using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var historyEntries = await _db.UsageHistories
+                .Where(u => u.OutfitId == outfitId)
+                .ToListAsync(cancellationToken);
+
+            if (historyEntries.Any())
+            {
+                _db.UsageHistories.RemoveRange(historyEntries);
+            }
+
+            var outfit = await _db.Outfits
+                .FirstOrDefaultAsync(o => o.Id == outfitId, cancellationToken);
+
+            if (outfit != null)
+            {
+                _db.Outfits.Remove(outfit);
+            }
+
+            await _db.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
         }
     }
 }
