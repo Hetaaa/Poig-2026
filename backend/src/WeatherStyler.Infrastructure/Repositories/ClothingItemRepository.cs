@@ -122,8 +122,11 @@ internal class ClothingItemRepository : IClothingItemRepository
 
         if (e is null) throw new InvalidOperationException("Not found");
 
-        // Map simple properties
-        _mapper.Map(item, e);
+        // Mapuj tylko proste pola, nie nawigacje
+        e.Name = item.Name;
+        e.PhotoUrl = item.PhotoUrl;
+        e.CategoryId = item.CategoryId; // tylko FK, nie obiekt Category
+        e.WarmthLevel = item.WarmthLevel;
 
         // replace properties
         _db.ClothingProperties.RemoveRange(e.Properties);
@@ -132,7 +135,13 @@ internal class ClothingItemRepository : IClothingItemRepository
         {
             foreach (var p in item.Properties)
             {
-                e.Properties.Add(new ClothingPropertyEntity { Id = p.Id == Guid.Empty ? Guid.NewGuid() : p.Id, Name = p.Name, Value = p.Value, ClothingItemId = e.Id });
+                e.Properties.Add(new ClothingPropertyEntity
+                {
+                    Id = p.Id == Guid.Empty ? Guid.NewGuid() : p.Id,
+                    Name = p.Name,
+                    Value = p.Value,
+                    ClothingItemId = e.Id
+                });
             }
         }
 
