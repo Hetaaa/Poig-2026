@@ -92,7 +92,7 @@ public class ClothingItemsController : ControllerBase
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
 
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.PhotoFile.FileName;
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.PhotoFile.FileName.Replace(" ", "-");
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
