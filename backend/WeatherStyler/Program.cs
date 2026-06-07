@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using WeatherStyler.Application;
@@ -77,7 +78,21 @@ if (app.Environment.IsDevelopment())
             });
     });
 }
-app.UseStaticFiles();
+
+var imagesPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "images");
+
+if (!Directory.Exists(imagesPath))
+{
+    Directory.CreateDirectory(imagesPath);
+}
+
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagesPath),
+    RequestPath = "/images"
+}); 
+
 app.UseCors("LocalhostPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
