@@ -1,61 +1,58 @@
-
 @use "./../../../variables" as *;
 
-
 .clothing-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+
+  .medium-component {
+    width: 9.875rem;
+    height: 9.875rem;
+    border-radius: 0.625rem;
+    background-color: $item-bg;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .clothing-item-text {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.4rem;
+    text-align: center;
 
-    .medium-component{
-        display: flex;
-        width: 9.875rem;
-        height: 9.875rem;
-        padding: 0.75rem;
-        justify-content: center;
-        align-items: center;
-        gap: 0.625rem;
-        aspect-ratio: 1/1;
+    p {
+      margin: 0;
     }
 
-    .clothing-item-text {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.4rem;
-        text-align: center;
+    .clothing-item-name {
+      color: #000;
+      text-align: center;
 
-        p {
-            margin: 0;
-        }
-
-        .clothing-item-name {
-            color: #000;
-            text-align: center;
-             
-            font-size: 1rem;
-            font-weight: 600;
-            line-height: 1.125rem;
-        }
-
-        .clothing-item-layer {
-            color: $blue;
-            text-align: center;
-             
-            font-size: 0.875rem;
-            font-weight: 400;
-            line-height: 1.125rem;
-        }
-
-        .clothing-item-category {
-            color: $secondary-text;
-            text-align: center;
-             
-            font-size: 0.875rem;
-            font-weight: 400;
-            line-height: 1.125rem;
-        }
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.125rem;
     }
+
+    .clothing-item-layer {
+      color: $blue;
+      text-align: center;
+
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.125rem;
+    }
+
+    .clothing-item-category {
+      color: $secondary-text;
+      text-align: center;
+
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.125rem;
+    }
+  }
 }

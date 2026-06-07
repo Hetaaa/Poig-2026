@@ -4,16 +4,14 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthPage } from "./features/Auth/AuthPage";
 import RequireAuth from "./guards/RequireAuth";
+import RequireLocation from "./guards/RequireLocation";
+import { LocationSetup } from "./features/LocationSetup/LocationSetup";
+import { Settings } from "./features/Settings/Settings";
 import "./main.scss";
 
 import { MainPage } from "./features/MainPage/MainPage";
 import { Favourites } from "./features/Favourites/Favourites";
-import { Wardrobe} from "./features/Wardrobe/Wardrobe"
-
-// TODO: Replace with actual pages when they are created
-function PlaceholderPage({ title }) {
-  return <h2>{title}</h2>;
-}
+import { Wardrobe } from "./features/Wardrobe/Wardrobe";
 
 const router = createBrowserRouter([
   {
@@ -21,10 +19,20 @@ const router = createBrowserRouter([
     element: <AuthPage />,
   },
   {
+    path: "/location-setup",
+    element: (
+      <RequireAuth>
+        <LocationSetup />
+      </RequireAuth>
+    ),
+  },
+  {
     path: "/",
     element: (
       <RequireAuth>
-        <App />
+        <RequireLocation>
+          <App />
+        </RequireLocation>
       </RequireAuth>
     ),
     children: [
@@ -38,7 +46,7 @@ const router = createBrowserRouter([
       },
       {
         path: "favourites",
-        element: <Favourites/>,
+        element: <Favourites />,
       },
       {
         path: "wardrobe",
@@ -46,7 +54,7 @@ const router = createBrowserRouter([
       },
       {
         path: "settings",
-        element: <PlaceholderPage title="Ustawienia" />,
+        element: <Settings />,
       },
     ],
   },

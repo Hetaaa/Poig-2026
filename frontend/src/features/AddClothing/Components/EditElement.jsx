@@ -2,34 +2,44 @@ import { useState, useEffect } from "react";
 import { MdOutlineShoppingBag } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { ModalFooter } from "../../../common/components/ModalFooter/ModalFooter";
-import { isTextValid, alreadyExists } from "../../../utils/helpers";
-import "./AddElement.scss";
+import { isTextValid } from "../../../utils/helpers";
 import { useClothingItemsStore } from "../../../common/components/ClothingItem/clothingItemsStore";
-import { apiClient } from "../../../api/apiClient";
+import { apiClient, backendBaseUrl } from "../../../api/apiClient";
+import "./AddElement.scss";
 
-export function AddElement({ onClose, clothingItems = [] }) {
-  const { addClothingItem } = useClothingItemsStore();
+export function EditElement({ item, onClose }) {
+  const { updateClothingItem } = useClothingItemsStore();
 
-  const [photoPreview, setPhotoPreview] = useState(null);
-  const [photoFile, setPhotoFile] = useState(null);
-  const [warmthLevel, setWarmthLevel] = useState(5);
-  const [name, setName] = useState("");
-  const [categoryId, setCategoryId] = useState("");
+  const existingPhotoUrl = item.photoUrl
+    ? item.photoUrl.startsWith("http")
+      ? item.photoUrl
+      : `${backendBaseUrl}${item.photoUrl}`
+    : null;
+
+  const [photoPreview, setPhotoPreview] = useState(existingPhotoUrl);
+  const [warmthLevel, setWarmthLevel] = useState(item.warmthLevel ?? 5);
+  const [name, setName] = useState(item.name ?? "");
+  const [categoryId, setCategoryId] = useState(item.categoryId ?? "");
   const [categories, setCategories] = useState([]);
   const [colors, setColors] = useState([]);
   const [styles, setStyles] = useState([]);
-  const [selectedColorIds, setSelectedColorIds] = useState([]);
-  const [selectedStyleIds, setSelectedStyleIds] = useState([]);
-  const [waterproof, setWaterproof] = useState(false);
+  const [selectedColorIds, setSelectedColorIds] = useState(
+    (item.colors ?? []).map((c) => c.id),
+  );
+  const [selectedStyleIds, setSelectedStyleIds] = useState(
+    (item.styles ?? []).map((s) => s.id),
+  );
+  const [waterproof, setWaterproof] = useState(
+    (item.properties ?? []).some(
+      (p) => p.name === "waterproof" && p.value === "true",
+    ),
+  );
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     apiClient
       .get("/Lookup/categories")
-      .then((res) => {
-        setCategories(res.data);
-        if (res.data.length > 0) setCategoryId(res.data[0].id);
-      })
+      .then((res) => setCategories(res.data))
       .catch(() => {});
     apiClient
       .get("/Lookup/colors")
@@ -46,56 +56,37 @@ export function AddElement({ onClose, clothingItems = [] }) {
       alert("Nazwa ubrania musi mieć od 3 do 50 znaków");
       return;
     }
-
-    if (alreadyExists(clothingItems, name)) {
-      alert("Takie ubranie już istnieje");
-      return;
-    }
-
     if (!categoryId) {
       alert("Wybierz kategorię ubrania");
       return;
     }
-
     if (selectedColorIds.length === 0) {
       alert("Wybierz co najmniej jeden kolor");
       return;
     }
 
+    const properties = waterproof
+      ? [
+          { name: "waterproof", value: "true" },
+          { name: "windproof", value: "true" },
+        ]
+      : [];
+
     setSaving(true);
     try {
-      const properties = waterproof
-        ? [
-            { name: "waterproof", value: "true" },
-            { name: "windproof", value: "true" },
-          ]
-        : [];
-
-      const payload = {
+      await updateClothingItem(item.id, {
         name,
         categoryId,
         warmthLevel,
-        photoFile,
-        properties,
         colorIds: selectedColorIds,
         styleIds: selectedStyleIds,
-      };
-      console.log("[Save] payload:", payload);
-
-      await addClothingItem(payload);
+        properties,
+      });
       onClose();
     } catch {
-      alert("Nie udało się zapisać ubrania. Spróbuj ponownie.");
+      alert("Nie udało się zapisać zmian. Spróbuj ponownie.");
     } finally {
       setSaving(false);
-    }
-  }
-
-  function PhotoChange(e) {
-    const file = e.target.files[0];
-    if (file) {
-      setPhotoPreview(URL.createObjectURL(file));
-      setPhotoFile(file);
     }
   }
 
@@ -105,7 +96,7 @@ export function AddElement({ onClose, clothingItems = [] }) {
         <div className="card-container">
           <div className="card-header">
             <MdOutlineShoppingBag className="card-icon" />
-            <span className="card-title">Dodawanie ubrania</span>
+            <span className="card-title">Edycja ubrania</span>
           </div>
         </div>
 
@@ -114,12 +105,6 @@ export function AddElement({ onClose, clothingItems = [] }) {
             <div className="clothes-image">
               <span className="image-description">Zdjęcie ubrania</span>
               <label className="image-upload">
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={PhotoChange}
-                />
                 {photoPreview ? (
                   <img
                     src={photoPreview}
@@ -137,7 +122,6 @@ export function AddElement({ onClose, clothingItems = [] }) {
               <input
                 className="clothes-input"
                 type="text"
-                placeholder="Czarna bluza..."
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />

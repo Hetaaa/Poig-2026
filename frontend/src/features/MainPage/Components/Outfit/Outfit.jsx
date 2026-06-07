@@ -1,62 +1,92 @@
 import { useState, useEffect } from "react";
 import "./Outfit.scss";
 import { BiShuffle } from "react-icons/bi";
-import { AiOutlineHeart} from "react-icons/ai";
+import { AiOutlineHeart } from "react-icons/ai";
 import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
 import { FavouriteModal } from "../FavouriteModal/FavouriteModal";
-import { useWeatherStore } from "../Weather/weatherStore";
-import { useClothingItemsStore } from "../../../../common/components/ClothingItem/clothingItemsStore";
+import { useOutfitStore } from "./outfitStore";
+import { apiClient } from "../../../../api/apiClient";
 
-const clothes = [
-  { id: 1, name: "Czarna MISBHV", category: "Bluza", warmth: 3, waterproof: false},
-  { id: 2, name: "Biała koszulka", category: "Koszulka", warmth: 1, waterproof: false},
-  { id: 3, name: "Jeansy niebieskie", category: "Spodnie", warmth: 2, waterproof: false},
-];
+function useCategoryMap() {
+  const [categoryMap, setCategoryMap] = useState({});
+  useEffect(() => {
+    apiClient
+      .get("/Lookup/categories")
+      .then((res) => {
+        const map = {};
+        res.data.forEach((cat) => {
+          map[cat.id] = cat.name;
+        });
+        setCategoryMap(map);
+      })
+      .catch(() => {});
+  }, []);
+  return categoryMap;
+}
 
 export function Outfit() {
-    const[showFavouriteModal, setShowFavouriteModal] = useState(false);
-    const[currentOutfit, setCurrentOutfit] = useState([])
+  const [showFavouriteModal, setShowFavouriteModal] = useState(false);
 
-    const {weather} = useWeatherStore();
-    const {clothingItems, fetchClothingItems} = useClothingItemsStore();
-    
-    useEffect(() => {
-    fetchClothingItems();
-    }, [fetchClothingItems]);
+  const { todayOutfit, todayStatus, fetchTodayOutfit } = useOutfitStore();
+  const categoryMap = useCategoryMap();
 
-    return (
+  useEffect(() => {
+    fetchTodayOutfit();
+  }, [fetchTodayOutfit]);
+
+  const items = todayOutfit?.clothingItems ?? [];
+
+  return (
     <>
-        <div className="outfit-container">
-            <div className="header">
-                <div className="title">
-                    <div className= "title-header">
-                        <span className="title-description">Twój outfit na dziś</span>
-                    </div>
-                    <span className="description">96% Dopasowania • Idealny na dzisiejszą pogodę</span>
-                </div>
-                <div className="react-img">
-                    <button className="icon-btn" aria-label="Shuffle outfit">
-                        <BiShuffle className="medium-icon" />
-                    </button>
+      <div className="outfit-container">
+        <div className="header">
+          <div className="title">
+            <div className="title-header">
+              <span className="title-description">Twój outfit na dziś</span>
+            </div>
+            <span className="description">
+              {todayOutfit ? todayOutfit.name : "Ładowanie..."}
+            </span>
+          </div>
+          <div className="react-img">
+            <button className="icon-btn" aria-label="Shuffle outfit">
+              <BiShuffle className="medium-icon" />
+            </button>
 
-                    <button className="icon-btn" aria-label="Add outfit to favorites" onClick={()=> setShowFavouriteModal(true)}>
-                        <AiOutlineHeart className="medium-icon heart"/>
-                    </button>
-                </div>
-           </div>
-
-            <div className="clothes">
-                {currentOutfit.map((item) => (
-                <ClothingItem
-                    key={item.id}
-                    name={item.name}
-                    category={item.categoryId}
-                />
-            ))}
-      </div>
-
-           {showFavouriteModal && <FavouriteModal clothes={currentOutfit} onClose={()=> setShowFavouriteModal(false)}/>}
+            <button
+              className="icon-btn"
+              aria-label="Add outfit to favorites"
+              onClick={() => setShowFavouriteModal(true)}
+            >
+              <AiOutlineHeart className="medium-icon heart" />
+            </button>
+          </div>
         </div>
+
+        {todayStatus === "loading" && <p>Generowanie outfitu...</p>}
+        {todayStatus === "error" && <p>Nie udało się pobrać outfitu na dziś</p>}
+        {todayStatus === "success" && items.length === 0 && (
+          <p>Brak outfitu – dodaj ubrania do garderoby</p>
+        )}
+
+        <div className="clothes">
+          {items.map((item) => (
+            <ClothingItem
+              key={item.id}
+              name={item.name}
+              categoryName={categoryMap[item.categoryId] ?? ""}
+              photoUrl={item.photoUrl}
+            />
+          ))}
+        </div>
+
+        {showFavouriteModal && (
+          <FavouriteModal
+            clothes={items}
+            onClose={() => setShowFavouriteModal(false)}
+          />
+        )}
+      </div>
     </>
   );
 }

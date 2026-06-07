@@ -1,15 +1,18 @@
 import { useEffect } from "react";
 import "./Weather.scss";
 import { useWeatherStore } from "./weatherStore";
+import { useLocationStore } from "../../../../common/stores/locationStore";
 import { AiOutlineCloud, AiOutlineSun } from "react-icons/ai";
 import { CiTempHigh } from "react-icons/ci";
 import { IoWaterOutline, IoRainyOutline } from "react-icons/io5";
 import { BiWind } from "react-icons/bi";
 import { TiWeatherWindyCloudy } from "react-icons/ti";
-import { getWeatherStatus, weatherDescriptions } from "../../../../utils/weatherHelpers";
+import {
+  getWeatherStatus,
+  weatherDescriptions,
+} from "../../../../utils/weatherHelpers";
 
-
-function WeatherDetail ({icon: Icon, label, value}){
+function WeatherDetail({ icon: Icon, label, value }) {
   return (
     <div className="weather-detail">
       <div className="frame">
@@ -24,34 +27,39 @@ function WeatherDetail ({icon: Icon, label, value}){
 }
 
 export function Weather() {
-
   const weatherIcons = {
-    cloudy: AiOutlineCloud, 
-    sunny: AiOutlineSun, 
-    raining: IoRainyOutline, 
+    cloudy: AiOutlineCloud,
+    sunny: AiOutlineSun,
+    raining: IoRainyOutline,
     windy: TiWeatherWindyCloudy,
   };
 
-
-  const { weather, status, error, fetchDailyWeather, setLastLocation } =
-    useWeatherStore();
-
-  // TODO: Change to actual data when discussed how
-  const warsawLocation = {
-    latitude: 52.2297,
-    longitude: 21.0122,
-  };
+  const { weather, status, error, fetchDailyWeather } = useWeatherStore();
+  const { location } = useLocationStore();
 
   useEffect(() => {
-    const loadWeather = async () => {
-      await setLastLocation(warsawLocation);
-      await fetchDailyWeather();
-    };
-    loadWeather();
-  }, [setLastLocation, fetchDailyWeather]);
+    fetchDailyWeather();
+  }, [fetchDailyWeather]);
 
   if (status === "loading") {
-    return <p>Ładowanie pogody...</p>;
+    return (
+      <div className="weather-block weather-cloudy">
+        <div className="info">
+          <div className="city-info">
+            <div className="city-text">
+              <AiOutlineCloud className="small-icon" />
+              <span className="city">Ładowanie...</span>
+            </div>
+            <div className="city-temperature">
+              <h1 className="temp-big">--°C</h1>
+              <span className="temp-small">/--°C</span>
+            </div>
+            <p className="opis">Pobieranie danych pogodowych</p>
+          </div>
+          <AiOutlineCloud className="big-icon" />
+        </div>
+      </div>
+    );
   }
 
   if (status === "error") {
@@ -68,34 +76,49 @@ export function Weather() {
   const windSpeed = weather?.windSpeed?.toFixed(0) ?? "-";
   const cloudCover = weather?.cloudCover?.toFixed(0) ?? "-";
 
- 
   const weatherStatus = getWeatherStatus(weather);
-  const WeatherIcon = weatherIcons[weatherStatus]
-  const weatherDescription = weatherDescriptions[weatherStatus]
-  
+  const WeatherIcon = weatherIcons[weatherStatus];
+  const weatherDescription = weatherDescriptions[weatherStatus];
+
   return (
-      <div className={`weather-block weather-${weatherStatus}`}>
-        <div className="info">
-          <div className="city-info">
-            <div className="city-text">
-              <AiOutlineCloud className="small-icon" />
-              <span className="city">Warszawa, Polska</span>
-            </div>
-            <div className="city-temperature">
-              <h1 className="temp-big">{temperature}°C</h1>
-              <span className="temp-small">/{feelsLike}°C</span>
-            </div>
-            <p className="opis">{weatherDescription}</p>
+    <div className={`weather-block weather-${weatherStatus}`}>
+      <div className="info">
+        <div className="city-info">
+          <div className="city-text">
+            <AiOutlineCloud className="small-icon" />
+            <span className="city">Moja lokalizacja</span>
           </div>
-          <WeatherIcon className="big-icon" />
+          <div className="city-temperature">
+            <h1 className="temp-big">{temperature}°C</h1>
+            <span className="temp-small">/{feelsLike}°C</span>
+          </div>
+          <p className="opis">{weatherDescription}</p>
         </div>
-        <div className="line"></div>
-        <div className="weather-info">
-          <WeatherDetail icon = {CiTempHigh} label="Odczuwalna" value = {`${feelsLike}°C`}/>
-          <WeatherDetail icon = {IoWaterOutline} label="Wilgotność" value = {`${humidity}%`}/>
-          <WeatherDetail icon = {BiWind} label="Wiatr" value = {`${windSpeed} km/h`}/>
-          <WeatherDetail icon= {AiOutlineCloud} label="Zachmurzenie" value={`${cloudCover}%`}/>
-        </div>
+        <WeatherIcon className="big-icon" />
       </div>
+      <div className="line"></div>
+      <div className="weather-info">
+        <WeatherDetail
+          icon={CiTempHigh}
+          label="Odczuwalna"
+          value={`${feelsLike}°C`}
+        />
+        <WeatherDetail
+          icon={IoWaterOutline}
+          label="Wilgotność"
+          value={`${humidity}%`}
+        />
+        <WeatherDetail
+          icon={BiWind}
+          label="Wiatr"
+          value={`${windSpeed} km/h`}
+        />
+        <WeatherDetail
+          icon={AiOutlineCloud}
+          label="Zachmurzenie"
+          value={`${cloudCover}%`}
+        />
+      </div>
+    </div>
   );
 }

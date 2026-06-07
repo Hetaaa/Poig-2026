@@ -42,8 +42,8 @@ hr {
   background-color: $border-light;
 }
 
-.micro-icon{
-  width: 0.875rem; 
+.micro-icon {
+  width: 0.875rem;
   height: 0.875rem;
   aspect-ratio: 1/1;
 }
@@ -61,15 +61,15 @@ hr {
   aspect-ratio: 1/1;
 }
 
-.icon-btn{
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.icon-btn:hover{
+.icon-btn:hover {
   transform: scale(1.2);
 }
 
@@ -79,11 +79,9 @@ hr {
   aspect-ratio: 1/1;
 }
 
-
 .big-icon {
   color: white;
   width: 4.6875rem;
   height: 4.6875rem;
   aspect-ratio: 1/1;
 }
-

@@ -1,216 +1,253 @@
 @use "./../../../variables" as *;
 
-.add-page{
+.add-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.3);
+
+  .add-card {
     display: flex;
+    width: 47rem;
+    padding: 1.5rem;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: fixed;
-    inset: 0; 
-    z-index: 10000;
-    background: rgba(0, 0, 0, 0.30);
+    gap: 0.75rem;
+    border-radius: 1rem;
+    border: 1px solid #e5e5e5;
+    background: #fff;
 
-    .add-card{
+    .card-container {
+      display: flex;
+      align-items: center;
+      gap: 2.25rem;
+      align-self: stretch;
+
+      .card-header {
         display: flex;
-        width: 47rem;
-        padding: 1.5rem;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 0.75rem;
-        border-radius: 1rem;
-        border: 1px solid #E5E5E5;
-        background: #FFF;
+        align-items: flex-start;
+        gap: 0.5rem;
 
-        .card-container{
-            display: flex;
-            align-items: center;
-            gap: 2.25rem;
-            align-self: stretch;
-            
-            .card-header{
-                display: flex;
-                align-items: flex-start;
-                gap: 0.5rem;
-
-                .card-icon{
-                    width: 1.125rem;
-                    height: 1.125rem;
-                    aspect-ratio: 1/1;
-                    fill: $blue;
-                }
-
-                .card-title{
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 0.75rem;
-                    color: #000;
-                    text-align: center;
-                    font-size: 1rem;
-                    font-weight: 600;
-                    line-height: 1.125rem; 
-                }
-            }
+        .card-icon {
+          width: 1.125rem;
+          height: 1.125rem;
+          aspect-ratio: 1/1;
+          fill: $blue;
         }
 
+        .card-title {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 0.75rem;
+          color: #000;
+          text-align: center;
+          font-size: 1rem;
+          font-weight: 600;
+          line-height: 1.125rem;
+        }
+      }
+    }
 
-        .add-clothes{
+    .add-clothes {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+      align-self: stretch;
+
+      .clothes-detail {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        align-self: stretch;
+
+        .clothes-image {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.25rem;
+          align-self: stretch;
+
+          .image-description {
+            color: #000;
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 150%;
+          }
+
+          .image-upload {
+            display: flex;
+            height: 11.125rem;
+            padding: 3rem 6.1875rem;
+            justify-content: center;
+            align-items: center;
+            gap: 0.625rem;
+            align-self: stretch;
+            border-radius: 0.625rem;
+            border: 0.125rem dashed #e5e5e5;
+            overflow: hidden;
+
+            .uploaded-image {
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+            }
+
+            .upload-icon {
+              color: #000;
+              font-size: 2rem;
+              font-weight: 400;
+              line-height: 150%; /* 3rem */
+            }
+          }
+        }
+
+        .clothes-option {
+          display: flex;
+          height: 3.375rem;
+          flex-direction: column;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 0.25rem;
+          align-self: stretch;
+          position: relative;
+
+          .clothes-title {
+            color: #000;
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 150%;
+          }
+
+          .clothes-input {
+            display: flex;
+            padding: 0.25rem 0.75rem;
+            align-items: center;
+            gap: 0.625rem;
+            align-self: stretch;
+            border-radius: 0.3125rem;
+            background: #f3f3f5;
+            color: #717182;
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 150%;
+          }
+          .category-title {
+            color: #000;
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 150%;
+          }
+
+          .category-select {
+            padding: 0.25rem 0.75rem;
+            justify-content: space-between;
+            align-items: center;
+            align-self: stretch;
+            border-radius: 0.3125rem;
+            background: #f3f3f5;
+          }
+        }
+
+        .clothes-warmth {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 3rem;
+          align-self: stretch;
+
+          .warmth-form {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 1.5rem;
-            align-self: stretch;
+            flex: 1 0 0;
 
-            .clothes-detail{
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.75rem;
-                align-self: stretch;
+            .warmth-title {
+              color: #000;
+              font-size: 0.875rem;
+              font-weight: 400;
+              line-height: 150%;
+            }
 
-                .clothes-image{
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 0.25rem;
-                    align-self: stretch;
-
-                    .image-description{
-                        color: #000;
-                        font-size: 0.875rem;
-                        font-weight: 400;
-                        line-height: 150%;
-                    }
-
-                    .image-upload{
-                        display: flex;
-                        height: 11.125rem;
-                        padding: 3rem 6.1875rem;
-                        justify-content: center;
-                        align-items: center;
-                        gap: 0.625rem;
-                        align-self: stretch;
-                        border-radius: 0.625rem;
-                        border: 1px dashed #E5E5E5;
-                        overflow: hidden;
-
-                        .uploaded-image{
-                            width: 100%;
-                            height: 100%;
-                            object-fit: contain;
-                        }
-
-                        .upload-icon{
-                            color: #000;
-                            font-size: 2rem;
-                            font-weight: 400;
-                            line-height: 150%; /* 3rem */
-                        }
-                    }
-                }
-
-                .clothes-option{
-                    display: flex;
-                    height: 3.375rem;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: flex-start;
-                    gap: 0.25rem;
-                    align-self: stretch;
-                    position: relative;
-
-                    .clothes-title{
-                        color: #000;
-                        font-size: 0.875rem;
-                        font-weight: 400;
-                        line-height: 150%;
-                    }
-
-                    .clothes-input{
-                        display: flex;
-                        padding: 0.25rem 0.75rem;
-                        align-items: center;
-                        gap: 0.625rem;
-                        align-self: stretch;
-                        border-radius: 0.3125rem;
-                        background: #F3F3F5;   
-                        color: #717182;
-                        font-size: 0.875rem;
-                        font-weight: 400;
-                        line-height: 150%;
-                    }
-                    .category-title{
-                        color: #000;
-                        font-size: 0.875rem;
-                        font-weight: 400;
-                        line-height: 150%;
-                    }
-
-                    .category-select{
-                        padding: 0.25rem 0.75rem;
-                        justify-content: space-between;
-                        align-items: center;
-                        align-self: stretch;
-                        border-radius: 0.3125rem;
-                        background: #F3F3F5;
-                    }
-                }
-
-                .clothes-warmth{
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 3rem;
-                    align-self: stretch;
-                    
-                    .warmth-form{
-                        display: flex;
-                        flex-direction: column;
-                        align-items: flex-start;
-                        flex: 1 0 0;
-
-                        .warmth-title{
-                            color: #000;
-                            font-size: 0.875rem;
-                            font-weight: 400;
-                            line-height: 150%;
-                        }
-
-                        .warmth-range{
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            gap: 0.75rem;
-                            align-self: stretch;
-                            cursor: pointer;
-                            accent-color: $blue;
-                        }
-                    }
-                }
-                
-                .clothes-waterproof{
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
-
-                        .waterproof-checkbox{
-                            width: 1rem;
-                            height: 1rem;
-
-                            border-radius: 0.3125rem;
-                            border: 1px solid #717182;
-                            cursor: pointer;
-                            accent-color: $blue;
-                        }
-
-                        .waterproof-text{
-                            color: #000;
-                            font-size: 0.875rem;
-                            font-weight: 500;
-                            line-height: 150%; 
-                        }
-                    }
-                }
+            .warmth-range {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 0.75rem;
+              align-self: stretch;
+              cursor: pointer;
+              accent-color: $blue;
+            }
+          }
         }
+
+        .clothes-pills-option {
+          display: flex;
+          flex-direction: column;
+          gap: 0.375rem;
+          align-self: stretch;
+
+          .pills-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+          }
+        }
+
+        .pill {
+          padding: 0.25rem 0.75rem;
+          border-radius: 62.5rem;
+          border: 0.0625rem solid #e5e5e5;
+          background: #f3f3f5;
+          color: #717182;
+          font-size: 0.8125rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition:
+            background 150ms ease,
+            color 150ms ease,
+            border-color 150ms ease;
+
+          &--selected {
+            background: $light-blue-bg;
+            color: $blue;
+            border-color: rgba(80, 118, 250, 0.4);
+          }
+
+          &:hover:not(&--selected) {
+            background: #eaeaed;
+          }
+        }
+
+        .clothes-waterproof {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .waterproof-checkbox {
+            width: 1rem;
+            height: 1rem;
+
+            border-radius: 0.3125rem;
+            border: 1px solid #717182;
+            cursor: pointer;
+            accent-color: $blue;
+          }
+
+          .waterproof-text {
+            color: #000;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 150%;
+          }
+        }
+      }
     }
+  }
 }

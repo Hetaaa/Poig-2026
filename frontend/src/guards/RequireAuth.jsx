@@ -6,6 +6,8 @@ export default function RequireAuth({ children }) {
   const location = useLocation();
   const from = `${location.pathname}${location.search || ""}`;
 
+  console.log("[RequireAuth] isAuthenticated:", !!token, "| token:", token);
+
   if (!token) {
     return <Navigate to="/auth" replace state={{ from }} />;
   }
