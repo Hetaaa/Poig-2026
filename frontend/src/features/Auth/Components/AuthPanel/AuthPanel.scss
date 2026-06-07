@@ -1,0 +1,128 @@
+@use "../../../../variables" as *;
+
+.auth-panel {
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-height: 0;
+  height: 100%;
+
+  .auth-header {
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: #0f172a;
+    }
+
+    p {
+      margin: 0.375rem 0 0;
+      color: $secondary-text;
+      font-size: 0.875rem;
+    }
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .auth-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $secondary-text;
+  }
+
+  .auth-input {
+    border: 0.0625rem solid $border-light;
+    background: $item-bg;
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+
+    &:focus {
+      outline: none;
+      border-color: rgba(80, 118, 250, 0.8);
+      box-shadow: 0 0 0 0.1875rem rgba(80, 118, 250, 0.2);
+    }
+  }
+
+  .auth-button {
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.125rem;
+    background: $blue;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition:
+      transform 200ms ease,
+      box-shadow 200ms ease;
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-0.0625rem);
+      box-shadow: 0 0.625rem 1.25rem rgba(80, 118, 250, 0.25);
+    }
+  }
+
+  .auth-footer {
+    font-size: 0.8125rem;
+    color: $secondary-text;
+    display: flex;
+    gap: 0.375rem;
+    align-items: center;
+  }
+
+  .auth-link {
+    border: none;
+    background: none;
+    color: $blue;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .auth-error {
+    background: $light-red-bg;
+    color: $red;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.625rem;
+    font-size: 0.8125rem;
+  }
+
+  .auth-status {
+    background: $light-blue-bg;
+    color: $blue;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.625rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 56.25rem) {
+  .auth-panel {
+    min-height: auto;
+    padding: 2rem 1.75rem 2.5rem;
+  }
+}
+
+@media (max-width: 37.5rem) {
+  .auth-panel {
+    padding: 1.75rem 1.25rem 2.25rem;
+  }
+}

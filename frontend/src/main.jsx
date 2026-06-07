@@ -2,8 +2,13 @@ import React from "react";
 import App from "./App";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import TestPage from "./features/Test/TestPage";
+import { AuthPage } from "./features/Auth/AuthPage";
+import RequireAuth from "./guards/RequireAuth";
 import "./main.scss";
+
+import { MainPage } from "./features/MainPage/MainPage";
+import { Favourites } from "./features/Favourites/Favourites";
+import { Wardrobe} from "./features/Wardrobe/Wardrobe"
 
 // TODO: Replace with actual pages when they are created
 function PlaceholderPage({ title }) {
@@ -12,28 +17,32 @@ function PlaceholderPage({ title }) {
 
 const router = createBrowserRouter([
   {
+    path: "/auth",
+    element: <AuthPage />,
+  },
+  {
     path: "/",
-    element: <App />,
+    element: (
+      <RequireAuth>
+        <App />
+      </RequireAuth>
+    ),
     children: [
       {
         index: true,
-        element: <TestPage />,
+        element: <MainPage />,
       },
       {
         path: "main-page",
-        element: <TestPage />,
+        element: <MainPage />,
       },
       {
         path: "favourites",
-        element: <PlaceholderPage title="Ulubione" />,
+        element: <Favourites/>,
       },
       {
         path: "wardrobe",
-        element: <PlaceholderPage title="Garderoba" />,
-      },
-      {
-        path: "add-clothing",
-        element: <PlaceholderPage title="Dodaj ubranie" />,
+        element: <Wardrobe />,
       },
       {
         path: "settings",

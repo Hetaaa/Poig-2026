@@ -4,6 +4,7 @@
 html,
 body,
 #root {
+  margin: 0;
   width: 100%;
   min-height: 100vh;
 }
@@ -40,3 +41,49 @@ hr {
   height: 0.0625rem;
   background-color: $border-light;
 }
+
+.micro-icon{
+  width: 0.875rem; 
+  height: 0.875rem;
+  aspect-ratio: 1/1;
+}
+
+.mini-icon {
+  width: 1rem;
+  height: 1rem;
+  aspect-ratio: 1/1;
+}
+
+.small-icon {
+  color: white;
+  width: 1.25rem;
+  height: 1.25rem;
+  aspect-ratio: 1/1;
+}
+
+.icon-btn{
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.icon-btn:hover{
+  transform: scale(1.2);
+}
+
+.medium-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  aspect-ratio: 1/1;
+}
+
+
+.big-icon {
+  color: white;
+  width: 4.6875rem;
+  height: 4.6875rem;
+  aspect-ratio: 1/1;
+}
+

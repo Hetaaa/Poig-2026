@@ -1,0 +1,96 @@
+@use "./../../../../variables" as *;
+@use "./../../../../common_component" as *;
+
+.outfit-container {
+    display: flex;
+    padding: 1.5rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    align-self: stretch;
+
+    border-radius: 1rem;
+    border: 1px solid #E5E5E5;
+    background: #FFF;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        align-self: stretch;
+
+        .react-img{
+            display: flex;
+            align-items: flex-start;
+            gap: 2.25rem;
+
+            .color{
+                color: $red;
+            }
+        }
+        
+        .title {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+
+            .title-header {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 0.75rem;
+
+                .title-description {
+                    color: #000;
+                    text-align: center;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    line-height: 1.125rem; /* 112.5% */
+                }
+            }
+        }
+
+        .description {
+            color: $secondary-text;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.125rem; /* 112.5% */
+        }
+
+        .icon-btn{
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+
+            &:hover{
+                transform: scale(1.08);
+                opacity: 0.8;
+            }
+
+            &:active{
+                transform: scale(0.95);
+            }
+
+            .medium-icon{
+                transition: transform 0.35s ease;
+            }
+        }
+
+        .heart{
+            color: $red;
+        }
+    }
+
+    .clothes {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 1.5rem;
+        align-self: stretch;
+    }
+}

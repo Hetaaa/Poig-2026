@@ -1,0 +1,132 @@
+import { useState } from "react";
+import { MdOutlineShoppingBag } from "react-icons/md";
+import { IoIosArrowDown } from "react-icons/io";
+import { ModalFooter } from "../../../common/components/ModalFooter/ModalFooter";
+import { isTextValid, alreadyExists } from "../../../utils/helpers";
+import "./AddElement.scss";
+import { useClothingItemsStore } from "../../../common/components/ClothingItem/clothingItemsStore";
+
+const CATEGORY_IDS = {
+  base: "GUID_BASE",
+  middle: "GUID_MIDDLE",
+  outer: "GUID_OUTER",
+  bottom: "GUID_BOTTOM",
+  shoes: "GUID_SHOES",
+};
+
+function CategoryOptions() {
+  return (
+    <>
+      <option value="base">Koszulka (warstwa bazowa)</option>
+      <option value="base">Koszula (warstwa bazowa)</option>
+
+      <option value="middle">Bluza (warstwa średnia)</option>
+      <option value="middle">Sweter (warstwa średnia)</option>
+
+      <option value="outer">Kurtka (warstwa wierzchnia)</option>
+
+      <option value="bottom">Spodnie (warstwa dolna)</option>
+      <option value="bottom">Spodenki (warstwa dolna)</option>
+      <option value="bottom">Spódnica (warstwa dolna)</option>
+
+      <option value="shoes">Obuwie</option>
+    </>
+  );
+}
+export function AddElement({onClose, clothingItems=[]}) {
+  const {addClothingItem} = useClothingItemsStore();
+
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [warmthLevel, setWarmthLevel] = useState(5);
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [waterproof, setWaterproof] = useState(false);
+  
+  function Save() {
+    if (!isTextValid(name, 3, 50)) {
+      alert("Nazwa ubrania musi mieć od 3 do 50 znaków");
+      return;
+    }
+
+    if (alreadyExists(clothingItems, name)) {
+      alert("Takie ubranie już istnieje");
+      return;
+    }
+
+    onClose();
+  }
+
+  function PhotoChange(e){
+    const file = e.target.files[0];
+    
+    if(file){
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  }
+  return (
+    <div className="add-page">
+      <div className="add-card">
+        <div className="card-container">
+          <div className="card-header">
+            <MdOutlineShoppingBag className="card-icon"/>
+            <span className="card-title">Dodawanie ubrania</span>
+          </div>
+        </div>
+
+        <div className="add-clothes">
+          <div className="clothes-detail">
+            <div className="clothes-image">
+              <span className="image-description">Zdjęcie ubrania</span>
+              <label className="image-upload">
+                <input type="file" accept="image/*" hidden onChange={PhotoChange} />
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Podgląd ubrania"
+                    className="uploaded-image"
+                  />
+                ) : (
+                  <span className="upload-icon">+</span>
+                )}
+              </label>
+            </div>
+
+            <div className="clothes-option">
+              <span className="clothes-title">Nazwa ubrania</span>
+              <input
+                className="clothes-input"
+                type="text"
+                placeholder="Czarna bluza..."
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+
+            <div className="clothes-option">
+              <span className="category-title">Kategoria</span>
+              <IoIosArrowDown className="select-icon" />
+              <select className="category-select" value={category} onChange={(e)=> setCategory(e.target.value)}>
+                <CategoryOptions />
+              </select>
+            </div>
+
+            <div className="clothes-warmth">
+              <div className="warmth-form">
+                <span className="warmth-title">Poziom ciepła: {warmthLevel}/10</span>
+                <input name = "warmthLevel"
+                className="warmth-range" type="range" min="1" max="10" value={warmthLevel} onChange={(e)=> setWarmthLevel(Number(e.target.value))}/>
+              </div>
+            </div>
+
+            <div className="clothes-waterproof">
+              <input name="waterproof"
+              type="checkbox" className="waterproof-checkbox" checked = {waterproof} onChange={(e)=> setWaterproof(e.target.checked)}/>
+              <span className="waterproof-text">Wodoodporne</span>
+            </div>
+          </div>
+          <ModalFooter onClose={onClose} onSave={Save} />
+        </div>
+      </div>
+      </div>
+    );
+  }

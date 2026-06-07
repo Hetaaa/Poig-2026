@@ -1,0 +1,111 @@
+@use "./../../../../variables" as *;
+@use "./../../../../common_component" as *;
+
+.favourite-preview{
+    display: flex;
+    inset: 0;
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    position: fixed;
+    background: rgba(0, 0, 0, 0.40);
+    backdrop-filter: blur(2px);
+
+    .favourite-card{
+        display: flex;
+        width: min(47rem, 90vw);
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 1.5rem;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.75rem;
+        flex-shrink: 0;
+        border-radius: 1rem;
+        border: 1px solid #E5E5E5;
+        background: #FFF;
+
+        .card-header{
+            display: flex;
+            align-items: flex-start;
+            gap: 2.25rem;
+            align-self: stretch;
+
+            .header{
+                display: flex;
+                align-items: flex-start;
+                gap: 0.5rem;
+
+                .color{
+                    color: $red;
+                }
+
+                .header-text{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 0.75rem;
+
+                    color: #000;
+                    text-align: center;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    line-height: 1.125rem; /* 112.5% */
+                }
+            }
+        }
+
+        .card-outfit{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            align-self: stretch;
+        }
+
+        .card-form{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.5rem;
+            align-self: stretch;
+
+          .form-description{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+            align-self: stretch;
+            border: none;
+
+            .description-title{
+                color: #000;
+                font-size: 0.875rem;
+                font-weight: 400;
+                line-height: 150%; /* 1.3125rem */
+
+            }
+
+            .description-text{
+                display: flex;
+                padding: 0.25rem 0.75rem;
+                align-items: center;
+                gap: 0.625rem;
+                align-self: stretch;
+                border: none;
+
+                border-radius: 0.3125rem;
+                background: #F3F3F5;
+
+                color: #717182;
+                font-size: 0.875rem;
+                font-weight: 400;
+                line-height: 150%; /* 1.3125rem */
+            }
+          }
+        }
+    }
+}

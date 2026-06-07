@@ -1,0 +1,27 @@
+@use "./variables.scss" as *;
+
+.small-component{
+    display: flex;
+    width: 5rem;
+    height: 5rem;
+    padding: 0.75rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    aspect-ratio: 1/1;
+    border-radius: 0.625rem;
+    background: $bg;
+    flex: 0 0 auto;
+}
+
+.medium-component{
+    display: flex;
+    width: 9.875rem;
+    height: 9.875rem;
+    padding: 0.75rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    aspect-ratio: 1/1;
+    background: $bg;
+}
