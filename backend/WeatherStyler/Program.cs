@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using System.Security.Claims;
 using WeatherStyler.Application;
 using WeatherStyler.Infrastructure;
+using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +34,20 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.IsDevelopment());
+
+// ─── UserExists Policy ────────────────────────────────────────────────────────
+builder.Services.AddScoped<IAuthorizationHandler, UserExistsHandler>();
+
+builder.Services.AddAuthorization(options =>
+{
+    var userExistsPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .AddRequirements(new UserExistsRequirement())
+        .Build();
+
+    options.AddPolicy("UserExists", userExistsPolicy);
+    options.DefaultPolicy = userExistsPolicy;
+});
 
 // ─── OpenAPI + JWT ────────────────────────────────────────────────────────────
 builder.Services.AddOpenApi(options =>
@@ -80,18 +98,14 @@ if (app.Environment.IsDevelopment())
 }
 
 var imagesPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "images");
-
 if (!Directory.Exists(imagesPath))
-{
     Directory.CreateDirectory(imagesPath);
-}
-
 
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(imagesPath),
     RequestPath = "/images"
-}); 
+});
 
 app.UseCors("LocalhostPolicy");
 app.UseAuthentication();

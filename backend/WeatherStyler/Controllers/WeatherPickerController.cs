@@ -85,6 +85,7 @@ public class WeatherPickerController : ControllerBase
     }
 
     [HttpGet("last")]
+    [Authorize]
     public async Task<IActionResult> GetLast(CancellationToken cancellationToken)
     {
         try
