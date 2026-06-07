@@ -4,13 +4,13 @@ import "./OutfitPlanner.scss";
 import { BiLinkExternal } from "react-icons/bi";
 
 const clothes = [
-  { id: 1, name: "Czarna MISBHV", layer: "Warstwa średnia", category: "Bluza" },
-  { id: 2, name: "Biała koszulka", layer: "Warstwa bazowa", category: "Koszulka" },
-  { id: 3, name: "Jeansy niebieskie", layer: "Dół", category: "Spodnie" },
-  { id: 4, name: "Jeansy niebieskie", layer: "Dół", category: "Spodnie" },
-  { id: 5, name: "Jeansy niebieskie", layer: "Dół", category: "Spodnie" },
-  { id: 6, name: "Jeansy niebieskie", layer: "Dół", category: "Spodnie" },
-  { id: 7, name: "Jeansy niebieskie", layer: "Dół", category: "Spodnie" },
+  { id: 1, name: "Czarna MISBHV", category: "Bluza" },
+  { id: 2, name: "Biała koszulka", category: "Koszulka" },
+  { id: 3, name: "Jeansy niebieskie", category: "Spodnie" },
+  { id: 4, name: "Jeansy niebieskie", category: "Spodnie" },
+  { id: 5, name: "Jeansy niebieskie", category: "Spodnie" },
+  { id: 6, name: "Jeansy niebieskie",  category: "Spodnie" },
+  { id: 7, name: "Jeansy niebieskie",  category: "Spodnie" },
 ];
 
 function OutfitCard({date, weather, description, itemCount, clothes}) {

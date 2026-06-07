@@ -8,9 +8,9 @@ import { useWeatherStore } from "../Weather/weatherStore";
 import { useClothingItemsStore } from "../../../../common/components/ClothingItem/clothingItemsStore";
 
 const clothes = [
-  { id: 1, name: "Czarna MISBHV", layer: "Warstwa średnia", category: "Bluza", warmth: 3, waterproof: false},
-  { id: 2, name: "Biała koszulka", layer: "Warstwa bazowa", category: "Koszulka", warmth: 1, waterproof: false},
-  { id: 3, name: "Jeansy niebieskie", layer: "Dół", category: "Spodnie", warmth: 2, waterproof: false},
+  { id: 1, name: "Czarna MISBHV", category: "Bluza", warmth: 3, waterproof: false},
+  { id: 2, name: "Biała koszulka", category: "Koszulka", warmth: 1, waterproof: false},
+  { id: 3, name: "Jeansy niebieskie", category: "Spodnie", warmth: 2, waterproof: false},
 ];
 
 export function Outfit() {
