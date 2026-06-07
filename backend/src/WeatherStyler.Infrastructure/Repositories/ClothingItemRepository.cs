@@ -122,23 +122,35 @@ internal class ClothingItemRepository : IClothingItemRepository
 
         if (e is null) throw new InvalidOperationException("Not found");
 
-        // Mapuj tylko proste pola, nie nawigacje
         e.Name = item.Name;
         e.PhotoUrl = item.PhotoUrl;
-        e.CategoryId = item.CategoryId; // tylko FK, nie obiekt Category
+        e.CategoryId = item.CategoryId;
         e.WarmthLevel = item.WarmthLevel;
 
-        // replace properties
-        var propertiesToRemove = e.Properties.ToList();
-        e.Properties.Clear();
-        _db.ClothingProperties.RemoveRange(propertiesToRemove);
-        if (item.Properties != null)
+        // Properties — upsert
+        var incomingProps = item.Properties ?? new List<ClothingProperty>();
+
+        // usuń te których nie ma w nowym żądaniu
+        var toRemove = e.Properties
+            .Where(p => !incomingProps.Any(ip => ip.Id == p.Id && ip.Id != Guid.Empty))
+            .ToList();
+        _db.ClothingProperties.RemoveRange(toRemove);
+
+        foreach (var p in incomingProps)
         {
-            foreach (var p in item.Properties)
+            var existing = e.Properties.FirstOrDefault(ep => ep.Id == p.Id && p.Id != Guid.Empty);
+            if (existing != null)
             {
+                // aktualizuj istniejący
+                existing.Name = p.Name;
+                existing.Value = p.Value;
+            }
+            else
+            {
+                // dodaj nowy
                 e.Properties.Add(new ClothingPropertyEntity
                 {
-                    Id = p.Id == Guid.Empty ? Guid.NewGuid() : p.Id,
+                    Id = Guid.NewGuid(),
                     Name = p.Name,
                     Value = p.Value,
                     ClothingItemId = e.Id
@@ -146,7 +158,7 @@ internal class ClothingItemRepository : IClothingItemRepository
             }
         }
 
-        // replace styles
+        // Styles — replace przez many-to-many (clear + attach)
         e.Styles.Clear();
         if (item.Styles != null)
         {
@@ -157,7 +169,7 @@ internal class ClothingItemRepository : IClothingItemRepository
             }
         }
 
-        // replace colors
+        // Colors — replace przez many-to-many (clear + attach)
         e.Colors.Clear();
         if (item.Colors != null)
         {
