@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./FavouriteOutfitCard.scss";
-import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import { AiFillHeart} from "react-icons/ai";
 import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
 import { useFavouriteOutfitStore } from "../../favouriteStore"; 
 
@@ -47,8 +47,7 @@ return (
             <ClothingItem
               key={item.id}
               name={item.name}
-              layer={item.layer}
-              category={item.category}
+              category={item.categoryId}
             />
           ))}
         </div>

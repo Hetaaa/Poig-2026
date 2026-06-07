@@ -23,7 +23,7 @@ export function OutfitModal({date, weather, description, clothes, onClose}) {
                     </button>
                 </div>
                 <div className="preview-clothes">
-                    {clothes.map((item)=> (<ClothingItem key={item.id} name={item.name} layer={item.layer} category={item.category}/>))}
+                    {clothes.map((item)=> (<ClothingItem key={item.id} name={item.name} category={item.categoryId}/>))}
                 </div>
             </div>
         </div>

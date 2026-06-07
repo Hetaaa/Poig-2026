@@ -73,6 +73,7 @@ export const useClothingItemsStore = create((set) => ({
         status:"success", 
         error: null,
       }));
+      return id;
     } catch(error){
       set({
         status: "error", 

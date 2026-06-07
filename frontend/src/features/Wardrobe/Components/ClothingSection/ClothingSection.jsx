@@ -4,37 +4,29 @@ import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useClothingItemsStore } from "../../../../common/components/ClothingItem/clothingItemsStore";
 
-function getLayerByCategory(category) {
-    if (["Koszulka", "Koszula"].includes(category)) return "base";
-    if (["Bluza", "Sweter"].includes(category)) return "middle";
-    if (["Spodnie", "Spódnica"].includes(category)) return "bottom";
-    if (["Kurtka"].includes(category)) return "outer";
-    if (["Obuwie"].includes(category)) return "shoes";
-
-    return "other";
-}
-
-function mappingItem(items){
+function mappingItem(items, onDelete){
     if (!Array.isArray(items)) return null;
 
     return items.map((item)=>(
         <OuterLayer
             key = {item.id}
+            id = {item.id}
             title = {item.name}
-            category = {item.category?.name}
+            categoryId = {item.categoryId}
             warmth = {item.warmthLevel}
+            onDelete = {onDelete}
         />
     ));
 }
 
-function layer(title, items) {
+function layer(title, items, onDelete) {
     if (!items.length) return null;
 
     return (
         <>
             <div className="out-layer">
                 <h3 className="out-text">{title}</h3>
-                <div className="out-card">{mappingItem(items)}</div>
+                <div className="out-card">{mappingItem(items, onDelete)}</div>
             </div>
             
             <div className="line"></div>
@@ -42,14 +34,14 @@ function layer(title, items) {
     )
 }
 
-function OuterLayer ({title, category, warmth}) {
+function OuterLayer ({id, title, categoryId, warmth, onDelete}) {
     return (
         <div className="out-item">
             <div className="medium-component"></div>
             <div className="wardrobe-text">
                 <span className="wardrobe-title">{title}</span>
                 <div className="wardrobe-description">
-                    <span className="description-text">{category}</span>
+                    <span className="description-text">{categoryId}</span>
                     <div className="description-rate">
                         <div className="description-rate-text">{warmth}/10</div>
                         <BiSolidHot className="small-icon color"/>
@@ -63,7 +55,7 @@ function OuterLayer ({title, category, warmth}) {
             </button>
             </div>
             <div className="bck-icon color1">
-                <button className="icon-btn" aria-label="Usuń ubranie">
+                <button className="icon-btn" aria-label="Usuń ubranie" onClick={()=> onDelete(id)}>
                     <RiDeleteBin6Line className="mini-icon color-icon"/>
                 </button>
             </div>
@@ -74,38 +66,17 @@ function OuterLayer ({title, category, warmth}) {
 
 
 export function ClothingSection(){
-    const {clothingItems} = useClothingItemsStore();
-
+    const {clothingItems, removeClothingItem} = useClothingItemsStore();
 
     const items = Array.isArray(clothingItems) ? clothingItems : [];
 
-    const baseLayer = items.filter(
-        (item) => getLayerByCategory(item.category?.name) === "base"
-    );
-
-    const middleLayer = items.filter(
-        (item) => getLayerByCategory(item.category?.name) === "middle"
-    );
-
-    const outerLayer = items.filter(
-        (item) => getLayerByCategory(item.category?.name) === "outer"
-    );
-
-    const bottomLayer = items.filter(
-        (item) => getLayerByCategory(item.category?.name) === "bottom"
-    );
-
-    const shoeLayer = items.filter(
-        (item) => getLayerByCategory(item.category?.name) === "shoes"
-    );
+    async function remove(id){
+        await removeClothingItem(id)
+    }
 
     return (
     <>
-        {layer("Warstwa bazowa", baseLayer)}
-        {layer("Warstwa średnia", middleLayer)}
-        {layer("Warstwa dolna", bottomLayer)}
-        {layer("Warstwa wierzchnia", outerLayer)}
-        {layer("Obuwie", shoeLayer)}
+        {layer("Ubrania", items, remove)}
     </>
     )
 }

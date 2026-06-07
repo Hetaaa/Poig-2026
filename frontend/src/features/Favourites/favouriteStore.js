@@ -13,12 +13,6 @@ const initialState = {
 export const useFavouriteOutfitStore = create((set) => ({
   ...initialState,
 
-  async addFavouriteOutfit(outfit) {
-    set((state) => ({
-      favouriteOutfits: [...state.favouriteOutfits, outfit],
-    }));
-  },
-
   async fetchFavouriteOutfits() {
     set({ status: "loading", error: null });
     try {

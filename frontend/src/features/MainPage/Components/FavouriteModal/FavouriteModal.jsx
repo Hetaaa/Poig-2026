@@ -3,18 +3,28 @@ import { ModalFooter } from "../../../../common/components/ModalFooter/ModalFoot
 import "./FavouriteModal.scss";
 import { AiOutlineHeart } from "react-icons/ai";
 import { useState } from "react";
+import { useFavouriteOutfitStore } from "../../../Favourites/favouriteStore";
 import { alreadyExists, isTextValid} from "../../../../utils/helpers";
 
 export function FavouriteModal({clothes, outfitId, onClose}) {
 
     const [outfitName, setOutfitName] = useState("");
     const [outfitDescription, setOutfitDescription] = useState("");
+    const {favouriteOutfits} = useFavouriteOutfitStore();
 
     async function Save(){
-        if (!outfitName.trim()) return;
-
         if(!isTextValid(outfitName, 3, 50)) {
             alert("Nazwa outfitu musi mieć od 3 do 50 znaków");
+            return;
+        }
+
+        if(outfitDescription && !isTextValid(outfitDescription, 0, 150)) {
+            alert("Opis outfitu może mieć maksymalnie 150 znaków");
+            return;
+        }
+
+        if(alreadyExists(favouriteOutfits, outfitName)){
+            alert("Outfit o takiej nazwie już istnieje");
             return;
         }
 
@@ -31,7 +41,7 @@ export function FavouriteModal({clothes, outfitId, onClose}) {
                     </div>
                 </div>
                 <div className="card-outfit">
-                    {clothes.map((item)=> (<ClothingItem key={item.id} name={item.name} layer={item.layer} category={item.category}/>))}
+                    {clothes?.map((item)=> (<ClothingItem key={item.id} name={item.name} category={item.categoryId}/>))}
                 </div>
                 <div className="card-form">
                     <div className="form-description">

@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Outfit.scss";
 import { BiShuffle } from "react-icons/bi";
 import { AiOutlineHeart} from "react-icons/ai";
 import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
 import { FavouriteModal } from "../FavouriteModal/FavouriteModal";
-import { getRandomMatchingOutfit } from "../../../../utils/matchingItem";
 import { useWeatherStore } from "../Weather/weatherStore";
+import { useClothingItemsStore } from "../../../../common/components/ClothingItem/clothingItemsStore";
 
 const clothes = [
   { id: 1, name: "Czarna MISBHV", layer: "Warstwa średnia", category: "Bluza", warmth: 3, waterproof: false},
@@ -15,16 +15,14 @@ const clothes = [
 
 export function Outfit() {
     const[showFavouriteModal, setShowFavouriteModal] = useState(false);
-    const[currentOutfit, setCurrentOutfit] = useState(clothes)
+    const[currentOutfit, setCurrentOutfit] = useState([])
 
     const {weather} = useWeatherStore();
-
-
-    function Shuffle() {
-        if(!weather) return;
-        const newOutfit = getRandomMatchingOutfit(clothes, weather);
-        setCurrentOutfit(newOutfit);
-    }
+    const {clothingItems, fetchClothingItems} = useClothingItemsStore();
+    
+    useEffect(() => {
+    fetchClothingItems();
+    }, [fetchClothingItems]);
 
     return (
     <>
@@ -37,7 +35,7 @@ export function Outfit() {
                     <span className="description">96% Dopasowania • Idealny na dzisiejszą pogodę</span>
                 </div>
                 <div className="react-img">
-                    <button className="icon-btn" aria-label="Shuffle outfit" onClick ={Shuffle}>
+                    <button className="icon-btn" aria-label="Shuffle outfit">
                         <BiShuffle className="medium-icon" />
                     </button>
 
@@ -52,8 +50,7 @@ export function Outfit() {
                 <ClothingItem
                     key={item.id}
                     name={item.name}
-                    layer={item.layer}
-                    category={item.category}
+                    category={item.categoryId}
                 />
             ))}
       </div>

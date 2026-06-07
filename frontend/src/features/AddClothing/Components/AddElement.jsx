@@ -4,6 +4,15 @@ import { IoIosArrowDown } from "react-icons/io";
 import { ModalFooter } from "../../../common/components/ModalFooter/ModalFooter";
 import { isTextValid, alreadyExists } from "../../../utils/helpers";
 import "./AddElement.scss";
+import { useClothingItemsStore } from "../../../common/components/ClothingItem/clothingItemsStore";
+
+const CATEGORY_IDS = {
+  base: "GUID_BASE",
+  middle: "GUID_MIDDLE",
+  outer: "GUID_OUTER",
+  bottom: "GUID_BOTTOM",
+  shoes: "GUID_SHOES",
+};
 
 function CategoryOptions() {
   return (
@@ -25,9 +34,13 @@ function CategoryOptions() {
   );
 }
 export function AddElement({onClose, clothingItems=[]}) {
+  const {addClothingItem} = useClothingItemsStore();
+
   const [photoPreview, setPhotoPreview] = useState(null);
   const [warmthLevel, setWarmthLevel] = useState(5);
   const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [waterproof, setWaterproof] = useState(false);
   
   function Save() {
     if (!isTextValid(name, 3, 50)) {
@@ -35,7 +48,7 @@ export function AddElement({onClose, clothingItems=[]}) {
       return;
     }
 
-    if (alreadyExists(ClothingItems, name)) {
+    if (alreadyExists(clothingItems, name)) {
       alert("Takie ubranie już istnieje");
       return;
     }
@@ -92,7 +105,7 @@ export function AddElement({onClose, clothingItems=[]}) {
             <div className="clothes-option">
               <span className="category-title">Kategoria</span>
               <IoIosArrowDown className="select-icon" />
-              <select className="category-select">
+              <select className="category-select" value={category} onChange={(e)=> setCategory(e.target.value)}>
                 <CategoryOptions />
               </select>
             </div>
@@ -107,7 +120,7 @@ export function AddElement({onClose, clothingItems=[]}) {
 
             <div className="clothes-waterproof">
               <input name="waterproof"
-              type="checkbox" className="waterproof-checkbox" />
+              type="checkbox" className="waterproof-checkbox" checked = {waterproof} onChange={(e)=> setWaterproof(e.target.checked)}/>
               <span className="waterproof-text">Wodoodporne</span>
             </div>
           </div>
