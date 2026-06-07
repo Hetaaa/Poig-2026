@@ -19,6 +19,8 @@ public class DomainToDtoProfile : Profile
         CreateMap<User, UserDto>();
         CreateMap<ClothingItem, OutfitClothingItemDto>();
         CreateMap<ClothingItem, ClothingItemDto>();
+        CreateMap<Category, CategoryDto>();
+
 
     }
 }

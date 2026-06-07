@@ -1,4 +1,6 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using WeatherStyler.Application.Dtos;
 using WeatherStyler.Domain.Interfaces.Services;
 
 namespace WeatherStyler.Controllers;
@@ -10,12 +12,14 @@ public class LookupController : ControllerBase
     private readonly ILookupService _service;
     private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
     private readonly bool _isDevelopment;
+    private readonly IMapper _mapper;
 
-    public LookupController(ILookupService service, Microsoft.Extensions.Configuration.IConfiguration configuration)
+    public LookupController(ILookupService service, Microsoft.Extensions.Configuration.IConfiguration configuration, IMapper mapper)
     {
         _service = service;
         _configuration = configuration;
         _isDevelopment = _configuration.GetValue<bool>("IsDevelopment");
+        _mapper = mapper;
     }
 
     [HttpGet("categories")]
@@ -24,7 +28,8 @@ public class LookupController : ControllerBase
         try
         {
             var items = await _service.GetCategoriesAsync(cancellationToken);
-            return Ok(items);
+            var dtos = items.Select(item => _mapper.Map<CategoryDto>(item));
+            return Ok(dtos);
         }
         catch (Exception ex)
         {
@@ -39,8 +44,10 @@ public class LookupController : ControllerBase
         try
         {
             var item = await _service.GetCategoryByIdAsync(id, cancellationToken);
+            var dto = _mapper.Map<CategoryDto>(item);
+
             if (item is null) return NotFound();
-            return Ok(item);
+            return Ok(dto);
         }
         catch (Exception ex)
         {
