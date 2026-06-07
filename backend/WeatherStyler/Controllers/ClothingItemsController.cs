@@ -88,7 +88,7 @@ public class ClothingItemsController : ControllerBase
             // --- LOGIKA ZAPISU PLIKU ---
             if (request.PhotoFile != null && request.PhotoFile.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+                var uploadsFolder = Path.Combine(_env.ContentRootPath, "wwwroot", "images");
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
 
