@@ -31,7 +31,11 @@ public class WeatherService : IWeatherService
             var thresholds = _configuration.GetSection("WeatherThresholds").Get<WeatherThresholds>() ?? new WeatherThresholds();
 
             // Link uwzględniający dane godzinowe: temp, opady, zachmurzenie i wiatr
-            var url = $"https://api.open-meteo.com/v1/forecast?latitude={latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&longitude={longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m&forecast_days=1&timezone=auto";
+            string latStr = latitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            string lngStr = longitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+            // 2. Wklejenie gotowych, "zakropkowanych" stringów do URL
+            var url = $"https://api.open-meteo.com/v1/forecast?latitude={latStr}&longitude={lngStr}&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m&forecast_days=1&timezone=auto";
 
             var response = await _http.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();

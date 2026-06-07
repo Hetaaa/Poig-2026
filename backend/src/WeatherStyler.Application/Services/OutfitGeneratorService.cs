@@ -155,8 +155,8 @@ public class OutfitManagerService : IOutfitManagerService
         if (lat is null || lon is null)
             return Failure("Brak zapisanej lokacji użytkownika. Ustaw lokację aby generować outfity.");
 
-        if (!double.TryParse(lat, CultureInfo.InvariantCulture, out double parsedLat) ||
-            !double.TryParse(lon, CultureInfo.InvariantCulture, out double parsedLon))
+        if (!double.TryParse(lat, CultureInfo.CurrentCulture, out double parsedLat) ||
+            !double.TryParse(lon, CultureInfo.CurrentCulture, out double parsedLon))
             return Failure("Zapisana lokacja użytkownika ma niepoprawny format numeryczny.");
 
         var weather = await _weatherService.GetWeatherForLocationAsync(parsedLat, parsedLon, cancellationToken);

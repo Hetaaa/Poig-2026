@@ -12,6 +12,9 @@ public class OutfitEntity : WardrobeEntityBase
     public Guid UserId { get; set; }
     public ApplicationUser? User { get; set; }
 
+    public bool IsFavourite { get; set; } 
+
+
     // items that compose this outfit
     public ICollection<ClothingItemEntity> ClothingItems { get; set; } = new List<ClothingItemEntity>();
     // usage history entries that reference this outfit (one outfit can be used on many days)

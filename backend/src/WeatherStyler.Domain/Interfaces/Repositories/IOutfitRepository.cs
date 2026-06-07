@@ -15,4 +15,6 @@ public interface IOutfitRepository
     Task SaveGeneratedOutfitAsync(Guid outfitId, string name, DateTime dateCreated, Guid userId, IEnumerable<Guid> clothingItemIds, DateTime dateWorn, CancellationToken cancellationToken = default);
     Task<bool> UserExistsAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<UsageHistory>> GetOutfitsSummaryAsync(Guid userId, DateTime from, DateTime to, CancellationToken cancellationToken = default);
+
+    Task SetFavouriteAsync(Guid outfitId, bool isFavourite, CancellationToken cancellationToken = default);
 }

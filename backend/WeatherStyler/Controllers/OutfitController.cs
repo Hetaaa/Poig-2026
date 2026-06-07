@@ -146,4 +146,29 @@ public class OutfitController : ControllerBase
             return StatusCode(500, new { message = ex.Message });
         }
     }
+    [HttpPut("{id:guid}/favourite")]
+    public async Task<IActionResult> SetFavourite(
+            Guid id,
+            [FromQuery] bool isFavourite,
+            CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var userId = _userService.GetUserId();
+
+            // Pobieramy ulubione z uwzględnieniem zalogowanego użytkownika (wewnątrz serwisu rzuci wyjątek jeśli id nie istnieje)
+            await _outfitRepository.SetFavouriteAsync(id, isFavourite, cancellationToken);
+
+            return Ok(new { message = isFavourite ? "Outfit marked as favourite" : "Outfit removed from favourites" });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            if (_isDevelopment) throw;
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
 }
