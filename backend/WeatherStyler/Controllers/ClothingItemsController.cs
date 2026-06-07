@@ -74,6 +74,17 @@ public class ClothingItemsController : ControllerBase
             var userId = _userService.GetUserId();
             var clothingItem = _mapper.Map<ClothingItem>(request);
 
+            if (request.StyleIds != null && request.StyleIds.Any())
+            {
+                // Tworzymy "puste" obiekty z samym ID, żeby Entity Framework wiedział, co powiązać
+                clothingItem.Styles = request.StyleIds.Select(id => new Style { Id = id, Name = ""}).ToList();
+            }
+
+            if (request.ColorIds != null && request.ColorIds.Any())
+            {
+                clothingItem.Colors = request.ColorIds.Select(id => new Color { Id = id, Name = ""}).ToList();
+            }
+
             // --- LOGIKA ZAPISU PLIKU ---
             if (request.PhotoFile != null && request.PhotoFile.Length > 0)
             {
