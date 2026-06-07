@@ -5,7 +5,7 @@ import { useAuthStore } from "../Auth/authStore";
 import "./Navbar.scss";
 
 export function Navbar() {
-  const { username } = useAuthStore();
+  const username = useAuthStore((state) => state.username);
 
   return (
     <div className="navbar">
