@@ -27,7 +27,7 @@ function useCategoryMap() {
 export function Outfit() {
   const [showFavouriteModal, setShowFavouriteModal] = useState(false);
 
-  const { todayOutfit, todayStatus, fetchTodayOutfit } = useOutfitStore();
+  const { todayOutfit, todayStatus, fetchTodayOutfit, regenerateTodayOutfit } = useOutfitStore();
   const categoryMap = useCategoryMap();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export function Outfit() {
             </span>
           </div>
           <div className="react-img">
-            <button className="icon-btn" aria-label="Shuffle outfit">
+            <button className="icon-btn" aria-label="Shuffle outfit" onClick={regenerateTodayOutfit} disabled={todayStatus === "loading"}>
               <BiShuffle className="medium-icon" />
             </button>
 

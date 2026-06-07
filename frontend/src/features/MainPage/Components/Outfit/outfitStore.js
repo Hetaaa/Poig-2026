@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getTodayOutfit, getOutfitsByRange } from "./outfitService";
+import { getTodayOutfit, getOutfitsByRange, regenerateTodayOutfit } from "./outfitService";
 import { getErrorMessage } from "../../../../utils/helpers";
 
 const initialState = {
@@ -19,6 +19,21 @@ export const useOutfitStore = create((set) => ({
     set({ todayStatus: "loading", todayError: null });
     try {
       const data = await getTodayOutfit();
+      set({
+        todayOutfit: data.outfit ?? null,
+        todayWarnings: data.warnings ?? [],
+        todayStatus: "success",
+        todayError: null,
+      });
+    } catch (error) {
+      set({ todayStatus: "error", todayError: getErrorMessage(error) });
+    }
+  },
+
+  async regenerateTodayOutfit() {
+    set({ todayStatus: "loading", todayError: null });
+    try {
+      const data = await regenerateTodayOutfit();
       set({
         todayOutfit: data.outfit ?? null,
         todayWarnings: data.warnings ?? [],

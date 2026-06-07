@@ -14,3 +14,8 @@ export async function getOutfitsByRange(from, to) {
   });
   return response.data;
 }
+
+export async function regenerateTodayOutfit() {
+  const response = await apiClient.post("/Outfit/today/regenerate");
+  return response.data;
+}
