@@ -10,8 +10,12 @@ function OutfitCard({ date, outfit }) {
   const items = outfit?.clothingItems ?? [];
 
   const formattedDate = date
-    ? new Date(date).toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "short" })
-    : outfit?.name ?? "";
+    ? new Date(date).toLocaleDateString("pl-PL", {
+        weekday: "long",
+        day: "numeric",
+        month: "short",
+      })
+    : (outfit?.name ?? "");
 
   return (
     <div className="outfit-card">
@@ -65,7 +69,11 @@ export function OutfitPlanner() {
   return (
     <div className="outfit-plan">
       {upcomingOutfits.map((entry, index) => (
-        <OutfitCard key={entry.outfit?.id ?? index} date={entry.date} outfit={entry.outfit} />
+        <OutfitCard
+          key={entry.outfit?.id ?? index}
+          date={entry.date}
+          outfit={entry.outfit}
+        />
       ))}
     </div>
   );

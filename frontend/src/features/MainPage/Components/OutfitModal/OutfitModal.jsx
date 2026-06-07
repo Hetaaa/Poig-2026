@@ -42,7 +42,11 @@ export function OutfitModal({ date, clothes, onClose }) {
   const temp = useDayWeather(date);
 
   const formattedDate = date
-    ? new Date(date).toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" })
+    ? new Date(date).toLocaleDateString("pl-PL", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      })
     : "";
 
   return (
