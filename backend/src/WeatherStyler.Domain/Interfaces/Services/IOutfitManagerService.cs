@@ -9,4 +9,6 @@ public interface IOutfitManagerService
 {
     Task<OutfitGeneratorResult> GenerateOutfitForTodayAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<OutfitGeneratorResult> GetOrGenerateTodayAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    Task<OutfitGeneratorResult> GetOrGenerateForDateAsync(Guid userId, DateTime date, CancellationToken cancellationToken = default);
 }

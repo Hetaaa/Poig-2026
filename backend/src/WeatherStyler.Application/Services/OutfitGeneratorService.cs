@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization; // Dodane dla InvariantCulture
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using WeatherStyler.Domain.Entities;
 using WeatherStyler.Domain.Entities.BuisnessLogic;
 using WeatherStyler.Domain.Interfaces.Repositories;
@@ -35,6 +36,7 @@ public class OutfitManagerService : IOutfitManagerService
     private readonly IUsageHistoryRepository _usageHistoryRepo;
     private readonly IWeatherService _weatherService;
     private readonly IOutfitRepository _outfitRepo;
+    private readonly IConfiguration _configuration;
     private readonly Random _random = new Random();
 
     private const double ScoreDiversity = 3.0;
@@ -51,7 +53,8 @@ public class OutfitManagerService : IOutfitManagerService
         ILookupRepository lookupRepo,
         IUsageHistoryRepository usageHistoryRepo,
         IWeatherService weatherService,
-        IOutfitRepository outfitRepo)
+        IOutfitRepository outfitRepo,
+        IConfiguration configuration)
     {
         _programVars = programVars;
         _clothingRepo = clothingRepo;
@@ -59,6 +62,7 @@ public class OutfitManagerService : IOutfitManagerService
         _usageHistoryRepo = usageHistoryRepo;
         _weatherService = weatherService;
         _outfitRepo = outfitRepo;
+        _configuration = configuration;
     }
 
     public async Task<OutfitGeneratorResult> GetOrGenerateTodayAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -94,6 +98,53 @@ public class OutfitManagerService : IOutfitManagerService
         return outfitResult;
     }
 
+    public async Task<OutfitGeneratorResult> GetOrGenerateForDateAsync(Guid userId, DateTime date, CancellationToken cancellationToken = default)
+    {
+        var dayStart = date.Date;
+        var dayEnd = dayStart.AddDays(1).AddTicks(-1);
+
+        var existingOutfits = (await _outfitRepo.GetOutfitsAsync(userId, dayStart, dayEnd, cancellationToken)).ToList();
+        if (existingOutfits.Any())
+            return new OutfitGeneratorResult { Outfit = existingOutfits.First(), Warnings = null };
+
+        var lat = await _programVars.GetValueAsync("last_location_lat", userId, cancellationToken);
+        var lon = await _programVars.GetValueAsync("last_location_lon", userId, cancellationToken);
+
+        if (lat is null || lon is null)
+            return Failure("Brak zapisanej lokacji użytkownika. Ustaw lokację aby generować outfity.");
+
+        if (!double.TryParse(lat, CultureInfo.InvariantCulture, out double parsedLat) ||
+            !double.TryParse(lon, CultureInfo.InvariantCulture, out double parsedLon))
+            return Failure("Zapisana lokacja użytkownika ma niepoprawny format numeryczny.");
+
+        var daily = await _weatherService.GetDailySummaryAsync(parsedLat, parsedLon, dayStart, cancellationToken);
+        if (daily is null)
+            return Failure("Nie udało się pobrać danych pogodowych dla tej daty.");
+
+        var thresholds = _configuration.GetSection("WeatherThresholds").Get<WeatherThresholds>() ?? new WeatherThresholds();
+
+        var weather = new WeatherDataForGeneration(
+            Temperature: (int)Math.Round(daily.Temperature),
+            IsRaining: daily.Precipitation > thresholds.RainThreshold,
+            IsWindy: daily.WindSpeed > thresholds.WindThreshold,
+            IsSunny: daily.CloudCover < thresholds.SunnyCloudThreshold
+        );
+
+        var outfitResult = await GenerateOutfitWithWeatherAsync(userId, weather, cancellationToken);
+        if (outfitResult.Outfit == null)
+            return outfitResult;
+
+        if (!await _outfitRepo.UserExistsAsync(userId, cancellationToken))
+            return Failure("Current user not found in database. Cannot save usage history.");
+
+        var itemIds = outfitResult.Outfit.ClothingItems.Select(ci => ci.Id).ToList();
+        var outfitId = outfitResult.Outfit.Id == Guid.Empty ? Guid.NewGuid() : outfitResult.Outfit.Id;
+
+        await _outfitRepo.SaveGeneratedOutfitAsync(outfitId, outfitResult.Outfit.Name, outfitResult.Outfit.DateCreated, userId, itemIds, dayStart, cancellationToken);
+
+        return outfitResult;
+    }
+
     public async Task<OutfitGeneratorResult> GenerateOutfitForTodayAsync(
         Guid userId,
         CancellationToken cancellationToken = default)
@@ -104,12 +155,9 @@ public class OutfitManagerService : IOutfitManagerService
         if (lat is null || lon is null)
             return Failure("Brak zapisanej lokacji użytkownika. Ustaw lokację aby generować outfity.");
 
-        // POPRAWKA: Użycie CultureInfo.InvariantCulture zapobiega błędom FormatException na systemach z polską kulturą
         if (!double.TryParse(lat, CultureInfo.InvariantCulture, out double parsedLat) ||
             !double.TryParse(lon, CultureInfo.InvariantCulture, out double parsedLon))
-        {
             return Failure("Zapisana lokacja użytkownika ma niepoprawny format numeryczny.");
-        }
 
         var weather = await _weatherService.GetWeatherForLocationAsync(parsedLat, parsedLon, cancellationToken);
 

@@ -50,9 +50,23 @@ public class OutfitController : ControllerBase
             if (from > to)
                 return BadRequest(new { message = "From date must be before To date" });
 
-            var outfits = await _outfitRepository.GetOutfitsAsync(userId, from, to, cancellationToken);
-            var dtos = outfits.Select(o => _mapper.Map<OutfitDto>(o));
-            return Ok(dtos);
+            var results = new List<object>();
+
+            for (var day = from.Date; day <= to.Date; day = day.AddDays(1))
+            {
+                var result = await _outfitManager.GetOrGenerateForDateAsync(userId, day, cancellationToken);
+                if (result.Outfit != null)
+                {
+                    results.Add(new
+                    {
+                        date = day,
+                        outfit = _mapper.Map<OutfitDto>(result.Outfit),
+                        warnings = result.Warnings
+                    });
+                }
+            }
+
+            return Ok(results);
         }
         catch (Exception ex)
         {

@@ -129,8 +129,9 @@ internal class ClothingItemRepository : IClothingItemRepository
         e.WarmthLevel = item.WarmthLevel;
 
         // replace properties
-        _db.ClothingProperties.RemoveRange(e.Properties);
+        var propertiesToRemove = e.Properties.ToList();
         e.Properties.Clear();
+        _db.ClothingProperties.RemoveRange(propertiesToRemove);
         if (item.Properties != null)
         {
             foreach (var p in item.Properties)
