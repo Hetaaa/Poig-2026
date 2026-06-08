@@ -16,6 +16,7 @@ public record OutfitClothingItemDto(
 );
 
 public record OutfitDto(
+    Guid Id,
     string Name,
     IEnumerable<OutfitClothingItemDto> ClothingItems
 );
