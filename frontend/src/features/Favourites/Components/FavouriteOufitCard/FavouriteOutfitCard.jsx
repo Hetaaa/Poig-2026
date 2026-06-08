@@ -25,7 +25,7 @@ return (
         <div className="outfit-header">
           <div className="header-title">
             <span className="favourite-outfit-text">
-              {outfit.name || `Outfit #${index + 1}`}
+              {`Outfit #${index + 1}`}
             </span>
           </div>
 

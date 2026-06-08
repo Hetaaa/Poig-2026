@@ -16,13 +16,12 @@ export function FavouriteModal({clothes, outfitId, onClose}) {
         setSaving(true);
 
         try{
+            console.log("outfitId w modalu:", outfitId);
+            console.log("clothes w modalu:", clothes);
             const outfit = {
+                id: outfitId,
                 clothes, 
             };
-
-            console.log("outfitId:", outfit.id);
-            console.log("outfit:", outfit);
-            console.log("[Save] favourite", outfit);
 
             await changeFavourite(outfit);
 
