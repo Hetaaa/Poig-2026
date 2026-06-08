@@ -5,7 +5,7 @@ import { ClothingItem } from "../../../../common/components/ClothingItem/Clothin
 import { useFavouriteOutfitStore } from "../../favouriteStore"; 
 
 export function FavouriteOutfitCard(){
-    const {favouriteOutfits, fetchFavouriteOutfits, status, error} = useFavouriteOutfitStore();
+    const {favouriteOutfits, fetchFavouriteOutfits, changeFavourite, status, error} = useFavouriteOutfitStore();
 
     useEffect(()=>{
         fetchFavouriteOutfits();
@@ -25,18 +25,14 @@ return (
         <div className="outfit-header">
           <div className="header-title">
             <span className="favourite-outfit-text">
-              {outfit.name || `Outfit #${index + 1}`}
-            </span>
-
-            <span className="header-description">
-              {outfit.description || "Brak opisu"}
+              {`Outfit #${index + 1}`}
             </span>
           </div>
 
           <div className="outfit-date">
             <span className="date-text">Zapisano w ulubionych</span>
 
-            <button className="icon-btn" aria-label="Usuń z ulubionych">
+            <button className="icon-btn" aria-label="Usuń z ulubionych" onClick = {()=> changeFavourite(outfit)}>
               <AiFillHeart className="medium-icon color" />
             </button>
           </div>

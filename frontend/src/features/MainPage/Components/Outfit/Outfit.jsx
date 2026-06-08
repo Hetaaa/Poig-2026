@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import "./Outfit.scss";
 import { BiShuffle } from "react-icons/bi";
-import { AiOutlineHeart } from "react-icons/ai";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
 import { FavouriteModal } from "../FavouriteModal/FavouriteModal";
 import { useOutfitStore } from "./outfitStore";
 import { apiClient } from "../../../../api/apiClient";
+import { useFavouriteOutfitStore } from "../../../Favourites/favouriteStore";
+import { changeFavouriteStatus } from "../../../Favourites/favouriteService";
 
 function useCategoryMap() {
   const [categoryMap, setCategoryMap] = useState({});
@@ -29,10 +31,38 @@ export function Outfit() {
 
   const { todayOutfit, todayStatus, fetchTodayOutfit, regenerateTodayOutfit } = useOutfitStore();
   const categoryMap = useCategoryMap();
-
+  const {favouriteOutfits, fetchFavouriteOutfits, changeFavourite} = useFavouriteOutfitStore();
+  
   useEffect(() => {
-    fetchTodayOutfit();
-  }, [fetchTodayOutfit]);
+      fetchTodayOutfit();
+      fetchFavouriteOutfits();
+  }, [fetchTodayOutfit, fetchFavouriteOutfits]);
+
+  const isCurrentOutfitFav = favouriteOutfits.some((fav)=> fav.id===todayOutfit?.id);
+
+  async function handleFavourite() {
+    const outfit = {
+      id: todayOutfit.id, 
+      clothes: items, 
+    };
+
+    if (isCurrentOutfitFav) {
+      await changeFavourite(outfit);
+      return;
+    }
+
+    setShowFavouriteModal(true);
+  }
+
+  async function handleRegenerate() {
+
+    if (isCurrentOutfitFav) {
+      alert("Ten outfit jest w ulubionych. Usuń go z ulubionych, aby wylosować nowy outfit");
+      return ;
+    }
+
+    await regenerateTodayOutfit();
+  }
 
   const items = todayOutfit?.clothingItems ?? [];
 
@@ -49,16 +79,17 @@ export function Outfit() {
             </span>
           </div>
           <div className="react-img">
-            <button className="icon-btn" aria-label="Shuffle outfit" onClick={regenerateTodayOutfit} disabled={todayStatus === "loading"}>
+            <button className="icon-btn" aria-label="Shuffle outfit" onClick={handleRegenerate} disabled={todayStatus === "loading"}>
               <BiShuffle className="medium-icon" />
             </button>
 
             <button
               className="icon-btn"
               aria-label="Add outfit to favorites"
-              onClick={() => setShowFavouriteModal(true)}
+              onClick={handleFavourite}
             >
-              <AiOutlineHeart className="medium-icon heart" />
+              {isCurrentOutfitFav ? (<AiFillHeart className="medium-icon heart"/>) :
+              (<AiOutlineHeart className="medium-icon heart" />)}
             </button>
           </div>
         </div>
@@ -83,6 +114,7 @@ export function Outfit() {
         {showFavouriteModal && (
           <FavouriteModal
             clothes={items}
+            outfitId = {todayOutfit.id}
             onClose={() => setShowFavouriteModal(false)}
           />
         )}

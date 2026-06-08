@@ -8,27 +8,29 @@ import { alreadyExists, isTextValid} from "../../../../utils/helpers";
 
 export function FavouriteModal({clothes, outfitId, onClose}) {
 
-    const [outfitName, setOutfitName] = useState("");
-    const [outfitDescription, setOutfitDescription] = useState("");
-    const {favouriteOutfits} = useFavouriteOutfitStore();
+    const {changeFavourite} = useFavouriteOutfitStore();
+
+    const [saving, setSaving] = useState(false);
 
     async function Save(){
-        if(!isTextValid(outfitName, 3, 50)) {
-            alert("Nazwa outfitu musi mieć od 3 do 50 znaków");
-            return;
-        }
+        setSaving(true);
 
-        if(outfitDescription && !isTextValid(outfitDescription, 0, 150)) {
-            alert("Opis outfitu może mieć maksymalnie 150 znaków");
-            return;
-        }
+        try{
+            console.log("outfitId w modalu:", outfitId);
+            console.log("clothes w modalu:", clothes);
+            const outfit = {
+                id: outfitId,
+                clothes, 
+            };
 
-        if(alreadyExists(favouriteOutfits, outfitName)){
-            alert("Outfit o takiej nazwie już istnieje");
-            return;
-        }
+            await changeFavourite(outfit);
 
-        onClose();
+            onClose();
+        } catch {
+            alert("Nie udało się dodać outfitu do ulubionych.");
+        } finally {
+            setSaving(false);
+        }
     }
     return (
     <>
@@ -44,15 +46,7 @@ export function FavouriteModal({clothes, outfitId, onClose}) {
                     {clothes?.map((item)=> (<ClothingItem key={item.id} name={item.name} category={item.categoryId}/>))}
                 </div>
                 <div className="card-form">
-                    <div className="form-description">
-                        <span className="description-title">Nazwa outfitu</span>
-                        <input type="text" className="description-text" placeholder="Outfit #1..." value={outfitName} onChange={(e)=> setOutfitName(e.target.value)}></input>
-                    </div>
-                    <div className="form-description">
-                        <span className="description-title">Opis outfitu</span>
-                        <input type="text" className="description-text" placeholder="Krótki opis outfitu..." value={outfitDescription} onChange={(e)=> setOutfitDescription(e.target.value)}></input>
-                    </div>
-                    <ModalFooter onClose={onClose} onSave={Save}/>
+                    <ModalFooter onClose={onClose} onSave={Save} disabled={saving}/>
                 </div>
             </div>
         </div>
