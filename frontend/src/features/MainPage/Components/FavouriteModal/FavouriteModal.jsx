@@ -5,10 +5,12 @@ import { AiOutlineHeart } from "react-icons/ai";
 import { useState } from "react";
 import { useFavouriteOutfitStore } from "../../../Favourites/favouriteStore";
 import { alreadyExists, isTextValid} from "../../../../utils/helpers";
+import { useAlertStore } from "../../../../common/components/AlertBox/alertStore";
 
 export function FavouriteModal({clothes, outfitId, onClose}) {
 
     const {changeFavourite} = useFavouriteOutfitStore();
+    const { showAlert } = useAlertStore();
 
     const [saving, setSaving] = useState(false);
 
@@ -27,7 +29,7 @@ export function FavouriteModal({clothes, outfitId, onClose}) {
 
             onClose();
         } catch {
-            alert("Nie udało się dodać outfitu do ulubionych.");
+            showAlert("Nie udało się dodać outfitu do ulubionych.", "error");
         } finally {
             setSaving(false);
         }

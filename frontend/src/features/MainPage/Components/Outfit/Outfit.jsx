@@ -3,11 +3,10 @@ import "./Outfit.scss";
 import { BiShuffle } from "react-icons/bi";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { ClothingItem } from "../../../../common/components/ClothingItem/ClothingItem";
-import { FavouriteModal } from "../FavouriteModal/FavouriteModal";
 import { useOutfitStore } from "./outfitStore";
 import { apiClient } from "../../../../api/apiClient";
 import { useFavouriteOutfitStore } from "../../../Favourites/favouriteStore";
-import { changeFavouriteStatus } from "../../../Favourites/favouriteService";
+import { useAlertStore } from "../../../../common/components/AlertBox/alertStore";
 
 function useCategoryMap() {
   const [categoryMap, setCategoryMap] = useState({});
@@ -27,11 +26,10 @@ function useCategoryMap() {
 }
 
 export function Outfit() {
-  const [showFavouriteModal, setShowFavouriteModal] = useState(false);
-
   const { todayOutfit, todayStatus, fetchTodayOutfit, regenerateTodayOutfit } = useOutfitStore();
   const categoryMap = useCategoryMap();
   const {favouriteOutfits, fetchFavouriteOutfits, changeFavourite} = useFavouriteOutfitStore();
+  const { showAlert } = useAlertStore();
   
   useEffect(() => {
       fetchTodayOutfit();
@@ -41,24 +39,28 @@ export function Outfit() {
   const isCurrentOutfitFav = favouriteOutfits.some((fav)=> fav.id===todayOutfit?.id);
 
   async function handleFavourite() {
+    const wasFav = isCurrentOutfitFav;
     const outfit = {
       id: todayOutfit.id, 
       clothes: items, 
     };
 
-    if (isCurrentOutfitFav) {
+    try {
       await changeFavourite(outfit);
-      return;
+      if (!wasFav) {
+        showAlert("Dodano outfit do ulubionych");
+      } else {
+        showAlert("Usunięto outfit z ulubionych");
+      }
+    } catch {
+      showAlert("Nie udało się zmienić ulubionych. Spróbuj ponownie.", "error");
     }
-
-    setShowFavouriteModal(true);
   }
 
   async function handleRegenerate() {
-
     if (isCurrentOutfitFav) {
-      alert("Ten outfit jest w ulubionych. Usuń go z ulubionych, aby wylosować nowy outfit");
-      return ;
+      showAlert("Ten outfit jest w ulubionych. Usuń go z ulubionych, aby wylosować nowy.", "error");
+      return;
     }
 
     await regenerateTodayOutfit();
@@ -88,8 +90,10 @@ export function Outfit() {
               aria-label="Add outfit to favorites"
               onClick={handleFavourite}
             >
-              {isCurrentOutfitFav ? (<AiFillHeart className="medium-icon heart"/>) :
-              (<AiOutlineHeart className="medium-icon heart" />)}
+              <span className="heart-icon">
+                <AiOutlineHeart className="medium-icon heart" />
+                <AiFillHeart className={`medium-icon heart heart-fill${isCurrentOutfitFav ? " heart-fill--active" : ""}`} />
+              </span>
             </button>
           </div>
         </div>
@@ -110,14 +114,6 @@ export function Outfit() {
             />
           ))}
         </div>
-
-        {showFavouriteModal && (
-          <FavouriteModal
-            clothes={items}
-            outfitId = {todayOutfit.id}
-            onClose={() => setShowFavouriteModal(false)}
-          />
-        )}
       </div>
     </>
   );

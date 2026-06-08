@@ -1,0 +1,61 @@
+@use "../../../variables" as *;
+
+.alert-box {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  z-index: 9999;
+
+  padding: 0.875rem 1.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid;
+
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+  &--info {
+    background: $light-blue-bg;
+    border-color: $blue;
+    color: $blue;
+  }
+
+  &--error {
+    background: $light-red-bg;
+    border-color: $red;
+    color: $red;
+  }
+
+  &.alert-enter {
+    animation: alertSlideDown 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  &.alert-leave {
+    animation: alertSlideUp 0.32s ease forwards;
+  }
+}
+
+@keyframes alertSlideDown {
+  from {
+    transform: translateX(-50%) translateY(-150%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes alertSlideUp {
+  from {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-50%) translateY(-150%);
+    opacity: 0;
+  }
+}

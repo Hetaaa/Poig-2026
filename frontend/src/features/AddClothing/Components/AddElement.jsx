@@ -6,9 +6,11 @@ import { isTextValid, alreadyExists } from "../../../utils/helpers";
 import "./AddElement.scss";
 import { useClothingItemsStore } from "../../../common/components/ClothingItem/clothingItemsStore";
 import { apiClient } from "../../../api/apiClient";
+import { useAlertStore } from "../../../common/components/AlertBox/alertStore";
 
 export function AddElement({ onClose, clothingItems = [] }) {
   const { addClothingItem } = useClothingItemsStore();
+  const { showAlert } = useAlertStore();
 
   const [photoPreview, setPhotoPreview] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
@@ -43,22 +45,22 @@ export function AddElement({ onClose, clothingItems = [] }) {
 
   async function Save() {
     if (!isTextValid(name, 3, 50)) {
-      alert("Nazwa ubrania musi mieć od 3 do 50 znaków");
+      showAlert("Nazwa ubrania musi mieć od 3 do 50 znaków", "error");
       return;
     }
 
     if (alreadyExists(clothingItems, name)) {
-      alert("Takie ubranie już istnieje");
+      showAlert("Takie ubranie już istnieje", "error");
       return;
     }
 
     if (!categoryId) {
-      alert("Wybierz kategorię ubrania");
+      showAlert("Wybierz kategorię ubrania", "error");
       return;
     }
 
     if (selectedColorIds.length === 0) {
-      alert("Wybierz co najmniej jeden kolor");
+      showAlert("Wybierz co najmniej jeden kolor", "error");
       return;
     }
 
@@ -85,7 +87,7 @@ export function AddElement({ onClose, clothingItems = [] }) {
       await addClothingItem(payload);
       onClose();
     } catch {
-      alert("Nie udało się zapisać ubrania. Spróbuj ponownie.");
+      showAlert("Nie udało się zapisać ubrania. Spróbuj ponownie.", "error");
     } finally {
       setSaving(false);
     }

@@ -6,9 +6,11 @@ import { isTextValid } from "../../../utils/helpers";
 import { useClothingItemsStore } from "../../../common/components/ClothingItem/clothingItemsStore";
 import { apiClient, backendBaseUrl } from "../../../api/apiClient";
 import "./AddElement.scss";
+import { useAlertStore } from "../../../common/components/AlertBox/alertStore";
 
 export function EditElement({ item, onClose }) {
   const { updateClothingItem } = useClothingItemsStore();
+  const { showAlert } = useAlertStore();
 
   const existingPhotoUrl = item.photoUrl
     ? item.photoUrl.startsWith("http")
@@ -53,15 +55,15 @@ export function EditElement({ item, onClose }) {
 
   async function Save() {
     if (!isTextValid(name, 3, 50)) {
-      alert("Nazwa ubrania musi mieć od 3 do 50 znaków");
+      showAlert("Nazwa ubrania musi mieć od 3 do 50 znaków", "error");
       return;
     }
     if (!categoryId) {
-      alert("Wybierz kategorię ubrania");
+      showAlert("Wybierz kategorię ubrania", "error");
       return;
     }
     if (selectedColorIds.length === 0) {
-      alert("Wybierz co najmniej jeden kolor");
+      showAlert("Wybierz co najmniej jeden kolor", "error");
       return;
     }
 
@@ -84,7 +86,7 @@ export function EditElement({ item, onClose }) {
       });
       onClose();
     } catch {
-      alert("Nie udało się zapisać zmian. Spróbuj ponownie.");
+      showAlert("Nie udało się zapisać zmian. Spróbuj ponownie.", "error");
     } finally {
       setSaving(false);
     }
