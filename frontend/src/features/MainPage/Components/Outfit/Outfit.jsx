@@ -26,23 +26,32 @@ function useCategoryMap() {
 }
 
 export function Outfit() {
-  const { todayOutfit, todayStatus, fetchTodayOutfit, regenerateTodayOutfit } = useOutfitStore();
+  const {
+    todayOutfit,
+    todayWarnings,
+    todayStatus,
+    fetchTodayOutfit,
+    regenerateTodayOutfit,
+  } = useOutfitStore();
   const categoryMap = useCategoryMap();
-  const {favouriteOutfits, fetchFavouriteOutfits, changeFavourite} = useFavouriteOutfitStore();
+  const { favouriteOutfits, fetchFavouriteOutfits, changeFavourite } =
+    useFavouriteOutfitStore();
   const { showAlert } = useAlertStore();
-  
+
   useEffect(() => {
-      fetchTodayOutfit();
-      fetchFavouriteOutfits();
+    fetchTodayOutfit();
+    fetchFavouriteOutfits();
   }, [fetchTodayOutfit, fetchFavouriteOutfits]);
 
-  const isCurrentOutfitFav = favouriteOutfits.some((fav)=> fav.id===todayOutfit?.id);
+  const isCurrentOutfitFav = favouriteOutfits.some(
+    (fav) => fav.id === todayOutfit?.id,
+  );
 
   async function handleFavourite() {
     const wasFav = isCurrentOutfitFav;
     const outfit = {
-      id: todayOutfit.id, 
-      clothes: items, 
+      id: todayOutfit.id,
+      clothes: items,
     };
 
     try {
@@ -59,7 +68,10 @@ export function Outfit() {
 
   async function handleRegenerate() {
     if (isCurrentOutfitFav) {
-      showAlert("Ten outfit jest w ulubionych. Usuń go z ulubionych, aby wylosować nowy.", "error");
+      showAlert(
+        "Ten outfit jest w ulubionych. Usuń go z ulubionych, aby wylosować nowy.",
+        "error",
+      );
       return;
     }
 
@@ -77,11 +89,18 @@ export function Outfit() {
               <span className="title-description">Twój outfit na dziś</span>
             </div>
             <span className="description">
-              {todayOutfit ? todayOutfit.name : "Ładowanie..."}
+              {todayStatus === "loading"
+                ? "Ładowanie..."
+                : (todayOutfit?.name ?? "")}
             </span>
           </div>
           <div className="react-img">
-            <button className="icon-btn" aria-label="Shuffle outfit" onClick={handleRegenerate} disabled={todayStatus === "loading"}>
+            <button
+              className="icon-btn"
+              aria-label="Shuffle outfit"
+              onClick={handleRegenerate}
+              disabled={todayStatus === "loading"}
+            >
               <BiShuffle className="medium-icon" />
             </button>
 
@@ -92,14 +111,22 @@ export function Outfit() {
             >
               <span className="heart-icon">
                 <AiOutlineHeart className="medium-icon heart" />
-                <AiFillHeart className={`medium-icon heart heart-fill${isCurrentOutfitFav ? " heart-fill--active" : ""}`} />
+                <AiFillHeart
+                  className={`medium-icon heart heart-fill${isCurrentOutfitFav ? " heart-fill--active" : ""}`}
+                />
               </span>
             </button>
           </div>
         </div>
 
         {todayStatus === "loading" && <p>Generowanie outfitu...</p>}
-        {todayStatus === "error" && <p>Nie udało się pobrać outfitu na dziś</p>}
+        {todayStatus === "error" && (
+          <p>
+            {todayWarnings?.length > 0
+              ? todayWarnings[0]
+              : "Nie udało się pobrać outfitu na dziś"}
+          </p>
+        )}
         {todayStatus === "success" && items.length === 0 && (
           <p>Brak outfitu – dodaj ubrania do garderoby</p>
         )}

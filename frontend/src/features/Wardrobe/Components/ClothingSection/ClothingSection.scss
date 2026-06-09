@@ -154,10 +154,11 @@
       gap: 0.625rem;
       flex: 1 0 0;
       border-radius: 0.625rem;
+      transition: transform 0.2s ease-in-out;
 
       &:hover {
         cursor: pointer;
-        transform: scale(1.15);
+        transform: scale(1.05);
       }
 
       &.color {

@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { getTodayOutfit, getOutfitsByRange, regenerateTodayOutfit } from "./outfitService";
+import {
+  getTodayOutfit,
+  getOutfitsByRange,
+  regenerateTodayOutfit,
+} from "./outfitService";
 import { getErrorMessage } from "../../../../utils/helpers";
 
 const initialState = {
@@ -26,7 +30,11 @@ export const useOutfitStore = create((set) => ({
         todayError: null,
       });
     } catch (error) {
-      set({ todayStatus: "error", todayError: getErrorMessage(error) });
+      set({
+        todayStatus: "error",
+        todayError: getErrorMessage(error),
+        todayWarnings: error?.response?.data?.warnings ?? [],
+      });
     }
   },
 
@@ -41,7 +49,11 @@ export const useOutfitStore = create((set) => ({
         todayError: null,
       });
     } catch (error) {
-      set({ todayStatus: "error", todayError: getErrorMessage(error) });
+      set({
+        todayStatus: "error",
+        todayError: getErrorMessage(error),
+        todayWarnings: error?.response?.data?.warnings ?? [],
+      });
     }
   },
 
