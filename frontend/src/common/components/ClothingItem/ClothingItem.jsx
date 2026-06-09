@@ -1,12 +1,19 @@
 import "./Clothingitem.scss";
 import { backendBaseUrl } from "../../../api/apiClient";
+// 1. Importujemy oficjalny konwerter ścieżek z rdzenia Tauri v2
+import { convertFileSrc } from "@tauri-apps/api/core";
 
 export function ClothingItem({ name, categoryName, photoUrl, className = "" }) {
-  const fullPhotoUrl = photoUrl
+  // 2. Budujemy pełny adres URL do backendu .NET
+  const rawPhotoUrl = photoUrl
     ? photoUrl.startsWith("http")
       ? photoUrl
       : `${backendBaseUrl}${photoUrl}`
     : null;
+
+  // 3. Konwertujemy adres URL na bezpieczny protokół Tauri (odporny na blokady CSP)
+  const fullPhotoUrl = rawPhotoUrl ? convertFileSrc(rawPhotoUrl) : null;
+
   const bgStyle = fullPhotoUrl
     ? { backgroundImage: `url(${fullPhotoUrl})` }
     : {};

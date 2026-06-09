@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,7 @@ namespace WeatherStyler.Tests
             _usageHistoryRepoMock = new Mock<IUsageHistoryRepository>();
             _weatherServiceMock = new Mock<IWeatherService>();
             _outfitRepoMock = new Mock<IOutfitRepository>();
+            var configurationMock = new Mock<IConfiguration>();
 
             _sut = new OutfitManagerService(
                 _programVarsMock.Object,
@@ -41,7 +43,8 @@ namespace WeatherStyler.Tests
                 _lookupRepoMock.Object,
                 _usageHistoryRepoMock.Object,
                 _weatherServiceMock.Object,
-                _outfitRepoMock.Object
+                _outfitRepoMock.Object,
+                configurationMock.Object
             );
 
             // Domyślna konfiguracja dla historii użycia — czysta historia

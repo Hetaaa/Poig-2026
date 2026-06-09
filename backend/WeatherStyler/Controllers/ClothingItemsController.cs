@@ -88,18 +88,27 @@ public class ClothingItemsController : ControllerBase
             // --- LOGIKA ZAPISU PLIKU ---
             if (request.PhotoFile != null && request.PhotoFile.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_env.ContentRootPath, "wwwroot", "images");
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
+                // 1. Dynamicznie pobieramy ścieżkę do AppData/Roaming/WeatherStyler/images
+                var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var uploadsFolder = Path.Combine(appDataPath, "WeatherStyler", "images");
 
+                // 2. Bezpiecznie upewniamy się, że folder istnieje (jeśli nie, tworzymy go)
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                // 3. Generujemy unikalną nazwę pliku
                 var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.PhotoFile.FileName.Replace(" ", "-");
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
+                // 4. Strumień i fizyczny zapis pliku w bezpiecznym katalogu Windowsa
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await request.PhotoFile.CopyToAsync(fileStream);
                 }
 
+                // 5. URL zostaje bez zmian, bo Program.cs mapuje "/images" na ten właśnie folder!
                 clothingItem.PhotoUrl = $"/images/{uniqueFileName}";
             }
 

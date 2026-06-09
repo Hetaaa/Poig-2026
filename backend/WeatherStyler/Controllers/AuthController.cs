@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading.Tasks;
 using WeatherStyler.Contracts;
 using WeatherStyler.Domain.Interfaces.Services;
 

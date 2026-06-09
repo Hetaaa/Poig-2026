@@ -1,32 +1,90 @@
+
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Identity;
+global using WeatherStyler.Application;
+global using WeatherStyler.Infrastructure;
+global using WeatherStyler.Infrastructure.Persistence;
+
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 using WeatherStyler.Application;
 using WeatherStyler.Infrastructure;
 using WeatherStyler.Infrastructure.Entities;
 using WeatherStyler.Infrastructure.Persistence;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
+
+System.Runtime.InteropServices.NativeLibrary.SetDllImportResolver(
+    typeof(SQLitePCL.raw).Assembly,
+    (libraryName, assembly, searchPath) =>
+    {
+        if (libraryName == "e_sqlite3")
+        {
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var dllPath = Path.Combine(baseDir, "e_sqlite3.dll");
+
+            if (File.Exists(dllPath))
+            {
+                return System.Runtime.InteropServices.NativeLibrary.Load(dllPath);
+            }
+        }
+        return IntPtr.Zero;
+    });
+
+builder.Configuration["Urls"] = "http://127.0.0.1:5267";
+
+// ─── BEZPIECZNE ŚCIEŻKI W APPDATA ───────────────────────────────────────────
 var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 var weatherStylerFolder = Path.Combine(appDataPath, "WeatherStyler");
 Directory.CreateDirectory(weatherStylerFolder);
 
+// Baza danych
 var databasePath = Path.Combine(weatherStylerFolder, "weatherstyler.db");
 builder.Configuration["ConnectionStrings:WeatherStylerDb"] = $"Data Source={databasePath}";
 
+// Zdjęcia (wewnątrz folderu AppData)
+var imagesPath = Path.Combine(weatherStylerFolder, "images");
+if (!Directory.Exists(imagesPath))
+{
+    Directory.CreateDirectory(imagesPath);
+}
+
+// ─── SERWISY APLIKACJI ───────────────────────────────────────────────────────
 builder.Services.AddControllers();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("LocalhostPolicy", policy =>
     {
         policy
-            .WithOrigins("http://localhost:1420", "http://localhost:5173", "http://localhost:3000")
+            .WithOrigins(
+                "http://localhost:1420",
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "tauri://localhost",
+                "https://tauri.localhost"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -35,9 +93,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.IsDevelopment());
 
-// ─── UserExists Policy ────────────────────────────────────────────────────────
+// ─── USEREXISTS POLICY ────────────────────────────────────────────────────────
 builder.Services.AddScoped<IAuthorizationHandler, UserExistsHandler>();
-
 builder.Services.AddAuthorization(options =>
 {
     var userExistsPolicy = new AuthorizationPolicyBuilder()
@@ -49,7 +106,7 @@ builder.Services.AddAuthorization(options =>
     options.DefaultPolicy = userExistsPolicy;
 });
 
-// ─── OpenAPI + JWT ────────────────────────────────────────────────────────────
+// ─── OPENAPI + JWT ────────────────────────────────────────────────────────────
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer((document, _, _) =>
@@ -81,6 +138,7 @@ builder.Services.AddOpenApi(options =>
 
 var app = builder.Build();
 
+// ─── MIDDLEWARE ──────────────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -97,10 +155,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-var imagesPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "images");
-if (!Directory.Exists(imagesPath))
-    Directory.CreateDirectory(imagesPath);
-
+// Statyczne pliki serwowane z AppData
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(imagesPath),
@@ -110,9 +165,9 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseCors("LocalhostPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
+// ─── MIGRACJA I SEEDER BAZY ──────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
